@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'tailwindcss';
+
+/* Твои кастомные настройки теперь живут здесь */
+@theme {
+  --font-poppins: var(--font-poppins);
+  --font-vibes: var(--font-great-vibes);
+
+  /* Описываем анимацию для Tailwind */
+  --animate-fade-in-up: fade-in-up 1s ease-out forwards;
+
+  /* Описываем само движение (Keyframes) */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
