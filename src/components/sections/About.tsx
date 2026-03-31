@@ -40,10 +40,10 @@ const About = () => {
         {/* БЛОК З ТЕКСТОМ */}
         <article className="flex-[1.2] text-left lg:text-left text-center">
           <header>
-            <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[4px] md:tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+            <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[4px] md:tracking-[6px] text-[#be8f65] mb-6 font-medium">
               Естетична косметологія
             </p>
-            <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] mb-10 font-light">
+            <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] mb-10 font-light">
               Професійний догляд <br /> за вашою шкірою
             </h2>
           </header>

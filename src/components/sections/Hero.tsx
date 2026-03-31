@@ -38,10 +38,10 @@ const Hero = () => {
         <p className="text-[#dcb38a] uppercase tracking-[8px] md:tracking-[12px] text-[10px] md:text-[11px] mb-8 font-light animate-fade-in-up">
           Студія воскової депіляції
         </p>
-        <h1 className="text-[#fdfbf7] text-[clamp(46px,8vw,100px)] leading-[1] mb-8 font-light animate-fade-in-up [animation-delay:200ms]">
+        <h1 className="text-[#fdfbf7] text-[clamp(48px,8vw,105px)] leading-[0.9] mb-8 font-light animate-fade-in-up">
           Воскова депіляція
           <br />
-          <span className="font-cormorant italic text-[#dcb38a] font-light lowercase text-[clamp(54px,9vw,110px)] tracking-tight">
+          <span className="font-vibes text-[#dcb38a] text-[clamp(70px,11vw,130px)] lowercase block mt-4">
             чисте мистецтво
           </span>
         </h1>

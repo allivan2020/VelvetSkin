@@ -60,7 +60,7 @@ const Services = () => {
             Прайс-лист
           </p>
           <h2
-            className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light"
+            className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light"
             itemProp="name"
           >
             Інвестиція у <span className="italic text-[#bd9b7d]">красу</span>

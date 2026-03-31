@@ -1,17 +1,24 @@
-// src/app/fonts.ts
-import { Poppins, Cormorant_Garamond } from 'next/font/google';
+import { Poppins, Cormorant_Garamond, Great_Vibes } from 'next/font/google';
 
 export const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400', '500'], // Прибрали 600 та 700
+  weight: ['400', '500'],
   variable: '--font-poppins',
   display: 'swap',
 });
 
 export const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'cyrillic'],
-  weight: ['300', '400'], // Для Cormorant достатньо цих двох для ефекту люксу
+  weight: ['400'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
+  display: 'swap',
+});
+
+// Додаємо рукописний шрифт для акцентів
+export const vibes = Great_Vibes({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-vibes',
   display: 'swap',
 });

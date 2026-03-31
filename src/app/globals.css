@@ -1,44 +1,45 @@
 @import 'tailwindcss';
 
-/* Налаштування теми прямо в CSS (особливість v4) */
 @theme {
-  --color-brand-bg: hsl(30 40% 98%);
-  --color-brand-fg: hsl(20 20% 15%);
-  --color-brand-primary: hsl(25 30% 45%);
-  --color-brand-secondary: hsl(35 40% 92%);
-  --color-brand-accent: hsl(35 50% 85%);
+  /* Усиливаем насыщенность и глубину */
+  --color-brand-bg: hsl(30 40% 98%);         /* Фон оставляем нежным */
+  --color-brand-fg: #1a1614;        /* Текст: почти черный кофе (был 15%) */
+  --color-brand-primary: #856142;   /* Акценты: глубокая бронза (была 45%) */
+  --color-brand-secondary: hsl(35 30% 88%);  /* Темнее для теней */
+  --color-brand-accent: #c49f2d;     /* Яркая бронза для рукописного шрифта */
 
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui;
   --font-serif: var(--font-cormorant), ui-serif, Georgia;
-}
+  --font-handwritten: var(--font-vibes), cursive;
 
-/* Базові стилі */
-@layer base {
-  body {
-    background-color: var(--color-brand-bg);
-    color: var(--color-brand-fg);
-    @apply antialiased transition-colors duration-300;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-family: var(--font-serif);
-    @apply font-semibold tracking-wide;
-  }
-}
-
-/* Твій кастомний клас */
-.glass-card {
-  @apply bg-white/50 backdrop-blur-md border border-white/20 shadow-sm;
-}
-@theme {
-  /* ... твої кольори ... */
-  
   --keyframes-fade-in-up: {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
   --animation-fade-in-up: fade-in-up 1s ease-out forwards;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-fg); /* Теперь основной текст будет четким */
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    color: var(--color-brand-fg); /* Заголовки станут массивнее */
+    @apply font-medium tracking-tight;
+  }
+
+  .font-vibes {
+    font-family: var(--font-handwritten);
+    @apply font-normal;
+  }
+
+  h1, h2 {
+    @apply antialiased font-medium;
+    color: var(--color-brand-fg);
+    text-rendering: optimizeLegibility;
+  }
 }

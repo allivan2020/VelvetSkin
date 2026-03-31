@@ -51,7 +51,7 @@ const Reviews = () => {
           <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
             Відгуки
           </p>
-          <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
+          <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
             Ваші <span className="italic text-[#bd9b7d]">історії</span>{' '}
             гладкості
           </h2>

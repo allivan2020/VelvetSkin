@@ -3,7 +3,7 @@ import { GoogleTagManager } from '@next/third-parties/google'; // Оптимал
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import BookingModal from '@/components/ui/BookingModal';
-import { poppins, cormorant } from './fonts';
+import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -80,7 +80,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="uk" className={`${poppins.variable} ${cormorant.variable}`}>
+    <html
+      lang="uk"
+      className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
+    >
       <head>
         <script
           type="application/ld+json"
@@ -92,7 +95,7 @@ export default function RootLayout({
         <GoogleTagManager gtmId="G-XXXXXXXXXX" />
 
         <Header />
-        <main>{children}</main>
+        <main className="relative">{children}</main>
         <Footer />
         <BookingModal />
       </body>

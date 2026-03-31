@@ -22,7 +22,7 @@ const Contacts = () => {
             <p className="text-[#bd9b7d] uppercase tracking-[6px] text-[10px] md:text-[11px] mb-6 font-medium">
               Зв{"'"}яжіться з нами
             </p>
-            <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.1] mb-12 font-light">
+            <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.1] mb-12 font-light">
               Ваша <span className="italic text-[#bd9b7d]">краса</span>{' '}
               <br className="hidden md:block" /> починається тут
             </h2>
