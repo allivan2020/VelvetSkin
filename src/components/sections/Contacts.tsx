@@ -12,54 +12,56 @@ const Contacts = () => {
       id="contacts"
       className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
     >
-      {/* М'який світловий акцент */}
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#bd9b7d]/5 blur-[120px] rounded-full pointer-events-none" />
+      {/* М'який світловий акцент — зробив трохи видимішим для глибини */}
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#bd9b7d]/10 blur-[130px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-[5%] max-w-6xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-center">
-          {/* ІНФОРМАЦІЯ: Журнальна верстка */}
+          {/* ІНФОРМАЦІЯ */}
           <div className="text-left max-lg:text-center max-lg:order-2">
-            <p className="text-[#bd9b7d] uppercase tracking-[6px] text-[10px] md:text-[11px] mb-6 font-medium">
+            <p className="text-[#917152] uppercase tracking-[6px] text-[10px] md:text-[11px] mb-6 font-semibold">
               Зв{"'"}яжіться з нами
             </p>
-            <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.1] mb-12 font-light">
-              Ваша <span className="italic text-[#bd9b7d]">краса</span>{' '}
+
+            {/* Рукописний заголовок з посиленим кольором */}
+            <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9] mb-12">
+              Ваша <span className="text-[#917152]">краса</span>{' '}
               <br className="hidden md:block" /> починається тут
             </h2>
 
             <address className="not-italic space-y-12">
               <div className="group">
-                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                <span className="block text-[10px] uppercase text-[#917152] mb-3 tracking-[3px] font-bold">
                   Локація
                 </span>
-                <p className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light">
+                <p className="font-cormorant text-2xl md:text-3xl text-[#1a1614] font-medium">
                   Запоріжжя, вул. Українська, 43
                 </p>
               </div>
 
               <div className="group">
-                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                <span className="block text-[10px] uppercase text-[#917152] mb-3 tracking-[3px] font-bold">
                   Телефон
                 </span>
                 <a
                   href="tel:+380971950698"
-                  className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light hover:text-[#bd9b7d] transition-colors duration-500"
+                  className="font-cormorant text-2xl md:text-3xl text-[#1a1614] font-medium hover:text-[#917152] transition-colors duration-500"
                 >
                   +38 (097) 195 06 98
                 </a>
               </div>
 
               <div className="group">
-                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                <span className="block text-[10px] uppercase text-[#917152] mb-3 tracking-[3px] font-bold">
                   Години візитів
                 </span>
-                <p className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light">
+                <p className="font-cormorant text-2xl md:text-3xl text-[#1a1614] font-medium">
                   Працюємо без вихідних
                 </p>
               </div>
             </address>
 
-            {/* Соціальні мережі: Ghost buttons */}
+            {/* Соціальні мережі — зробив кнопки темнішими для контрасту */}
             <div className="mt-16 flex flex-wrap gap-6 max-lg:justify-center">
               <a
                 href="https://www.instagram.com/sandy_waxing/"
@@ -67,7 +69,7 @@ const Contacts = () => {
                 rel="noopener noreferrer"
                 suppressHydrationWarning={true}
                 target="_blank"
-                className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
+                className="px-10 py-3.5 border border-[#1a1614]/20 rounded-full text-[#1a1614] text-[10px] uppercase tracking-[2px] font-bold hover:bg-[#1a1614] hover:text-[#fdfbf7] transition-all duration-500"
               >
                 Instagram
               </a>
@@ -77,14 +79,14 @@ const Contacts = () => {
                 rel="noopener noreferrer"
                 suppressHydrationWarning={true}
                 target="_blank"
-                className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
+                className="px-10 py-3.5 border border-[#1a1614]/20 rounded-full text-[#1a1614] text-[10px] uppercase tracking-[2px] font-bold hover:bg-[#1a1614] hover:text-[#fdfbf7] transition-all duration-500"
               >
                 Telegram
               </a>
             </div>
           </div>
 
-          {/* КАРТА: Естетичне скло та мінімалізм */}
+          {/* КАРТА */}
           <div className="relative h-[450px] md:h-[600px] w-full rounded-t-[200px] rounded-b-lg overflow-hidden border border-[#bd9b7d]/20 bg-[#f0ede8] max-lg:order-1">
             {!showMap ? (
               <div
@@ -96,13 +98,13 @@ const Contacts = () => {
                   alt="Локація VelvetSkin"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
+                  className="object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-[#231d19]/20 group-hover:bg-[#231d19]/40 transition-colors duration-500 flex items-center justify-center">
+                <div className="absolute inset-0 bg-[#1a1614]/20 group-hover:bg-[#1a1614]/40 transition-colors duration-500 flex items-center justify-center">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-10 py-4 bg-[#fdfbf7] text-[#231d19] rounded-full text-[11px] uppercase tracking-[2px] font-medium shadow-xl backdrop-blur-sm"
+                    className="px-10 py-4 bg-[#fdfbf7] text-[#1a1614] rounded-full text-[11px] uppercase tracking-[2px] font-bold shadow-xl"
                   >
                     Переглянути на мапі
                   </motion.button>

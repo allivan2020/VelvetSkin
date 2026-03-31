@@ -4,6 +4,18 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
+interface ServiceItem {
+  name: string;
+  price: number;
+}
+
+interface ScrollCardProps {
+  title: string;
+  imgSrc: string;
+  services: ServiceItem[];
+  isFirst: boolean;
+}
+
 const maleServices = [
   { name: 'Глибоке бікіні повністю', price: 800 },
   { name: 'Бікіні глибоке частково', price: 650 },
@@ -37,9 +49,6 @@ const femaleServices = [
 ];
 
 const Services = () => {
-  // Ми повністю прибрали mounted/setMounted, оскільки тут немає звернень до window при рендері.
-  // React більше не буде сваритися!
-
   return (
     <section
       id="story"
@@ -56,14 +65,11 @@ const Services = () => {
 
       <div className="relative container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-20 md:mb-32">
-          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
             Прайс-лист
           </p>
-          <h2
-            className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light"
-            itemProp="name"
-          >
-            Інвестиція у <span className="italic text-[#bd9b7d]">красу</span>
+          <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9]">
+            Інвестиція у <span className="text-[#917152]">красу</span>
           </h2>
         </header>
 
@@ -86,8 +92,8 @@ const Services = () => {
   );
 };
 
-const ScrollCard = ({ title, imgSrc, services, isFirst }: any) => {
-  const containerRef = useRef(null);
+const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
+  const containerRef = useRef<HTMLDivElement>(null); // Для TS тоже лучше уточнить тип рефа
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -103,15 +109,15 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: any) => {
   const y = useTransform(scrollYProgress, [0, 0.4], [100, 0]);
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div
+      ref={containerRef}
+      className="relative w-full"
+      style={{ position: 'relative' }}
+    >
       <motion.article
         style={{ opacity, scale, y }}
-        className="relative rounded-[40px] md:rounded-[60px] overflow-hidden min-h-[700px] flex items-center justify-center p-4 md:p-12"
-        itemProp="hasOfferCatalog"
-        itemScope
-        itemType="https://schema.org/OfferCatalog"
+        className="relative rounded-[40px] md:rounded-[60px] overflow-hidden min-h-[700px] flex items-center justify-center p-4 md:p-12 shadow-2xl"
       >
-        {/* ФОТО ТА ЗАТЕМНЕННЯ */}
         <div className="absolute inset-0 z-0">
           <Image
             src={imgSrc}
@@ -120,45 +126,29 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: any) => {
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1200px"
             priority={isFirst}
-            loading={isFirst ? 'eager' : 'lazy'}
+            quality={90}
           />
-          {/* Теплий градієнт замість чорного/сірого */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(74,63,57,0.2),rgba(35,29,25,0.8))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(26,22,20,0.35),rgba(26,22,20,0.85))]" />
         </div>
 
-        {/* КОНТЕНТ: Скляна панель */}
         <div className="relative z-20 w-full max-w-[900px] flex flex-col items-center mt-auto md:mt-0">
-          {/* Заголовок картки */}
-          <h3
-            className="font-cormorant italic text-[clamp(36px,5vw,54px)] text-[#fdfbf7] mb-8 md:mb-12 font-light"
-            itemProp="name"
-          >
+          <h3 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#fdfbf7] mb-8 md:mb-12 leading-none">
             {title}
           </h3>
 
-          {/* Скло (Glassmorphism) */}
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 w-full bg-white/5 backdrop-blur-2xl border-[0.5px] border-white/20 rounded-[32px] p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.2)]">
-            {services.map((item: any, idx: number) => (
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.3)]">
+            {/* ТУТ ОШИБКА ИСЧЕЗНЕТ: теперь TS знает, что item — это ServiceItem */}
+            {services.map((item, idx) => (
               <li
                 key={idx}
-                className="flex justify-between items-end border-b border-white/10 pb-3 text-[#fdfbf7]/90 font-light tracking-wide group hover:border-[#bd9b7d]/50 transition-colors duration-300"
-                itemProp="itemListElement"
-                itemScope
-                itemType="https://schema.org/Offer"
+                className="flex justify-between items-end border-b border-white/10 pb-4 text-[#fdfbf7] group hover:border-[#dcb38a] transition-colors duration-300"
               >
-                <span
-                  className="text-[14px] md:text-[15px] group-hover:text-white transition-colors"
-                  itemProp="name"
-                >
+                <span className="text-[15px] md:text-[17px] font-medium tracking-wide group-hover:text-white">
                   {item.name}
                 </span>
-                <span className="font-poppins text-[13px] md:text-[14px] font-medium text-[#dcb38a]">
-                  <span itemProp="price" content={item.price.toString()}>
-                    {item.price}
-                  </span>{' '}
-                  <span className="text-[10px] uppercase tracking-widest text-[#dcb38a]/70">
-                    грн
-                  </span>
+                <span className="font-poppins text-[15px] md:text-[16px] font-bold text-[#dcb38a]">
+                  {item.price}{' '}
+                  <span className="text-[10px] opacity-70 uppercase">грн</span>
                 </span>
               </li>
             ))}

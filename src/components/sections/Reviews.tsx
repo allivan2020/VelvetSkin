@@ -48,12 +48,11 @@ const Reviews = () => {
 
       <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-20 md:mb-32">
-          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
             Відгуки
           </p>
-          <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
-            Ваші <span className="italic text-[#bd9b7d]">історії</span>{' '}
-            гладкості
+          <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9]">
+            Ваші <span className="text-[#917152]">історії</span> гладкості
           </h2>
         </header>
 
@@ -67,7 +66,7 @@ const Reviews = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="text-center flex flex-col items-center"
             >
-              <span className="font-cormorant italic text-[80px] md:text-[120px] text-[#bd9b7d]/20 leading-none block mb-[-20px] md:mb-[-40px]">
+              <span className="font-vibes text-[100px] md:text-[150px] text-[#917152]/20 leading-none block mb-[-30px] md:mb-[-50px]">
                 &ldquo;
               </span>
 
@@ -77,7 +76,7 @@ const Reviews = () => {
 
               <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-3">
-                  <h3 className="font-poppins text-[12px] uppercase tracking-[3px] text-[#231d19] font-semibold">
+                  <h3 className="font-poppins text-[13px] uppercase tracking-[3px] text-[#1a1614] font-bold">
                     {reviews[activeIndex].name}
                   </h3>
                   {/* Кнопка-доказ */}

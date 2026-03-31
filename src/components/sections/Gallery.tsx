@@ -23,11 +23,11 @@ const Gallery = () => {
     >
       <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-20 md:mb-32">
-          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
             Естетика результату
           </p>
-          <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
-            Luxe <span className="italic text-[#bd9b7d]">Moments</span>
+          <h2 className="font-vibes text-[clamp(60px,8vw,90px)] text-[#1a1614] leading-[0.9]">
+            Luxe <span className="text-[#917152]">Moments</span>
           </h2>
         </header>
 

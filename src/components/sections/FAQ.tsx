@@ -38,11 +38,11 @@ const FAQ = () => {
     >
       <div className="relative z-10 max-w-[800px] mx-auto">
         <header className="text-center mb-20 md:mb-32">
-          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
             Відповіді на питання
           </p>
-          <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
-            Часті <span className="italic text-[#bd9b7d]">запитання</span>
+          <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9]">
+            Часті <span className="text-[#917152]">запитання</span>
           </h2>
         </header>
 
@@ -60,13 +60,9 @@ const FAQ = () => {
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex justify-between items-center py-8 md:py-10 text-left focus:outline-none group"
               >
-                <span
-                  className="text-[17px] md:text-[20px] font-cormorant text-[#231d19] tracking-wide transition-colors group-hover:text-[#bd9b7d]"
-                  itemProp="name"
-                >
+                <span className="text-[18px] md:text-[22px] font-cormorant text-[#1a1614] font-medium tracking-wide transition-colors group-hover:text-[#917152]">
                   {item.q}
                 </span>
-
                 <div
                   className={`flex-shrink-0 w-5 h-5 text-[#bd9b7d] transition-transform duration-500 ease-out ${
                     openIndex === index ? 'rotate-180' : 'rotate-0'

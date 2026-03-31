@@ -90,12 +90,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={poppins.className}>
+      <body className={`${poppins.className} relative`}>
         {/* 3. Оптимизированная аналитика (не блокирует рендер) */}
         <GoogleTagManager gtmId="G-XXXXXXXXXX" />
 
         <Header />
-        <main className="relative">{children}</main>
+        <main className="relative" style={{ position: 'relative' }}>
+          {children}
+        </main>
         <Footer />
         <BookingModal />
       </body>
