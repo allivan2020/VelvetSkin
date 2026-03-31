@@ -64,6 +64,7 @@ const Contacts = () => {
               <a
                 href="https://www.instagram.com/sandy_waxing/"
                 aria-label="Наш Instagram"
+                rel="noopener noreferrer"
                 suppressHydrationWarning={true}
                 target="_blank"
                 className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
@@ -73,6 +74,7 @@ const Contacts = () => {
               <a
                 href="https://t.me/sandy_waxing/"
                 aria-label="Наш Telegram"
+                rel="noopener noreferrer"
                 suppressHydrationWarning={true}
                 target="_blank"
                 className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"

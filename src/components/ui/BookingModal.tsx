@@ -129,6 +129,7 @@ const BookingModal = () => {
           >
             <button
               onClick={closeModal}
+              aria-label="Закрити"
               className="absolute top-6 right-6 text-[#535353] hover:text-[#fcb25e] transition-colors"
             >
               <svg
@@ -247,6 +248,7 @@ const BookingModal = () => {
 
                 <button
                   type="submit"
+                  aria-label="Записатись"
                   disabled={status === 'loading' || !captchaToken}
                   className="w-full py-4 rounded-full text-white font-medium transition-all shadow-md bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] hover:shadow-[0_4px_15px_rgba(212,175,55,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >

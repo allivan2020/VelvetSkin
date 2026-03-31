@@ -83,6 +83,7 @@ const Lightbox = ({ images, index, onClose, setIndex }: any) => {
       <button
         className="absolute top-8 right-8 text-white/50 text-4xl font-light hover:text-white transition-colors z-[110]"
         onClick={onClose}
+        aria-label="Закрити галерею"
       >
         &times;
       </button>
