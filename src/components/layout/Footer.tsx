@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className="relative py-20 md:py-32 border-t border-[#bd9b7d]/10 bg-[#fdfbf7] overflow-hidden">
       {/* Ледь помітний декор на фоні */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#bd9b7d]/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-[#bd9b7d]/30 to-transparent" />
 
       <div className="container mx-auto px-[5%] flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left relative z-10">
         {/* LOGO & COPYRIGHT: Мінімалізм та стиль */}

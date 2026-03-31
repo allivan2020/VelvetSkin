@@ -20,7 +20,7 @@ const Contacts = () => {
           {/* ІНФОРМАЦІЯ: Журнальна верстка */}
           <div className="text-left max-lg:text-center max-lg:order-2">
             <p className="text-[#bd9b7d] uppercase tracking-[6px] text-[10px] md:text-[11px] mb-6 font-medium">
-              Зв'яжіться з нами
+              Зв{"'"}яжіться з нами
             </p>
             <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.1] mb-12 font-light">
               Ваша <span className="italic text-[#bd9b7d]">краса</span>{' '}
@@ -104,7 +104,7 @@ const Contacts = () => {
               </div>
             ) : (
               <iframe
-                src="https://www.google.com/maps/embed?pb=YOUR_EMBED_LINK"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2704.645693898742!2d35.15837834751748!3d47.827017671500755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40dc60aab8b82aab%3A0x2095f293e4eef4c6!2z0LLRg9C7LiDQo9C60YDQsNGX0L3RgdGM0LrQsCwgNDMsINCX0LDQv9C-0YDRltC20LbRjywg0JfQsNC_0L7RgNGW0LfRjNC60LAg0L7QsdC70LDRgdGC0YwsIDY5MDAw!5e1!3m2!1suk!2sua!4v1774939984064!5m2!1suk!2sua"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
