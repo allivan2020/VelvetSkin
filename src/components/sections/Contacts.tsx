@@ -8,70 +8,78 @@ const Contacts = () => {
   const [showMap, setShowMap] = useState(false);
 
   return (
-    <section id="contacts" className="relative py-20 md:py-32 bg-[#fcfaf8]">
-      <div className="container mx-auto px-[5%] max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* ИНФОРМАЦИЯ */}
+    <section
+      id="contacts"
+      className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
+    >
+      {/* М'який світловий акцент */}
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#bd9b7d]/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="container mx-auto px-[5%] max-w-6xl relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-center">
+          {/* ІНФОРМАЦІЯ: Журнальна верстка */}
           <div className="text-left max-lg:text-center max-lg:order-2">
-            <p className="text-[#fcb25e] uppercase tracking-[3px] text-sm mb-4 font-semibold">
+            <p className="text-[#bd9b7d] uppercase tracking-[6px] text-[10px] md:text-[11px] mb-6 font-medium">
               Зв'яжіться з нами
             </p>
-            <h2 className="font-vibes text-[clamp(42px,5vw,62px)] text-[#535353] leading-tight mb-10">
-              Ваша краса чекає
+            <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.1] mb-12 font-light">
+              Ваша <span className="italic text-[#bd9b7d]">краса</span>{' '}
+              <br className="hidden md:block" /> починається тут
             </h2>
 
-            <address className="not-italic space-y-8">
+            <address className="not-italic space-y-12">
               <div className="group">
-                <span className="block text-[11px] uppercase text-[#fcb25e] mb-2 tracking-widest font-bold">
-                  Адреса:
+                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                  Локація
                 </span>
-                <p className="text-xl md:text-2xl font-medium text-[#2c2c2c] transition-colors group-hover:text-[#fcb25e]">
+                <p className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light">
                   Запоріжжя, вул. Українська, 43
                 </p>
               </div>
 
               <div className="group">
-                <span className="block text-[11px] uppercase text-[#fcb25e] mb-2 tracking-widest font-bold">
-                  Телефон:
+                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                  Телефон
                 </span>
                 <a
                   href="tel:+380971950698"
-                  className="text-xl md:text-2xl font-medium text-[#2c2c2c] hover:text-[#fcb25e] transition-colors"
+                  className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light hover:text-[#bd9b7d] transition-colors duration-500"
                 >
                   +38 (097) 195 06 98
                 </a>
               </div>
 
               <div className="group">
-                <span className="block text-[11px] uppercase text-[#fcb25e] mb-2 tracking-widest font-bold">
-                  Графік:
+                <span className="block text-[10px] uppercase text-[#bd9b7d] mb-3 tracking-[3px] font-medium">
+                  Години візитів
                 </span>
-                <p className="text-xl md:text-2xl font-medium text-[#2c2c2c]">
-                  Без вихідних
+                <p className="font-cormorant text-2xl md:text-3xl text-[#4a3f39] font-light">
+                  Працюємо без вихідних
                 </p>
               </div>
             </address>
 
-            <div className="mt-12 flex flex-wrap gap-4 max-lg:justify-center">
+            {/* Соціальні мережі: Ghost buttons */}
+            <div className="mt-16 flex flex-wrap gap-6 max-lg:justify-center">
               <a
                 href="https://www.instagram.com/sandy_waxing/"
                 target="_blank"
-                className="px-8 py-3 border border-[#fcb25e] rounded-full text-[#fcb25e] font-semibold hover:bg-[#fcb25e] hover:text-white transition-all transform hover:-translate-y-1"
+                className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
               >
                 Instagram
               </a>
               <a
                 href="https://t.me/sandy_waxing/"
                 target="_blank"
-                className="px-8 py-3 border border-[#fcb25e] rounded-full text-[#fcb25e] font-semibold hover:bg-[#fcb25e] hover:text-white transition-all transform hover:-translate-y-1"
+                className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
               >
                 Telegram
               </a>
             </div>
           </div>
 
-          {/* КАРТА */}
-          <div className="relative h-[400px] md:h-[500px] w-full rounded-[40px] overflow-hidden shadow-2xl bg-[#eee] max-lg:order-1">
+          {/* КАРТА: Естетичне скло та мінімалізм */}
+          <div className="relative h-[450px] md:h-[600px] w-full rounded-t-[200px] rounded-b-lg overflow-hidden border border-[#bd9b7d]/20 bg-[#f0ede8] max-lg:order-1">
             {!showMap ? (
               <div
                 className="relative w-full h-full cursor-pointer group"
@@ -79,32 +87,30 @@ const Contacts = () => {
               >
                 <Image
                   src="/img/map-placeholder-large.avif"
-                  alt="Карта VelvetSkin"
+                  alt="Локація VelvetSkin"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover opacity-80 transition-transform duration-1000 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                <div className="absolute inset-0 bg-[#231d19]/20 group-hover:bg-[#231d19]/40 transition-colors duration-500 flex items-center justify-center">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-white text-[#2c2c2c] rounded-full font-bold shadow-xl"
+                    className="px-10 py-4 bg-[#fdfbf7] text-[#231d19] rounded-full text-[11px] uppercase tracking-[2px] font-medium shadow-xl backdrop-blur-sm"
                   >
-                    Показати мапу
+                    Переглянути на мапі
                   </motion.button>
                 </div>
               </div>
             ) : (
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2678.966459345479!2d35.15830937691866!3d47.82079087315581!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40dc5f949c258d4d%3A0xe5a3637e96b862!2z0YPQuy4g0KPQutGA0LDQuNC90YHQutCw0Y8sIDQzLCDQl9Cw0L_QvtGA0L7QttGM0LUsINCX0LDQv9C-0YDQvtC20YHQutCw0Y8g0L7QsdC70LDRgdGC0YwsIDY5MDAw!5e0!3m2!1sru!2sua!4v1711200000000!5m2!1sru!2sua"
+                src="https://www.google.com/maps/embed?pb=YOUR_EMBED_LINK"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="animate-fade-in"
+                className="animate-fade-in grayscale-[0.3] contrast-[1.1]"
               />
             )}
           </div>
