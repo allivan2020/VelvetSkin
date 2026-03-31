@@ -1,30 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const About = () => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Если сервер еще не "договорился" с браузером, показываем пустую секцию, чтобы не было ошибки
-  if (!mounted)
-    return <section className="py-[clamp(60px,10vw,120px)] bg-white" />;
-
   return (
     <section
       id="about"
-      className="py-[clamp(60px,10vw,120px)] bg-white overflow-hidden"
+      className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
     >
-      <div className="container mx-auto max-w-[1200px] flex flex-col lg:flex-row items-center justify-center gap-[clamp(40px,8vw,100px)] px-[5%]">
-        {/* БЛОК С КАРТИНКАМИ */}
-        <figure className="relative flex-1 max-w-[500px] w-full lg:w-auto mb-10 lg:mb-0">
-          {/* Главное фото */}
-          <div className="w-full aspect-[4/5] relative overflow-hidden rounded-t-[200px] shadow-lg">
+      <div className="container mx-auto max-w-[1200px] flex flex-col lg:flex-row items-center justify-center gap-16 md:gap-24 px-[5%]">
+        {/* БЛОК З КАРТИНКАМИ */}
+        <figure className="relative flex-1 max-w-[460px] w-full lg:w-auto mb-10 lg:mb-0">
+          <div className="w-full aspect-[4/5] relative overflow-hidden rounded-t-[150px] md:rounded-t-[200px] rounded-b-md">
             <Image
               src="/img/aftor.jpg"
               alt="Майстер депіляції"
@@ -35,57 +23,63 @@ const About = () => {
             />
           </div>
 
-          <div className="absolute bottom-[-5%] left-[-10%] w-[45%] aspect-[1/1.2] z-[2] overflow-hidden rounded-[15px] border-[8px] border-white shadow-xl">
-            <Image
-              src="/img/sert.jpg"
-              alt="Сертифікат"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 50vw, 25vw"
-              priority
-            />
+          <div className="absolute -bottom-8 -left-6 md:-left-12 w-[55%] aspect-[3/4] z-[2] p-2 md:p-3 bg-[#fdfbf7] shadow-[0_20px_40px_rgba(74,63,57,0.08)]">
+            <div className="relative w-full h-full overflow-hidden">
+              <Image
+                src="/img/sert.jpg"
+                alt="Сертифікат"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 25vw"
+                priority
+              />
+            </div>
           </div>
         </figure>
-        {/* БЛОК С ТЕКСТОМ */}
+
+        {/* БЛОК З ТЕКСТОМ */}
         <article className="flex-[1.2] text-left lg:text-left text-center">
           <header>
-            <p className="font-poppins text-[13px] uppercase tracking-[4px] text-[#fcb25e] mb-5 font-semibold">
+            <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[4px] md:tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
               Естетична косметологія
             </p>
-            <h2 className="font-vibes text-[clamp(36px,5vw,56px)] text-[#535353] leading-[1.15] mb-[30px]">
+            <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] mb-10 font-light">
               Професійний догляд <br /> за вашою шкірою
             </h2>
           </header>
 
-          <div className="border-l-[1px] border-[#a68b81]/30 pl-[30px] mb-10 lg:border-l-[1px] lg:border-t-0 border-t-[1px] pt-6 lg:pt-0 max-lg:pl-0">
-            <p className="text-[17px] leading-[1.8] text-gray-600 mb-[15px] max-w-[480px] lg:mx-0 mx-auto">
-              Ми віримо, що краса — це не лише зовнішній вигляд, а й внутреннє
+          <div className="border-l border-[#bd9b7d]/30 pl-6 md:pl-10 mb-12">
+            <p className="text-[16px] md:text-[18px] leading-[1.9] text-[#4a3f39]/80 font-light mb-6 max-w-[480px] lg:mx-0 mx-auto">
+              Ми віримо, що краса — це не лише зовнішній вигляд, а й внутрішнє
               відчуття впевненості.
             </p>
-            <p className="text-[17px] leading-[1.8] text-gray-600 mb-[15px] max-w-[480px] lg:mx-0 mx-auto">
+            <p className="text-[16px] md:text-[18px] leading-[1.9] text-[#4a3f39]/80 font-light mb-6 max-w-[480px] lg:mx-0 mx-auto">
               Кожна процедура депіляції — це ритуал турботи про себе, виконаний
-              з професіоналізмом.
+              з бездоганним професіоналізмом.
             </p>
-            <p className="text-[17px] leading-[1.8] text-gray-600 max-w-[480px] lg:mx-0 mx-auto">
-              Velvet<span className="text-[#fcb25e]">Skin</span> — коли турбота
-              про себе стає красивим ритуалом.
+            <p className="text-[16px] md:text-[18px] leading-[1.9] text-[#4a3f39]/80 font-light max-w-[480px] lg:mx-0 mx-auto">
+              Velvet
+              <span className="font-cormorant italic text-[#bd9b7d] text-[22px]">
+                Skin
+              </span>{' '}
+              — коли турбота про себе стає красивим мистецтвом.
             </p>
           </div>
 
-          <ul className="flex gap-10 p-0 mb-10 lg:justify-start justify-center">
-            <li className="flex flex-col gap-[5px]">
-              <span className="text-[24px] font-light text-[#fcb25e]/80">
+          <ul className="flex gap-12 p-0 mb-14 lg:justify-start justify-center">
+            <li className="flex flex-col gap-2">
+              <span className="font-cormorant italic text-[36px] text-[#bd9b7d]/60 leading-none">
                 01
               </span>
-              <span className="text-[12px] uppercase tracking-[1px] text-[#535353] font-semibold">
+              <span className="text-[10px] uppercase tracking-[2px] text-[#231d19] font-medium">
                 Сертифіковані майстри
               </span>
             </li>
-            <li className="flex flex-col gap-[5px]">
-              <span className="text-[24px] font-light text-[#fcb25e]/80">
+            <li className="flex flex-col gap-2">
+              <span className="font-cormorant italic text-[36px] text-[#bd9b7d]/60 leading-none">
                 02
               </span>
-              <span className="text-[12px] uppercase tracking-[1px] text-[#535353] font-semibold">
+              <span className="text-[10px] uppercase tracking-[2px] text-[#231d19] font-medium">
                 Преміальна косметика
               </span>
             </li>
@@ -94,7 +88,7 @@ const About = () => {
           <div className="lg:flex lg:justify-start flex justify-center">
             <Link
               href="#booking-modal"
-              className="inline-block px-[24px] py-[10px] rounded-[50px] text-white text-[14px] font-medium transition-all duration-300 shadow-md bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] border border-[#c49f2d] hover:shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+              className="inline-block px-10 py-3.5 border border-[#bd9b7d] text-[#4a3f39] text-[11px] uppercase tracking-[2px] font-medium rounded-full transition-all duration-500 hover:bg-[#bd9b7d] hover:text-[#fdfbf7]"
             >
               Записатись
             </Link>

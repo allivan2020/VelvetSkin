@@ -8,7 +8,7 @@ const Contacts = () => {
   const [showMap, setShowMap] = useState(false);
 
   return (
-    <section id="contacts" className="py-20 md:py-32 bg-[#fcfaf8]">
+    <section id="contacts" className="relative py-20 md:py-32 bg-[#fcfaf8]">
       <div className="container mx-auto px-[5%] max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* ИНФОРМАЦИЯ */}
@@ -78,9 +78,10 @@ const Contacts = () => {
                 onClick={() => setShowMap(true)}
               >
                 <Image
-                  src="/img/map-placeholder-large.avif" // Твоя заглушка карты (замени на map-placeholder позже)
+                  src="/img/map-placeholder-large.avif"
                   alt="Карта VelvetSkin"
                   fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />

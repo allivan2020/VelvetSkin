@@ -32,61 +32,60 @@ const FAQ = () => {
   return (
     <section
       id="faq"
-      className="relative py-24 px-4 overflow-hidden bg-[#fcfaf8]"
+      className="relative py-32 md:py-48 px-4 overflow-hidden bg-[#fdfbf7]"
       itemScope
       itemType="https://schema.org/FAQPage"
     >
-      {/* Визуальные блобы (Background Blobs) */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        aria-hidden="true"
-      >
-        <div className="absolute top-[10%] -right-[5%] w-[300px] h-[300px] rounded-full bg-radial-gradient from-[#e1ccb9] to-transparent blur-[80px] opacity-60 hidden md:block" />
-        <div className="absolute bottom-0 -left-[10%] w-[400px] h-[400px] rounded-full bg-radial-gradient from-[#eaddcf] to-transparent blur-[80px] opacity-60 hidden md:block" />
-      </div>
-
-      <div className="relative z-10 max-w-[600px] mx-auto">
-        <header className="text-center mb-12">
-          <h2 className="font-vibes text-[clamp(42px,6vw,64px)] text-[#535353] leading-tight">
-            Часті питання
+      <div className="relative z-10 max-w-[800px] mx-auto">
+        <header className="text-center mb-20 md:mb-32">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+            Відповіді на питання
+          </p>
+          <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
+            Часті <span className="italic text-[#bd9b7d]">запитання</span>
           </h2>
-          <div className="w-20 h-[1px] bg-[#fcb25e] mx-auto mt-4" />
         </header>
 
-        {/* Стеклянный контейнер аккордеона */}
-        <div className="bg-white/35 backdrop-blur-[20px] border border-white/60 rounded-[32px] shadow-xl overflow-hidden">
+        {/* Акордеон без важких контейнерів - тільки витончені лінії */}
+        <div className="space-y-2">
           {faqData.map((item, index) => (
             <div
               key={index}
-              className="border-b border-white/60 last:border-none transition-colors hover:bg-white/10"
+              className="border-b border-[#bd9b7d]/20 transition-all duration-500"
               itemProp="mainEntity"
               itemScope
               itemType="https://schema.org/Question"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex justify-between items-center p-6 md:p-8 text-left focus:outline-none group"
+                className="w-full flex justify-between items-center py-8 md:py-10 text-left focus:outline-none group"
               >
                 <span
-                  className="text-lg md:text-xl font-medium text-[#2c2c2c]/90"
+                  className="text-[17px] md:text-[20px] font-cormorant text-[#231d19] tracking-wide transition-colors group-hover:text-[#bd9b7d]"
                   itemProp="name"
                 >
                   {item.q}
                 </span>
-                <motion.svg
-                  animate={{ rotate: openIndex === index ? 45 : 0 }}
-                  transition={{ duration: 0.4, ease: 'circOut' }}
-                  className="w-6 h-6 text-[#fcb25e] flex-shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
+
+                <div
+                  className={`flex-shrink-0 w-5 h-5 text-[#bd9b7d] transition-transform duration-500 ease-out ${
+                    openIndex === index ? 'rotate-180' : 'rotate-0'
+                  }`}
                 >
-                  <path
-                    d="M12 4V20M4 12H20"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </motion.svg>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    className="w-full h-full"
+                  >
+                    <path
+                      d="M6 9l6 6 6-6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
               </button>
 
               <AnimatePresence>
@@ -95,14 +94,14 @@ const FAQ = () => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                     itemProp="acceptedAnswer"
                     itemScope
                     itemType="https://schema.org/Answer"
                   >
                     <div
-                      className="px-6 md:px-8 pb-8 text-[#2c2c2c]/70 leading-relaxed"
+                      className="pb-10 text-[15px] md:text-[16px] text-[#4a3f39]/70 leading-[1.8] font-light max-w-[90%]"
                       itemProp="text"
                     >
                       {item.a}

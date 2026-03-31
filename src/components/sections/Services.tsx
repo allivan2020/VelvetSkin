@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
@@ -37,18 +37,13 @@ const femaleServices = [
 ];
 
 const Services = () => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <section className="min-h-screen bg-[#f6f4f0]" />;
+  // Ми повністю прибрали mounted/setMounted, оскільки тут немає звернень до window при рендері.
+  // React більше не буде сваритися!
 
   return (
     <section
       id="story"
-      className="relative bg-[#f6f4f0] py-20 overflow-hidden"
+      className="relative bg-[#fdfbf7] py-32 md:py-48 overflow-hidden"
       itemScope
       itemType="https://schema.org/Service"
     >
@@ -59,23 +54,25 @@ const Services = () => {
       <meta itemProp="provider" content="VelvetSkin" />
       <meta itemProp="areaServed" content="Запоріжжя" />
 
-      <div className="relative container mx-auto px-4">
-        <header className="text-center mb-16">
+      <div className="relative container mx-auto px-4 md:px-[5%]">
+        <header className="text-center mb-20 md:mb-32">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
+            Прайс-лист
+          </p>
           <h2
-            className="font-vibes text-[clamp(36px,5vw,56px)] text-[#535353] mb-4"
+            className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light"
             itemProp="name"
           >
-            Ціни на депіляцію
+            Інвестиція у <span className="italic text-[#bd9b7d]">красу</span>
           </h2>
-          <div className="w-24 h-[1px] bg-[#fcb25e] mx-auto" />
         </header>
 
-        <div className="relative max-w-[1100px] mx-auto space-y-20 lg:space-y-40">
+        <div className="relative max-w-[1200px] mx-auto space-y-32 lg:space-y-48">
           <ScrollCard
             title="Чоловіча депіляція"
             imgSrc="/img/man-price.jpg"
             services={maleServices}
-            isFirst={true} // Передаем, что это первая карточка
+            isFirst={true}
           />
           <ScrollCard
             title="Жіноча депіляція"
@@ -90,7 +87,6 @@ const Services = () => {
 };
 
 const ScrollCard = ({ title, imgSrc, services, isFirst }: any) => {
-  // ИСПРАВЛЕНО: Теперь имя переменной совпадает с тем, что в JSX
   const containerRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -100,56 +96,69 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: any) => {
 
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.35, 0.65, 1],
+    [0, 0.35, 0.75, 1],
     [0, 1, 1, 0],
   );
   const scale = useTransform(scrollYProgress, [0, 0.4], [0.95, 1]);
-  const y = useTransform(scrollYProgress, [0, 0.4], [60, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.4], [100, 0]);
 
   return (
     <div ref={containerRef} className="relative w-full">
       <motion.article
         style={{ opacity, scale, y }}
-        className="relative rounded-[50px] overflow-hidden shadow-2xl min-h-[600px] flex items-center justify-center"
+        className="relative rounded-[40px] md:rounded-[60px] overflow-hidden min-h-[700px] flex items-center justify-center p-4 md:p-12"
         itemProp="hasOfferCatalog"
         itemScope
         itemType="https://schema.org/OfferCatalog"
       >
+        {/* ФОТО ТА ЗАТЕМНЕННЯ */}
         <div className="absolute inset-0 z-0">
           <Image
             src={imgSrc}
             alt={title}
             fill
             className="object-cover"
-            sizes="(max-width: 1100px) 100vw, 1100px"
+            sizes="(max-width: 1200px) 100vw, 1200px"
             priority={isFirst}
             loading={isFirst ? 'eager' : 'lazy'}
           />
-          <div className="absolute inset-0 bg-black/40 bg-gradient-to-b from-black/50 via-transparent to-black/70 z-10" />
+          {/* Теплий градієнт замість чорного/сірого */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(74,63,57,0.2),rgba(35,29,25,0.8))]" />
         </div>
 
-        <div className="relative z-20 p-6 lg:p-16 w-full flex flex-col items-center">
+        {/* КОНТЕНТ: Скляна панель */}
+        <div className="relative z-20 w-full max-w-[900px] flex flex-col items-center mt-auto md:mt-0">
+          {/* Заголовок картки */}
           <h3
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-8 py-3 text-2xl lg:text-3xl font-semibold uppercase tracking-widest text-white mb-8 w-fit"
+            className="font-cormorant italic text-[clamp(36px,5vw,54px)] text-[#fdfbf7] mb-8 md:mb-12 font-light"
             itemProp="name"
           >
             {title}
           </h3>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 w-full max-w-[850px] bg-white/10 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 lg:p-12 shadow-inner">
+
+          {/* Скло (Glassmorphism) */}
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 w-full bg-white/5 backdrop-blur-2xl border-[0.5px] border-white/20 rounded-[32px] p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.2)]">
             {services.map((item: any, idx: number) => (
               <li
                 key={idx}
-                className="flex justify-between items-baseline border-b border-white/10 pb-2 text-white/90"
+                className="flex justify-between items-end border-b border-white/10 pb-3 text-[#fdfbf7]/90 font-light tracking-wide group hover:border-[#bd9b7d]/50 transition-colors duration-300"
                 itemProp="itemListElement"
                 itemScope
                 itemType="https://schema.org/Offer"
               >
-                <span itemProp="name">{item.name}</span>
-                <span className="font-bold text-[#fcb25e]">
+                <span
+                  className="text-[14px] md:text-[15px] group-hover:text-white transition-colors"
+                  itemProp="name"
+                >
+                  {item.name}
+                </span>
+                <span className="font-poppins text-[13px] md:text-[14px] font-medium text-[#dcb38a]">
                   <span itemProp="price" content={item.price.toString()}>
                     {item.price}
                   </span>{' '}
-                  грн.
+                  <span className="text-[10px] uppercase tracking-widest text-[#dcb38a]/70">
+                    грн
+                  </span>
                 </span>
               </li>
             ))}

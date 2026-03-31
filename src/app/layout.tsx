@@ -1,13 +1,15 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next';
-import Script from 'next/script'; // Импортируем для Google Analytics
+import Script from 'next/script';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
-import { poppins, greatVibes } from './fonts';
+import BookingModal from '@/components/ui/BookingModal'; // <-- 1. ИМПОРТИРУЕМ МОДАЛКУ
+import { poppins, cormorant } from './fonts';
 import './globals.css';
 
 // 1. ПЕРЕНОСИМ SEO ИЗ ТВОЕГО HTML
 export const metadata: Metadata = {
+  metadataBase: new URL('https://epil-story.vercel.app'), // <-- Добавлено
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
   description:
     'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладка шкіра, безпечні методики та дбайливий догляд за тілом. Записуйтесь онлайн!',
@@ -62,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="uk" className={`${poppins.variable} ${greatVibes.variable}`}>
+    <html lang="uk" className={`${poppins.variable} ${cormorant.variable}`}>
       <head>
         {/* Вставляем микроразметку прямо в head */}
         <script
@@ -88,6 +90,7 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <BookingModal />
       </body>
     </html>
   );

@@ -1,66 +1,58 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-} from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Заглушка, пока не приехали реальные фото
+// Заглушка
 const placeholderImage = '/img/man-price.jpg';
 
 const galleryImages = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   src: placeholderImage,
-  alt: `Приклад роботи ${i + 1}`,
+  alt: `Результат депіляції ${i + 1}`,
 }));
 
 const Gallery = () => {
-  const [mounted, setMounted] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <section className="py-24 bg-[#fcfaf8] min-h-screen" />;
 
   return (
     <section
       id="gallery"
-      className="relative py-24 bg-[#fcfaf8] overflow-hidden"
+      className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
     >
-      {/* SVG Шум (генерируется прямо в браузере) */}
-      <div
-        className="absolute inset-0 opacity-[0.1] pointer-events-none z-0"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0%200%20200%20200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      <div className="relative z-10 container mx-auto px-4">
-        <header className="text-center mb-20">
-          <p className="font-poppins text-[13px] uppercase tracking-[4px] text-[#fcb25e] mb-4 font-semibold">
+      <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
+        <header className="text-center mb-20 md:mb-32">
+          <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#bd9b7d] mb-6 font-medium">
             Естетика результату
           </p>
-          <h2 className="font-vibes text-[clamp(42px,8vw,84px)] text-[#535353] leading-none">
-            Luxe Moments
+          <h2 className="font-cormorant text-[clamp(42px,6vw,64px)] text-[#231d19] leading-[1.05] font-light">
+            Luxe <span className="italic text-[#bd9b7d]">Moments</span>
           </h2>
-          <div className="w-24 h-[1px] bg-[#fcb25e]/40 mx-auto mt-8" />
         </header>
 
-        {/* Сетка - КРИТИЧНО: добавили relative для корректного скролла */}
-        <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10 max-w-[1200px] mx-auto">
+        {/* Ідеальна преміальна сітка */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 max-w-[1400px] mx-auto">
           {galleryImages.map((img, index) => (
-            <GalleryItem
+            <motion.div
               key={img.id}
-              img={img}
-              index={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.05 }}
               onClick={() => setSelectedIndex(index)}
-            />
+              className="relative aspect-square overflow-hidden bg-[#f0ede8] cursor-zoom-in group"
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+              {/* Ледь помітний оверлей при наведенні */}
+              <div className="absolute inset-0 bg-[#231d19]/0 group-hover:bg-[#231d19]/10 transition-colors duration-500" />
+            </motion.div>
           ))}
         </div>
       </div>
@@ -79,67 +71,17 @@ const Gallery = () => {
   );
 };
 
-const GalleryItem = ({ img, index, onClick }: any) => {
-  const ref = useRef(null);
-
-  // Наклон карточек
-  const rotate = (index % 2 === 0 ? 1 : -1) * ((index * 3) % 8);
-  const depth = ((index % 3) + 1) * 0.12;
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], [0, -120 * depth]);
-
-  return (
-    <motion.div
-      ref={ref}
-      style={{ y, rotate: `${rotate}deg` }}
-      whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
-      onClick={onClick}
-      className="relative aspect-[3/4] bg-white p-2 shadow-xl cursor-zoom-in group"
-    >
-      <div className="relative w-full h-full overflow-hidden">
-        <Image
-          src={img.src}
-          alt={img.alt}
-          fill
-          className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
-          sizes="(max-width: 768px) 45vw, 25vw"
-        />
-      </div>
-    </motion.div>
-  );
-};
-
 const Lightbox = ({ images, index, onClose, setIndex }: any) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') setIndex((index + 1) % images.length);
-      if (e.key === 'ArrowLeft')
-        setIndex((index - 1 + images.length) % images.length);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [index, images.length, onClose, setIndex]);
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-10 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] bg-[#231d19]/fb backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
       onClick={onClose}
     >
       <button
-        className="absolute top-8 right-8 text-white/50 text-5xl font-thin hover:text-white z-[110]"
+        className="absolute top-8 right-8 text-white/50 text-4xl font-light hover:text-white transition-colors z-[110]"
         onClick={onClose}
       >
         &times;
@@ -150,7 +92,8 @@ const Lightbox = ({ images, index, onClose, setIndex }: any) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="relative w-full max-w-5xl h-[80vh]"
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="relative w-full max-w-5xl h-[70vh] md:h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <Image
@@ -162,24 +105,30 @@ const Lightbox = ({ images, index, onClose, setIndex }: any) => {
         />
       </motion.div>
 
-      <button
-        className="absolute left-4 md:left-8 text-white/30 text-6xl font-thin hover:text-white"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIndex((index - 1 + images.length) % images.length);
-        }}
-      >
-        &#8249;
-      </button>
-      <button
-        className="absolute right-4 md:right-8 text-white/30 text-6xl font-thin hover:text-white"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIndex((index + 1) % images.length);
-        }}
-      >
-        &#8250;
-      </button>
+      {/* Навігація в лайтбоксі */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-12 text-white/40 font-poppins text-[11px] tracking-[4px]">
+        <button
+          className="hover:text-white transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIndex((index - 1 + images.length) % images.length);
+          }}
+        >
+          PREV
+        </button>
+        <span className="text-[#bd9b7d] font-medium tracking-[1px]">
+          {index + 1} / {images.length}
+        </span>
+        <button
+          className="hover:text-white transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIndex((index + 1) % images.length);
+          }}
+        >
+          NEXT
+        </button>
+      </div>
     </motion.div>
   );
 };

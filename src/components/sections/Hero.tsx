@@ -7,26 +7,28 @@ const Hero = () => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <section className="h-[100dvh] bg-black" />;
+  // Теплый темный фон вместо холодного черного
+  if (!mounted) return <section className="h-[100dvh] bg-[#231d19]" />;
 
   return (
     <section
       id="hero"
-      className="relative h-[100dvh] min-h-[700px] flex items-center overflow-hidden bg-black"
+      className="relative h-[100dvh] min-h-[700px] flex items-center justify-center overflow-hidden bg-[#231d19]"
     >
-      {/* 1. ПОСТЕР (Оптимизированный) */}
+      {/* 1. ПОСТЕР */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/img/hero-poster.jpg"
           alt="VelvetSkin Background"
           fill
-          className="object-cover"
+          className="object-cover opacity-90"
           priority
-          quality={75} // Исправлено на стандартное значение
+          loading="eager"
+          quality={75}
         />
       </div>
 
-      {/* 2. ВИДЕО (Поверх постера) */}
+      {/* 2. ВИДЕО */}
       <video
         autoPlay
         muted
@@ -39,35 +41,34 @@ const Hero = () => {
         <source src="/img/hero-video.mp4" type="video/mp4" />
       </video>
 
-      {/* 3. ГРАДИЕНТ (Затемнение) */}
-      <div className="absolute inset-0 z-[2] bg-black/40 bg-[linear-gradient(90deg,rgba(0,0,0,0.8)_0%,transparent_100%)]" />
+      {/* 3. ГРАДИЕНТ (Тепле бронзове затемнення замість сірого) */}
+      <div className="absolute inset-0 z-[2] bg-[linear-gradient(to_bottom,rgba(43,35,30,0.6),rgba(20,16,14,0.7))]" />
 
-      {/* 4. КОНТЕНТ (Твой текст вернулся на место) */}
-      <div className="relative z-[3] container mx-auto px-[5%] text-left max-md:text-center">
-        <article className="flex flex-col items-start max-md:items-center max-w-[650px] max-md:max-w-full">
-          <p className="text-[#fcb25e] uppercase tracking-[5px] text-[13px] mb-5 font-semibold animate-fade-in-up">
-            Студія воскової депіляції VelvetSkin
-          </p>
+      {/* 4. КОНТЕНТ */}
+      <div className="relative z-[3] container mx-auto px-[5%] text-center flex flex-col items-center mt-10">
+        <p className="text-[#dcb38a] uppercase tracking-[8px] md:tracking-[12px] text-[10px] md:text-[11px] mb-8 font-light animate-fade-in-up">
+          Студія воскової депіляції
+        </p>
 
-          <h1 className="text-white text-[clamp(42px,7vw,92px)] leading-[1.05] mb-6 font-normal animate-fade-in-up [animation-delay:200ms]">
-            Воскова депіляція
-            <br />
-            <span className="font-vibes text-[#fcb25e] capitalize">
-              чисте мистецтво
-            </span>
-          </h1>
+        {/* Текст тепер не чисто білий, а кремовий (#fdfbf7) */}
+        <h1 className="text-[#fdfbf7] text-[clamp(46px,8vw,100px)] leading-[1] mb-8 font-light animate-fade-in-up [animation-delay:200ms]">
+          Воскова депіляція
+          <br />
+          <span className="font-cormorant italic text-[#dcb38a] font-light lowercase text-[clamp(54px,9vw,110px)] tracking-tight">
+            чисте мистецтво
+          </span>
+        </h1>
 
-          <p className="text-white/85 text-[18px] leading-[1.6] max-w-[500px] font-light animate-fade-in-up [animation-delay:400ms]">
-            Відчуй ідеальну гладкість та преміальний догляд за шкірою у
-            Запоріжжі. Ми перетворили депіляцію на ритуал краси.
-          </p>
-        </article>
+        <p className="text-[#fdfbf7]/70 text-[15px] md:text-[17px] leading-[1.8] max-w-[480px] font-light animate-fade-in-up [animation-delay:400ms]">
+          Відчуй ідеальну гладкість та преміальний догляд за шкірою. Ми
+          перетворили депіляцію на ритуал краси.
+        </p>
       </div>
 
       {/* 5. СКРОЛЛ ИНДИКАТОР */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-[3] opacity-70 animate-bounce">
-        <div className="w-[20px] h-[35px] border-2 border-white rounded-full relative after:content-[''] after:absolute after:top-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-2 after:bg-white after:rounded-full" />
-        <span className="text-white text-[10px] uppercase tracking-widest font-poppins">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-[3] opacity-60 hover:opacity-100 transition-opacity duration-500">
+        <div className="w-[22px] h-[36px] border-[1.5px] border-[#fdfbf7]/60 rounded-full relative after:content-[''] after:absolute after:top-2 after:left-1/2 after:-translate-x-1/2 after:w-[2px] after:h-[6px] after:bg-[#fdfbf7] after:rounded-full after:animate-bounce" />
+        <span className="text-[#fdfbf7]/60 text-[9px] uppercase tracking-[0.3em] font-poppins font-light">
           Scroll
         </span>
       </div>

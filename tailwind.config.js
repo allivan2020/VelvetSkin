@@ -5,7 +5,12 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx,mdx}', // БЕЗ ЭТОГО ТЕЙЛВИНД НЕ ВИДИТ ТВОИ ФАЙЛЫ
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        poppins: ['var(--font-poppins)'],
+        cormorant: ['var(--font-cormorant)'], // Додали сюди
+      },
+    },
   },
   plugins: [],
 };
