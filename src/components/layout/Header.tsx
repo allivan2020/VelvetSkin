@@ -121,6 +121,7 @@ const Header = () => {
           <div className="hidden sm:flex items-center">
             <Link
               href="#booking-modal"
+              aria-label="Записатись"
               className={clsx(
                 'inline-block px-8 py-2.5 rounded-full text-[11px] uppercase tracking-[2px] font-medium whitespace-nowrap transition-all duration-500 active:scale-95',
                 isScrolled

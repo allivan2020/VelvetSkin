@@ -181,6 +181,7 @@ const BookingModal = () => {
                 </p>
                 <button
                   onClick={closeModal}
+                  aria-label="Закрити"
                   className="mt-6 px-8 py-3 rounded-full text-white font-medium bg-[#fcb25e] hover:bg-[#d4a373] transition-colors"
                 >
                   Зрозуміло

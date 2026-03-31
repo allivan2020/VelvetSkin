@@ -63,6 +63,8 @@ const Contacts = () => {
             <div className="mt-16 flex flex-wrap gap-6 max-lg:justify-center">
               <a
                 href="https://www.instagram.com/sandy_waxing/"
+                aria-label="Наш Instagram"
+                suppressHydrationWarning={true}
                 target="_blank"
                 className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
               >
@@ -70,6 +72,8 @@ const Contacts = () => {
               </a>
               <a
                 href="https://t.me/sandy_waxing/"
+                aria-label="Наш Telegram"
+                suppressHydrationWarning={true}
                 target="_blank"
                 className="px-10 py-3.5 border border-[#bd9b7d]/40 rounded-full text-[#4a3f39] text-[10px] uppercase tracking-[2px] font-medium hover:bg-[#bd9b7d] hover:text-[#fdfbf7] transition-all duration-500"
               >

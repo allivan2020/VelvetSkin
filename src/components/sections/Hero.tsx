@@ -16,7 +16,7 @@ const Hero = () => {
       className="relative h-[100dvh] min-h-[700px] flex items-center justify-center overflow-hidden bg-[#231d19]"
     >
       {/* 1. ПОСТЕР */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 bg-black/30">
         <Image
           src="/img/hero-poster.jpg"
           alt="VelvetSkin Background"
@@ -34,11 +34,13 @@ const Hero = () => {
         muted
         loop
         playsInline
+        aria-hidden="true"
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-1000"
         onCanPlay={(e) => (e.currentTarget.style.opacity = '1')}
         style={{ opacity: 0 }}
       >
-        <source src="/img/hero-video.mp4" type="video/mp4" />
+        <source src="/img/hero-video.webm" type="video/webm" />
       </video>
 
       {/* 3. ГРАДИЕНТ (Тепле бронзове затемнення замість сірого) */}
