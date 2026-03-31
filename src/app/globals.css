@@ -1,25 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 @import 'tailwindcss';
 
-/* Твои кастомные настройки теперь живут здесь */
+/* Налаштування теми прямо в CSS (особливість v4) */
 @theme {
-  --font-poppins: var(--font-poppins);
-  --font-vibes: var(--font-great-vibes);
+  --color-brand-bg: hsl(30 40% 98%);
+  --color-brand-fg: hsl(20 20% 15%);
+  --color-brand-primary: hsl(25 30% 45%);
+  --color-brand-secondary: hsl(35 40% 92%);
+  --color-brand-accent: hsl(35 50% 85%);
 
-  /* Описываем анимацию для Tailwind */
-  --animate-fade-in-up: fade-in-up 1s ease-out forwards;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia;
+}
 
-  /* Описываем само движение (Keyframes) */
-  @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+/* Базові стилі */
+@layer base {
+  body {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-fg);
+    @apply antialiased transition-colors duration-300;
   }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    @apply font-semibold tracking-wide;
+  }
+}
+
+/* Твій кастомний клас */
+.glass-card {
+  @apply bg-white/50 backdrop-blur-md border border-white/20 shadow-sm;
 }
