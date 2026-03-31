@@ -100,6 +100,7 @@ const Reviews = () => {
           <div className="flex justify-center items-center gap-16 mt-16 md:mt-24">
             <button
               onClick={prevReview}
+              aria-label="Попередній відгук"
               className="group flex items-center gap-4 text-[#bd9b7d]"
             >
               <div className="w-12 h-[1px] bg-[#bd9b7d]/30 group-hover:w-16 group-hover:bg-[#bd9b7d] transition-all duration-500" />
@@ -119,6 +120,7 @@ const Reviews = () => {
 
             <button
               onClick={nextReview}
+              aria-label="Наступний відгук"
               className="group flex items-center gap-4 text-[#bd9b7d]"
             >
               <span className="text-[10px] uppercase tracking-[3px] font-medium hidden md:block">

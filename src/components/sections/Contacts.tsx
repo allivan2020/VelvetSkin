@@ -115,6 +115,7 @@ const Contacts = () => {
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
                 loading="lazy"
                 className="animate-fade-in grayscale-[0.3] contrast-[1.1]"
               />

@@ -60,7 +60,7 @@ const About = () => {
             </p>
             <p className="text-[16px] md:text-[18px] leading-[1.9] text-[#4a3f39]/80 font-light max-w-[480px] lg:mx-0 mx-auto">
               Velvet
-              <span className="font-cormorant italic text-[#bd9b7d] text-[22px]">
+              <span className="font-cormorant italic text-[#917152] text-[22px]">
                 Skin
               </span>{' '}
               — коли турбота про себе стає красивим мистецтвом.
@@ -90,6 +90,7 @@ const About = () => {
             <Link
               href="#booking-modal"
               aria-label="Записатись"
+              rel="noopener noreferrer"
               className="inline-block px-10 py-3.5 border border-[#bd9b7d] text-[#4a3f39] text-[11px] uppercase tracking-[2px] font-medium rounded-full transition-all duration-500 hover:bg-[#bd9b7d] hover:text-[#fdfbf7]"
             >
               Записатись

@@ -1,32 +1,32 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next';
-import Script from 'next/script';
+import { GoogleTagManager } from '@next/third-parties/google'; // Оптимальный способ для Performance
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
-import BookingModal from '@/components/ui/BookingModal'; // <-- 1. ИМПОРТИРУЕМ МОДАЛКУ
+import BookingModal from '@/components/ui/BookingModal';
 import { poppins, cormorant } from './fonts';
 import './globals.css';
 
-// 1. ПЕРЕНОСИМ SEO ИЗ ТВОЕГО HTML
 export const metadata: Metadata = {
-  metadataBase: new URL('https://epil-story.vercel.app'), // <-- Добавлено
+  // 1. Указываем твой КУПЛЕННЫЙ домен
+  metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
   description:
     'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладка шкіра, безпечні методики та дбайливий догляд за тілом. Записуйтесь онлайн!',
   alternates: {
-    canonical: 'https://epil-story.vercel.app/',
+    canonical: 'https://www.velvetskinzp.com/',
   },
   openGraph: {
     title: 'VelvetSkin — Твоя історія ідеально гладкої шкіри',
     description:
       'Професійна воскова депіляція у Запоріжжі. Дбайливий догляд, якому довіряють.',
-    url: 'https://epil-story.vercel.app/',
+    url: 'https://www.velvetskinzp.com/',
     siteName: 'VelvetSkin',
     images: [
       {
-        url: '/og-preview.png', // Файл должен лежать в public/
+        url: '/og-preview.png',
         width: 1200,
         height: 630,
+        alt: 'VelvetSkin Запоріжжя',
       },
     ],
     locale: 'uk_UA',
@@ -34,13 +34,13 @@ export const metadata: Metadata = {
   },
 };
 
-// 2. ПЕРЕНОСИМ МИКРОРАЗМЕТКУ (JSON-LD)
+// 2. JSON-LD: Синхронизировал телефон с твоим компонентом Contacts
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BeautySalon',
   name: 'VelvetSkin',
   description: 'Студія професійної воскової депіляції у Запоріжжі.',
-  image: 'https://epil-story.vercel.app/og-preview.png',
+  image: 'https://www.velvetskinzp.com/og-preview.png',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'вул. Українська, 43',
@@ -53,9 +53,25 @@ const jsonLd = {
     latitude: '47.8223',
     longitude: '35.1764',
   },
-  url: 'https://epil-story.vercel.app',
-  telephone: '+380685740490',
-  priceRange: '$$',
+  url: 'https://www.velvetskinzp.com',
+  telephone: '+380971950698', // Обновил на номер из твоих контактов
+  priceRange: '₴₴',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ],
+      opens: '09:00',
+      closes: '20:00',
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -66,26 +82,14 @@ export default function RootLayout({
   return (
     <html lang="uk" className={`${poppins.variable} ${cormorant.variable}`}>
       <head>
-        {/* Вставляем микроразметку прямо в head */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className={poppins.className}>
-        {/* 3. ГУГЛ АНАЛИТИКА (Переносим твой G-XXXXXXXXXX) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XXXXXXXXXX');
-          `}
-        </Script>
+        {/* 3. Оптимизированная аналитика (не блокирует рендер) */}
+        <GoogleTagManager gtmId="G-XXXXXXXXXX" />
 
         <Header />
         <main>{children}</main>
