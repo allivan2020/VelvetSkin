@@ -15,6 +15,7 @@ export default function SmoothScroll({
         smoothWheel: true,
       }}
     >
+      {/* @ts-expect-error: React 19 type mismatch with react-lenis */}
       {children}
     </ReactLenis>
   );
