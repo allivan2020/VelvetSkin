@@ -4,13 +4,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Заглушка
-const placeholderImage = '/img/man-price.jpg';
-
+// Генерируем массив путей на основе ваших файлов в public/img/gallery
 const galleryImages = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
-  src: placeholderImage,
-  alt: `Результат депіляції ${i + 1}`,
+  src: `/img/gallery/res-${i + 1}.webp`,
+  alt: `Результат депіляції №${i + 1}`,
 }));
 
 const Gallery = () => {
@@ -31,7 +29,7 @@ const Gallery = () => {
           </h2>
         </header>
 
-        {/* Ідеальна преміальна сітка */}
+        {/* Сетка изображений */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 max-w-[1400px] mx-auto">
           {galleryImages.map((img, index) => (
             <motion.div
@@ -50,7 +48,6 @@ const Gallery = () => {
                 className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
-              {/* Ледь помітний оверлей при наведенні */}
               <div className="absolute inset-0 bg-[#231d19]/0 group-hover:bg-[#231d19]/10 transition-colors duration-500" />
             </motion.div>
           ))}
@@ -71,13 +68,21 @@ const Gallery = () => {
   );
 };
 
-const Lightbox = ({ images, index, onClose, setIndex }: any) => {
+interface LightboxProps {
+  images: typeof galleryImages;
+  index: number;
+  onClose: () => void;
+  setIndex: (index: number) => void;
+}
+
+const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-[#231d19]/fb backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
+      // Исправлен цвет bg-[#231d19]/f0 для корректной прозрачности
+      className="fixed inset-0 z-[100] bg-[#231d19]/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
       onClick={onClose}
     >
       <button
@@ -106,7 +111,6 @@ const Lightbox = ({ images, index, onClose, setIndex }: any) => {
         />
       </motion.div>
 
-      {/* Навігація в лайтбоксі */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-12 text-white/40 font-poppins text-[11px] tracking-[4px]">
         <button
           className="hover:text-white transition-colors"
