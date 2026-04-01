@@ -107,7 +107,7 @@ const Reviews = () => {
               <p className="font-cormorant text-2xl text-[#4a3f39] italic mb-4">
                 Поки що немає відгуків.
               </p>
-              <p className="font-poppins text-[#917152] text-xs uppercase tracking-[2px] font-bold">
+              <p className="font-poppins text-[#70573f] text-xs uppercase tracking-[2px] font-bold">
                 Будьте першими!
               </p>
             </div>

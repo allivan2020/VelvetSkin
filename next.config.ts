@@ -3,7 +3,8 @@ import type { NextConfig } from 'next';
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value: 'upgrade-insecure-requests; block-all-mixed-content;',
+    value:
+      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
   },
   {
     key: 'Strict-Transport-Security',
