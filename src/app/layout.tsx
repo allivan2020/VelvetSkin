@@ -7,6 +7,9 @@ import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
+  verification: {
+    google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
+  },
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
   description:
