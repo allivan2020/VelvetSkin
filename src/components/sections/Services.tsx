@@ -126,7 +126,7 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1200px"
             priority={isFirst}
-            quality={90}
+            quality={75}
           />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(26,22,20,0.35),rgba(26,22,20,0.85))]" />
         </div>

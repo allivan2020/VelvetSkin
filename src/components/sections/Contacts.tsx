@@ -87,7 +87,7 @@ const Contacts = () => {
           </div>
 
           {/* КАРТА */}
-          <div className="relative h-[450px] md:h-[600px] w-full rounded-t-[200px] rounded-b-lg overflow-hidden border border-[#bd9b7d]/20 bg-[#f0ede8] max-lg:order-1">
+          <div className="relative h-[450px] md:h-[600px] w-full rounded-[40px] rounded-b-lg overflow-hidden border border-[#bd9b7d]/20 bg-[#f0ede8] max-lg:order-1">
             {!showMap ? (
               <div
                 className="relative w-full h-full cursor-pointer group"
@@ -95,7 +95,7 @@ const Contacts = () => {
               >
                 <Image
                   src="/img/map-placeholder-large.avif"
-                  alt="Локація VelvetSkin"
+                  alt="Локація VelvetSkin на карті Запоріжжя"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105"
@@ -115,6 +115,7 @@ const Contacts = () => {
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2704.645693898742!2d35.15837834751748!3d47.827017671500755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40dc60aab8b82aab%3A0x2095f293e4eef4c6!2z0LLRg9C7LiDQo9C60YDQsNGX0L3RgdGM0LrQsCwgNDMsINCX0LDQv9C-0YDRltC20LbRjywg0JfQsNC_0L7RgNGW0LfRjNC60LAg0L7QsdC70LDRgdGC0YwsIDY5MDAw!5e1!3m2!1suk!2sua!4v1774939984064!5m2!1suk!2sua"
                 width="100%"
                 height="100%"
+                title="Карта проїзду до студії VelvetSkin"
                 style={{ border: 0 }}
                 allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"

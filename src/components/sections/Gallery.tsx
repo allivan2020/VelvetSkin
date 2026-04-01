@@ -90,63 +90,59 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-[#231d19]/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
-      onClick={onClose}
-      role="dialog" // Вказуємо семантику модального вікна
+      // Устанавливаем z-index выше хедера
+      className="fixed inset-0 z-[9999] bg-[#231d19]/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-10 cursor-zoom-out"
+      onClick={onClose} // Закрытие по клику на фон
+      role="dialog"
       aria-modal="true"
-      aria-label="Перегляд збільшеного фото результату депіляції"
     >
+      {/* Кнопка закрытия */}
       <button
-        className="absolute top-8 right-8 text-white/50 text-4xl font-light hover:text-white transition-colors z-[110]"
-        onClick={onClose}
+        className="absolute top-6 right-6 md:top-10 md:right-10 text-white/50 text-4xl font-light hover:text-white transition-colors z-[10001] p-4"
+        onClick={(e) => {
+          e.stopPropagation(); // Чтобы клик по крестику не дублировался
+          onClose();
+        }}
         aria-label="Закрити галерею"
       >
         &times;
       </button>
 
+      {/* Контейнер изображения */}
       <motion.div
         key={index}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="relative w-full max-w-5xl h-[70vh] md:h-[85vh]"
-        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-5xl h-[60vh] md:h-[80vh] cursor-default"
+        onClick={(e) => e.stopPropagation()} // Клик по самому фото НЕ закрывает окно
       >
         <Image
           src={images[index].src}
-          alt={`Збільшене фото: ${images[index].alt}`} // Уточнюємо alt для лайтбоксу
-          title={images[index].title}
+          alt={images[index].alt}
           fill
           className="object-contain"
-          priority // Залишаємо priority, оскільки лайтбокс з'являється по кліку і картинка потрібна миттєво
+          priority
         />
       </motion.div>
 
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-12 text-white/40 font-poppins text-[11px] tracking-[4px]">
+      {/* Панель навигации (внизу) */}
+      <div
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-12 text-white/40 font-poppins text-[11px] tracking-[4px] z-[10001]"
+        onClick={(e) => e.stopPropagation()} // Клик в зоне кнопок НЕ закрывает окно
+      >
         <button
-          className="hover:text-white transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIndex((index - 1 + images.length) % images.length);
-          }}
-          aria-label="Попереднє фото" // SEO / Accessibility
+          className="hover:text-[#bd9b7d] transition-colors py-4 px-2"
+          onClick={() => setIndex((index - 1 + images.length) % images.length)}
         >
           PREV
         </button>
-        <span
-          className="text-[#bd9b7d] font-medium tracking-[1px]"
-          aria-live="polite" // Озвучує зміну номера для скрінрідерів
-        >
+        <span className="text-[#bd9b7d] font-medium tracking-[1px] min-w-[60px] text-center">
           {index + 1} / {images.length}
         </span>
         <button
-          className="hover:text-white transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIndex((index + 1) % images.length);
-          }}
-          aria-label="Наступне фото" // SEO / Accessibility
+          className="hover:text-[#bd9b7d] transition-colors py-4 px-2"
+          onClick={() => setIndex((index + 1) % images.length)}
         >
           NEXT
         </button>
@@ -154,5 +150,4 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
     </motion.div>
   );
 };
-
 export default Gallery;

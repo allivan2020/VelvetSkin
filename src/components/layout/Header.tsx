@@ -32,7 +32,7 @@ const Header = () => {
   return (
     <header
       className={clsx(
-        'fixed top-0 left-0 w-full z-[1000] transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]',
+        'fixed top-0 left-0 w-full z-[100] transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]',
         isScrolled ? 'py-[15px]' : 'py-[30px] md:py-[40px]',
       )}
     >
@@ -64,6 +64,7 @@ const Header = () => {
           {/* Бургер для мобилки */}
           <button
             className="lg:hidden flex flex-col gap-[6px] p-2 bg-transparent border-none z-[2001]"
+            aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <span
