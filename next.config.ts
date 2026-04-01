@@ -5,18 +5,18 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      // СКРИПТИ: додаємо Cloudflare
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://challenges.cloudflare.com;",
-      // СТИЛІ: залишаємо як було
-      "style-src 'self' 'unsafe-inline';",
-      // З'ЄДНАННЯ: додаємо Cloudflare для валідації
-      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com;",
-      // КАРТИНКИ: залишаємо
-      "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com;",
-      // ФРЕЙМИ: Turnstile працює через iframe, це критично важливо!
-      "frame-src 'self' https://challenges.cloudflare.com;",
-      // ІНШЕ
-      "font-src 'self' data:;",
+      // СКРИПТЫ: Объединяем Google и Cloudflare в одну строку
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com;",
+      // СТИЛИ: Добавляем шрифты Google
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+      // СОЕДИНЕНИЯ: Аналитика, Cloudflare и API карт
+      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com;",
+      // КАРТИНКИ: Аналитика + все домены Google для плиток карты
+      "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com;",
+      // ФРЕЙМИ: И Cloudflare Turnstile, и Google Maps вместе
+      "frame-src 'self' https://challenges.cloudflare.com https://www.google.com https://www.google.com/maps/ https://maps.google.com;",
+      // ШРИФТЫ
+      "font-src 'self' data: https://fonts.gstatic.com;",
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';",
@@ -43,7 +43,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // 1. Применяем заголовки безопасности (Best Practices)
   async headers() {
     return [
       {
@@ -54,10 +53,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // 2. Включаем современные форматы (Performance)
-    // AVIF даст максимальное сжатие для твоих сертификатов и фото
     formats: ['image/avif', 'image/webp'],
-
     remotePatterns: [
       {
         protocol: 'https',
@@ -68,10 +64,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  // 3. Компилятор для ускорения работы React (Performance)
   reactCompiler: true,
-
-  // 4. Сжатие ответов сервера (Performance)
   compress: true,
 };
 
