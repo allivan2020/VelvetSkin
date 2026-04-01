@@ -5,13 +5,15 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      // Разрешаем скрипты GTM
+      // Скрипты (GTM и аналитика)
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
-      // РАЗРЕШАЕМ ОТПРАВКУ ДАННЫХ (исправляет твою ошибку)
+      // СТИЛИ (Исправляет твою ошибку с инлайновыми стилями)
+      "style-src 'self' 'unsafe-inline';",
+      // Соединения (Аналитика)
       "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;",
-      // Разрешаем картинки и пиксели отслеживания
+      // Картинки
       "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com;",
-      // Остальные правила для безопасности
+      // Остальное для безопасности
       "font-src 'self' data:;",
       "object-src 'none';",
       "base-uri 'self';",
@@ -37,6 +39,7 @@ const securityHeaders = [
     value: 'strict-origin-when-cross-origin',
   },
 ];
+
 const nextConfig: NextConfig = {
   // 1. Применяем заголовки безопасности (Best Practices)
   async headers() {
