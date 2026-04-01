@@ -3,8 +3,22 @@ import type { NextConfig } from 'next';
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value:
-      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
+    value: [
+      "default-src 'self';",
+      // Разрешаем скрипты GTM
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
+      // РАЗРЕШАЕМ ОТПРАВКУ ДАННЫХ (исправляет твою ошибку)
+      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;",
+      // Разрешаем картинки и пиксели отслеживания
+      "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com;",
+      // Остальные правила для безопасности
+      "font-src 'self' data:;",
+      "object-src 'none';",
+      "base-uri 'self';",
+      "form-action 'self';",
+      "frame-ancestors 'none';",
+      'upgrade-insecure-requests;',
+    ].join(' '),
   },
   {
     key: 'Strict-Transport-Security',
@@ -23,7 +37,6 @@ const securityHeaders = [
     value: 'strict-origin-when-cross-origin',
   },
 ];
-
 const nextConfig: NextConfig = {
   // 1. Применяем заголовки безопасности (Best Practices)
   async headers() {
