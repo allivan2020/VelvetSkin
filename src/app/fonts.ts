@@ -5,6 +5,7 @@ export const poppins = Poppins({
   weight: ['400', '500'],
   variable: '--font-poppins',
   display: 'swap',
+  preload: false,
 });
 
 export const cormorant = Cormorant_Garamond({
@@ -13,6 +14,7 @@ export const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
   display: 'swap',
+  preload: false,
 });
 
 // Додаємо рукописний шрифт для акцентів
@@ -21,4 +23,5 @@ export const vibes = Great_Vibes({
   weight: ['400'],
   variable: '--font-vibes',
   display: 'swap',
+  preload: false,
 });

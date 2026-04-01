@@ -23,7 +23,7 @@ const About = () => {
             />
           </div>
 
-          <div className="absolute -bottom-8 -left-6 md:-left-12 w-[55%] aspect-[3/4] z-[2] p-2 md:p-3 bg-[#fdfbf7] shadow-[0_20px_40px_rgba(74,63,57,0.08)]">
+          <div className="absolute -bottom-15 left-6 md:-bottom-12 md:-left-4 w-[40%] md:w-[38%] aspect-[3/4] z-[2] -rotate-90 origin-center p-2 md:p-3 bg-[#fdfbf7] shadow-[0_20px_40px_rgba(74,63,57,0.15)]">
             <div className="relative w-full h-full overflow-hidden">
               <Image
                 src="/img/sert.jpg"

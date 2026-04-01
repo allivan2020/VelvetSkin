@@ -4,11 +4,19 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Генерируем массив путей на основе ваших файлов в public/img/gallery
-const galleryImages = Array.from({ length: 12 }, (_, i) => ({
+export interface GalleryItem {
+  id: number;
+  src: string;
+  alt: string;
+  title: string; // Додали поле title для SEO
+}
+
+// SEO-оптимізація: додаємо ключові слова (депіляція, Запоріжжя, VelvetSkin) до alt та title
+const galleryImages: GalleryItem[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   src: `/img/gallery/res-${i + 1}.webp`,
-  alt: `Результат депіляції №${i + 1}`,
+  alt: `Професійна воскова депіляція Запоріжжя - результат процедури VelvetSkin №${i + 1}`,
+  title: `Фото результату депіляції VelvetSkin №${i + 1}`,
 }));
 
 const Gallery = () => {
@@ -17,6 +25,7 @@ const Gallery = () => {
   return (
     <section
       id="gallery"
+      aria-label="Галерея результатів воскової депіляції" // Допомагає пошуковикам зрозуміти контент секції
       className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
     >
       <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
@@ -29,7 +38,6 @@ const Gallery = () => {
           </h2>
         </header>
 
-        {/* Сетка изображений */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 max-w-[1400px] mx-auto">
           {galleryImages.map((img, index) => (
             <motion.div
@@ -44,9 +52,10 @@ const Gallery = () => {
               <Image
                 src={img.src}
                 alt={img.alt}
+                title={img.title} // Підказка при наведенні
                 fill
                 className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, 25vw"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" // Трохи уточнив sizes для кращого підбору розміру браузером
               />
               <div className="absolute inset-0 bg-[#231d19]/0 group-hover:bg-[#231d19]/10 transition-colors duration-500" />
             </motion.div>
@@ -69,7 +78,7 @@ const Gallery = () => {
 };
 
 interface LightboxProps {
-  images: typeof galleryImages;
+  images: GalleryItem[];
   index: number;
   onClose: () => void;
   setIndex: (index: number) => void;
@@ -81,9 +90,11 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      // Исправлен цвет bg-[#231d19]/f0 для корректной прозрачности
       className="fixed inset-0 z-[100] bg-[#231d19]/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
       onClick={onClose}
+      role="dialog" // Вказуємо семантику модального вікна
+      aria-modal="true"
+      aria-label="Перегляд збільшеного фото результату депіляції"
     >
       <button
         className="absolute top-8 right-8 text-white/50 text-4xl font-light hover:text-white transition-colors z-[110]"
@@ -104,10 +115,11 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
       >
         <Image
           src={images[index].src}
-          alt={images[index].alt}
+          alt={`Збільшене фото: ${images[index].alt}`} // Уточнюємо alt для лайтбоксу
+          title={images[index].title}
           fill
           className="object-contain"
-          priority
+          priority // Залишаємо priority, оскільки лайтбокс з'являється по кліку і картинка потрібна миттєво
         />
       </motion.div>
 
@@ -118,10 +130,14 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
             e.stopPropagation();
             setIndex((index - 1 + images.length) % images.length);
           }}
+          aria-label="Попереднє фото" // SEO / Accessibility
         >
           PREV
         </button>
-        <span className="text-[#bd9b7d] font-medium tracking-[1px]">
+        <span
+          className="text-[#bd9b7d] font-medium tracking-[1px]"
+          aria-live="polite" // Озвучує зміну номера для скрінрідерів
+        >
           {index + 1} / {images.length}
         </span>
         <button
@@ -130,6 +146,7 @@ const Lightbox = ({ images, index, onClose, setIndex }: LightboxProps) => {
             e.stopPropagation();
             setIndex((index + 1) % images.length);
           }}
+          aria-label="Наступне фото" // SEO / Accessibility
         >
           NEXT
         </button>

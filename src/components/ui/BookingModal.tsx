@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Turnstile } from '@marsidev/react-turnstile';
 
+// Выносим опции за пределы компонента, чтобы предотвратить бесконечный цикл рендеринга
+const turnstileOptions = { theme: 'light' as const };
+
 const BookingModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState<
@@ -16,11 +19,15 @@ const BookingModal = () => {
   });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-  // 1. Глобальный перехват кликов
+  // 1. Глобальный перехват кликов (безопасный для Next.js)
   useEffect(() => {
+    // Проверяем, что код выполняется в браузере (на клиенте)
+    if (typeof window === 'undefined') return;
+
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const anchor = target.closest('a');
+      // Используем опциональную цепочку для безопасности
+      const anchor = target?.closest('a');
 
       if (anchor && anchor.getAttribute('href') === '#booking-modal') {
         e.preventDefault();
@@ -32,13 +39,17 @@ const BookingModal = () => {
     return () => document.removeEventListener('click', handleGlobalClick);
   }, []);
 
-  // 2. Блокируем скролл
+  // 2. Блокируем скролл (с проверкой typeof window)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
+
+    // Функция очистки
     return () => {
       document.body.style.overflow = '';
     };
@@ -236,7 +247,7 @@ const BookingModal = () => {
                     siteKey="0x4AAAAAACppbzwvZa1GFBX5"
                     onSuccess={(token) => setCaptchaToken(token)}
                     onError={() => setStatus('error')}
-                    options={{ theme: 'light' }}
+                    options={turnstileOptions} // ИСПОЛЬЗУЕМ ВЫНЕСЕННУЮ ПЕРЕМЕННУЮ
                   />
                 </div>
 
