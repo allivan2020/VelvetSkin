@@ -28,9 +28,7 @@ const About = () => {
               <Image
                 src="/img/sert.jpg"
                 alt="Сертифікат"
-                width={300}
-                height={400}
-                quality={70}
+                quality={75}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 25vw"
