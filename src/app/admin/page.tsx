@@ -81,6 +81,8 @@ export default function AdminPage() {
           </h1>
           <input
             type="password"
+            name="password"
+            autoComplete="current-password"
             placeholder="Пароль адміна"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

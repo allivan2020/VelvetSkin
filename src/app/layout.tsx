@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { GoogleTagManager } from '@next/third-parties/google'; // Оптимальный способ для Performance
+import { GoogleAnalytics } from '@next/third-parties/google'; // Змінюємо на Analytics
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import BookingModal from '@/components/ui/BookingModal';
@@ -7,7 +7,6 @@ import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
-  // 1. Указываем твой КУПЛЕННЫЙ домен
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
   description:
@@ -34,7 +33,6 @@ export const metadata: Metadata = {
   },
 };
 
-// 2. JSON-LD: Синхронизировал телефон с твоим компонентом Contacts
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BeautySalon',
@@ -54,7 +52,7 @@ const jsonLd = {
     longitude: '35.1764',
   },
   url: 'https://www.velvetskinzp.com',
-  telephone: '+380971950698', // Обновил на номер из твоих контактов
+  telephone: '+380971950698',
   priceRange: '₴₴',
   openingHoursSpecification: [
     {
@@ -91,13 +89,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${poppins.className} relative`}>
-        {/* 3. Оптимизированная аналитика (не блокирует рендер) */}
-        <GoogleTagManager gtmId="G-XXXXXXXXXX" />
+        {/* Вставляємо твій реальний ID сюди */}
+        <GoogleAnalytics gaId="G-D2VMY46VL3" />
 
         <Header />
-        <main className="relative" style={{ position: 'relative' }}>
-          {children}
-        </main>
+        <main className="relative">{children}</main>
         <Footer />
         <BookingModal />
       </body>
