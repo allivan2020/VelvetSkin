@@ -5,15 +5,17 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      // Скрипты (GTM и аналитика)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
-      // СТИЛИ (Исправляет твою ошибку с инлайновыми стилями)
+      // СКРИПТИ: додаємо Cloudflare
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://challenges.cloudflare.com;",
+      // СТИЛІ: залишаємо як було
       "style-src 'self' 'unsafe-inline';",
-      // Соединения (Аналитика)
-      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;",
-      // Картинки
+      // З'ЄДНАННЯ: додаємо Cloudflare для валідації
+      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com;",
+      // КАРТИНКИ: залишаємо
       "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com;",
-      // Остальное для безопасности
+      // ФРЕЙМИ: Turnstile працює через iframe, це критично важливо!
+      "frame-src 'self' https://challenges.cloudflare.com;",
+      // ІНШЕ
       "font-src 'self' data:;",
       "object-src 'none';",
       "base-uri 'self';",
