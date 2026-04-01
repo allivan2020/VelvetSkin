@@ -33,14 +33,28 @@ export async function POST(req: Request) {
     }
 
     await connectToDatabase();
-
-    // Создаем новый отзыв. isApproved автоматически станет false благодаря нашей Схеме
-    const newReview = new Review({
-      name,
-      text,
-    });
-
+    const newReview = new Review({ name, text });
     await newReview.save();
+
+    // --- ОТПРАВКА В TELEGRAM ---
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (botToken && chatId) {
+      const message = `✨ *Новий відгук на сайті!*\n\n👤 *Ім'я:* ${name}\n💬 *Текст:* ${text}\n\n👉 [Перейти в адмінку](https://вашісайт.com/admin)`;
+
+      // Просто отправляем запрос к API Телеграма
+      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown',
+        }),
+      });
+    }
+    // ----------------------------
 
     return NextResponse.json(
       { message: 'Відгук успішно додано' },
@@ -48,7 +62,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: 'Помилка при збереженні відгуку' },
+      { error: 'Помилка при збереженні' },
       { status: 500 },
     );
   }
