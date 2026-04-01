@@ -29,13 +29,31 @@ const faqData = [
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  // Генеруємо дані для Google у форматі JSON-LD
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqData.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <section
       id="faq"
       className="relative py-32 md:py-48 px-4 overflow-hidden bg-[#fdfbf7]"
-      itemScope
-      itemType="https://schema.org/FAQPage"
     >
+      {/* Цей скрипт «годує» Google даними, навіть якщо акордеон закритий */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <div className="relative z-10 max-w-[800px] mx-auto">
         <header className="text-center mb-20 md:mb-32">
           <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
@@ -46,15 +64,11 @@ const FAQ = () => {
           </h2>
         </header>
 
-        {/* Акордеон без важких контейнерів - тільки витончені лінії */}
         <div className="space-y-2">
           {faqData.map((item, index) => (
             <div
               key={index}
               className="border-b border-[#bd9b7d]/20 transition-all duration-500"
-              itemProp="mainEntity"
-              itemScope
-              itemType="https://schema.org/Question"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
@@ -92,14 +106,8 @@ const FAQ = () => {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
-                    itemProp="acceptedAnswer"
-                    itemScope
-                    itemType="https://schema.org/Answer"
                   >
-                    <div
-                      className="pb-10 text-[15px] md:text-[16px] text-[#4a3f39]/70 leading-[1.8] font-light max-w-[90%]"
-                      itemProp="text"
-                    >
+                    <div className="pb-10 text-[15px] md:text-[16px] text-[#4a3f39]/70 leading-[1.8] font-light max-w-[90%]">
                       {item.a}
                     </div>
                   </motion.div>
