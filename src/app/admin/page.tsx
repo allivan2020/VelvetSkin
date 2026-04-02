@@ -1,82 +1,183 @@
 'use client';
 
-import { useState } from 'react';
-import { clsx } from 'clsx';
-// Импортируем компоненты вкладок
-import ReviewsTab from '@/components/admin/ReviewsTab';
-import LeadsTab from '@/components/admin/LeadsTab';
+import { useState, useEffect } from 'react';
+
+// --- ОПИС ТИПІВ (щоб не було any) ---
+interface Lead {
+  _id: string;
+  name: string;
+  contact: string;
+  status: string;
+  createdAt: string;
+}
+
+interface Review {
+  _id: string;
+  name: string;
+  text: string;
+  isApproved: boolean;
+  date: string;
+}
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('leads');
+  const [activeTab, setActiveTab] = useState<'leads' | 'reviews'>('leads');
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const tabs = [
-    { id: 'leads', label: '🔥 Нові Ліди (Квіз)' },
-    { id: 'clients', label: '👥 База Клієнтів' },
-    { id: 'reviews', label: '💬 Відгуки' },
-  ];
+  // Функція завантаження всього одразу
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      // Додаємо timestamp (?t=...), щоб Vercel не видавав старий кеш
+      const t = Date.now();
+      const [leadsRes, reviewsRes] = await Promise.all([
+        fetch(`/api/admin/leads?t=${t}`),
+        fetch(`/api/reviews?admin=true&t=${t}`),
+      ]);
+
+      const leadsData = await leadsRes.json();
+      const reviewsData = await reviewsRes.json();
+
+      setLeads(Array.isArray(leadsData) ? leadsData : []);
+      setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+    } catch (err) {
+      console.error('Помилка завантаження:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Керування відгуками (Схвалити/Видалити)
+  const handleReviewAction = async (
+    id: string,
+    action: 'approve' | 'delete',
+    currentStatus?: boolean,
+  ) => {
+    const url = action === 'approve' ? '/api/reviews' : `/api/reviews?id=${id}`;
+    const method = action === 'approve' ? 'PATCH' : 'DELETE';
+    const body =
+      action === 'approve'
+        ? JSON.stringify({ id, isApproved: !currentStatus })
+        : null;
+
+    await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    loadData();
+  };
+
+  if (loading)
+    return <div className="p-10 text-center font-bold">Оновлення даних...</div>;
 
   return (
-    <div className="min-h-screen bg-[#fcfaf8] p-6 md:p-12 font-poppins text-[#4a3f39]">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-10">
-          <h1 className="font-cormorant text-4xl md:text-5xl mb-2">
-            CRM Velvet Skin
+    <div className="min-h-screen bg-gray-50 p-4 md:p-10 font-sans">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-black uppercase tracking-tight">
+            Панель керування
           </h1>
-          <p className="text-sm opacity-70">
-            Керування заявками, клієнтами та розкладом
-          </p>
-        </header>
-
-        {/* Навигация */}
-        <div className="flex flex-wrap gap-2 border-b border-[#bd9b7d]/30 mb-8 pb-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={clsx(
-                'px-6 py-2.5 rounded-full text-[13px] uppercase tracking-[1px] font-medium transition-all',
-                activeTab === tab.id
-                  ? 'bg-[#bd9b7d] text-white shadow-md'
-                  : 'bg-transparent text-[#4a3f39] hover:bg-[#bd9b7d]/10',
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+          <button
+            onClick={loadData}
+            className="text-xs bg-gray-200 px-3 py-1 rounded-full"
+          >
+            Оновити базу
+          </button>
         </div>
 
-        {/* Контент вкладок */}
-        <main className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-[#4a3f39]/5 min-h-[500px]">
-          {/* ВКЛАДКА ЛИДОВ */}
-          {activeTab === 'leads' && (
-            <div>
-              <h2 className="text-2xl font-cormorant mb-6">
-                Нові заявки (Квіз)
-              </h2>
-              <LeadsTab />
-            </div>
-          )}
+        {/* Таби */}
+        <div className="flex gap-2 mb-8 bg-white p-1.5 rounded-2xl w-fit shadow-sm border border-gray-100">
+          <button
+            onClick={() => setActiveTab('leads')}
+            className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'leads'
+                ? 'bg-[#c49f2d] text-white shadow-lg'
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+          >
+            Ліди ({leads.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'reviews'
+                ? 'bg-[#c49f2d] text-white shadow-lg'
+                : 'text-gray-400 hover:bg-gray-50'
+            }`}
+          >
+            Відгуки ({reviews.length})
+          </button>
+        </div>
 
-          {/* ВКЛАДКА КЛИЕНТОВ (Пока пустая) */}
-          {activeTab === 'clients' && (
-            <div>
-              <h2 className="text-2xl font-cormorant mb-4">База клієнтів</h2>
-              <p className="text-sm opacity-70 italic">
-                Тут буде список постійних клієнтів та Google Календар.
-              </p>
-            </div>
-          )}
-
-          {/* ВКЛАДКА ОТЗЫВОВ */}
-          {activeTab === 'reviews' && (
-            <div>
-              <h2 className="text-2xl font-cormorant mb-6">
-                Модерація відгуків
-              </h2>
-              {/* <ReviewsTab /> */}
-            </div>
-          )}
-        </main>
+        {/* Контент */}
+        <div className="space-y-4">
+          {activeTab === 'leads'
+            ? leads.map((lead) => (
+                <div
+                  key={lead._id}
+                  className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"
+                >
+                  <div>
+                    <div className="font-bold text-gray-900">{lead.name}</div>
+                    <div className="text-gray-500 text-sm">{lead.contact}</div>
+                  </div>
+                  <div className="text-[10px] bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold uppercase">
+                    {lead.status}
+                  </div>
+                </div>
+              ))
+            : reviews.map((review) => (
+                <div
+                  key={review._id}
+                  className={`p-5 rounded-2xl border transition-all ${review.isApproved ? 'bg-white border-gray-100' : 'bg-amber-50 border-amber-200'}`}
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                      <div className="font-bold text-gray-900 flex items-center gap-2">
+                        {review.name}
+                        {!review.isApproved && (
+                          <span className="bg-amber-200 text-amber-800 text-[9px] px-2 py-0.5 rounded-md uppercase">
+                            Новий
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {review.text}
+                      </p>
+                      <div className="text-[10px] text-gray-400 mt-2">
+                        {review.date}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() =>
+                          handleReviewAction(
+                            review._id,
+                            'approve',
+                            review.isApproved,
+                          )
+                        }
+                        className={`px-4 py-2 rounded-xl text-xs font-bold text-white ${review.isApproved ? 'bg-gray-400' : 'bg-green-600'}`}
+                      >
+                        {review.isApproved ? 'Приховати' : 'Схвалити'}
+                      </button>
+                      <button
+                        onClick={() => handleReviewAction(review._id, 'delete')}
+                        className="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold"
+                      >
+                        Видалити
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+        </div>
       </div>
     </div>
   );

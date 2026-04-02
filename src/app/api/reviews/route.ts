@@ -1,64 +1,59 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import Review from '@/models/Review';
+import Review from '@/models/Review'; // Убедись, что модель существует!
 
 export async function GET(req: Request) {
   try {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
-    const isAdmin = searchParams.get('admin') === 'true';
+    const isAdmin = searchParams.get('admin');
+
+    // Если запрос из админки, отдаем все отзывы. Иначе - только одобренные.
     const query = isAdmin ? {} : { isApproved: true };
     const reviews = await Review.find(query).sort({ createdAt: -1 });
+
     return NextResponse.json(reviews);
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Помилка завантаження відгуків' },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const { name, text } = await req.json();
+    const body = await req.json();
+    const { name, text } = body;
 
-    const newReview = await Review.create({ name, text, isApproved: false });
-
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    if (botToken && chatId) {
-      const message =
-        `<b>✨ Новий відгук!</b>\n\n` +
-        `<b>👤 Ім'я:</b> ${name}\n` +
-        `<b>💬 Текст:</b> ${text}`;
-
-      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      });
-    }
+    const newReview = await Review.create({
+      name: name || 'Анонім',
+      text,
+      isApproved: false, // По умолчанию отзывы не одобрены
+    });
 
     return NextResponse.json(newReview, { status: 201 });
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Помилка створення' }, { status: 500 });
   }
 }
 
 export async function PATCH(req: Request) {
   try {
     await connectToDatabase();
-    const { id, isApproved } = await req.json();
-    const updated = await Review.findByIdAndUpdate(
+    const body = await req.json();
+    const { id, isApproved } = body;
+
+    const updatedReview = await Review.findByIdAndUpdate(
       id,
       { isApproved },
       { new: true },
     );
-    return NextResponse.json(updated);
+
+    return NextResponse.json(updatedReview);
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
   }
 }
 
@@ -68,8 +63,8 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     await Review.findByIdAndDelete(id);
-    return NextResponse.json({ message: 'Ok' });
+    return NextResponse.json({ message: 'Видалено' });
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }

@@ -22,10 +22,9 @@ export async function POST(req: Request) {
     const { name, phone, contact, service, experience, selections, type } =
       body;
 
-    // Исправляем ошибку 500: мапим phone в contact, если contact не пришел
     const leadData = {
       name: name || 'Без імені',
-      contact: contact || phone || 'Не вказано', // ПОЛЕ ИЗ ТВОЕЙ МОДЕЛИ
+      contact: contact || phone || 'Не вказано',
       experience: experience || 'Не вказано',
       selections: selections || (service ? [service] : []),
       status: 'Новий',
@@ -33,7 +32,6 @@ export async function POST(req: Request) {
 
     const newLead = await Lead.create(leadData);
 
-    // Уведомление в Telegram
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (botToken && chatId) {
@@ -59,6 +57,36 @@ export async function POST(req: Request) {
     const detail = error instanceof Error ? error.message : 'Unknown';
     console.error('СБОЙ БАЗЫ:', detail);
     return NextResponse.json({ error: detail }, { status: 500 });
+  }
+}
+
+// ДОБАВЛЕН МЕТОД PATCH ДЛЯ ОБНОВЛЕНИЯ СТАТУСА
+export async function PATCH(req: Request) {
+  try {
+    await connectToDatabase();
+    const body = await req.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json({ error: 'Недостатньо даних' }, { status: 400 });
+    }
+
+    const updatedLead = await Lead.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true },
+    );
+
+    if (!updatedLead) {
+      return NextResponse.json(
+        { error: 'Заявку не знайдено' },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(updatedLead);
+  } catch (error: unknown) {
+    return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
   }
 }
 
