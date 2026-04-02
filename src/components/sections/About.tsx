@@ -1,9 +1,43 @@
 'use client';
 
+import { useState } from 'react'; // ДОБАВЛЕНО: импортируем хук состояния
 import Link from 'next/link';
 import Image from 'next/image';
+import QuizModal from '@/components/ui/QuizModal';
 
 const About = () => {
+  // ДОБАВЛЕНО: Создаем состояние для открытия/закрытия модалки
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+
+  // ДОБАВЛЕНО: Функція відправки
+  interface QuizData {
+    experience: string;
+    selections: string[];
+    name: string;
+    contact: string;
+  }
+
+  const handleQuizSubmit = async (data: QuizData) => {
+    try {
+      const response = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert(
+          'Дякуємо! Ми звʼяжемося з вами найближчим часом та закріпимо бонус.',
+        );
+      } else {
+        alert('Упс, щось пішло не так. Спробуйте ще раз.');
+      }
+    } catch (error) {
+      console.error('Помилка відправки квізу:', error);
+    }
+  };
   return (
     <section
       id="about"
@@ -82,8 +116,25 @@ const About = () => {
               </span>
             </li>
           </ul>
+
+          {/* ДОБАВЛЕНО: Обертка для центрирования кнопки (опционально, но так красивее) */}
+          <div className="flex justify-center lg:justify-start">
+            <button
+              onClick={() => setIsQuizOpen(true)}
+              className="px-8 py-4 bg-[#bd9b7d] text-white rounded-full font-poppins text-[12px] md:text-[13px] uppercase tracking-[2px] transition-all hover:bg-[#a6856a] shadow-lg active:scale-95"
+            >
+              Підібрати догляд та отримати бонус
+            </button>
+          </div>
         </article>
       </div>
+
+      {/* Сам компонент квиза (он скрыт, пока isQuizOpen = false) */}
+      <QuizModal
+        isOpen={isQuizOpen}
+        onClose={() => setIsQuizOpen(false)}
+        onSubmit={handleQuizSubmit}
+      />
     </section>
   );
 };
