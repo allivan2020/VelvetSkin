@@ -8,16 +8,14 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const isAdmin = searchParams.get('admin') === 'true';
 
-    // Если админ — отдаем всё, если нет — только одобренные
     const query = isAdmin ? {} : { isApproved: true };
     const reviews = await Review.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json(reviews);
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Помилка при отриманні' },
-      { status: 500 },
-    );
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -34,15 +32,11 @@ export async function POST(req: Request) {
     await dbConnect();
     const newReview = await Review.create({ name, text, isApproved: false });
 
-    // Уведомление в Telegram
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    const siteUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || 'https://www.velvetskinzp.com';
-
     if (botToken && chatId) {
-      const message = `<b>✨ Новий відгук!</b>\n\n<b>👤 Ім'я:</b> ${name}\n<b>💬 Текст:</b> ${text}\n\n<a href="${siteUrl}/admin">👉 В адмінку</a>`;
-      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      const message = `<b>✨ Новий відгук!</b>\n\n<b>👤 Ім'я:</b> ${name}\n<b>💬 Текст:</b> ${text}`;
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -50,11 +44,11 @@ export async function POST(req: Request) {
           text: message,
           parse_mode: 'HTML',
         }),
-      });
+      }).catch((err) => console.error('TG Error:', err));
     }
 
     return NextResponse.json(newReview, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Помилка при збереженні' },
       { status: 500 },
@@ -62,23 +56,21 @@ export async function POST(req: Request) {
   }
 }
 
-// Метод для одобрения отзыва
 export async function PATCH(req: Request) {
   try {
     await dbConnect();
     const { id, isApproved } = await req.json();
-    const updatedReview = await Review.findByIdAndUpdate(
+    const updated = await Review.findByIdAndUpdate(
       id,
       { isApproved },
       { new: true },
     );
-    return NextResponse.json(updatedReview);
-  } catch (error) {
+    return NextResponse.json(updated);
+  } catch (error: unknown) {
     return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
   }
 }
 
-// Метод для удаления
 export async function DELETE(req: Request) {
   try {
     await dbConnect();
@@ -86,7 +78,7 @@ export async function DELETE(req: Request) {
     const id = searchParams.get('id');
     await Review.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Видалено' });
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }
