@@ -196,7 +196,7 @@ export default function ClientsTab() {
                         </span>
                         {visit.notes && (
                           <span className="text-gray-500 text-xs italic flex-1 md:text-center px-2">
-                            "{visit.notes}"
+                            {visit.notes}
                           </span>
                         )}
                         {visit.price > 0 && (

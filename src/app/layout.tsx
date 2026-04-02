@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { GoogleAnalytics } from '@next/third-parties/google'; // Змінюємо на Analytics
+import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import BookingModal from '@/components/ui/BookingModal';
+import AdminHide from '@/components/layout/AdminHide'; // Додали наш новий компонент
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 
@@ -92,13 +93,18 @@ export default function RootLayout({
         />
       </head>
       <body className={`${poppins.className} relative`}>
-        {/* Вставляємо твій реальний ID сюди */}
         <GoogleAnalytics gaId="G-D2VMY46VL3" />
 
-        <Header />
+        <AdminHide>
+          <Header />
+        </AdminHide>
+
         <main className="relative">{children}</main>
-        <Footer />
-        <BookingModal />
+
+        <AdminHide>
+          <Footer />
+          <BookingModal />
+        </AdminHide>
       </body>
     </html>
   );
