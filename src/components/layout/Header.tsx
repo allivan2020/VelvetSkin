@@ -5,19 +5,19 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 
 const Header = () => {
-  const [mounted, setMounted] = useState(false);
+  // По умолчанию считаем, что мы на самом верху (isScrolled = false)
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
+
+    // Проверяем скролл сразу при монтировании компонента (полезно при рефреше страницы)
+    handleScroll();
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  if (!mounted)
-    return <header className="fixed top-0 w-full py-[40px] z-[1000]" />;
 
   const navLinks = [
     { name: 'Головна', href: '#hero' },
