@@ -6,26 +6,32 @@ if (!MONGODB_URI) {
   throw new Error('Будь ласка, додайте MONGODB_URI у файл .env.local');
 }
 
-// Кэшируем подключение, чтобы не плодить их при каждой перезагрузке в dev-режиме
-let cached = (global as any).mongoose;
+// Указываем тип для глобального кэша, чтобы избежать 'any'
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache;
+}
+
+let cached = global.mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
-  }
+  if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        bufferCommands: false,
+      })
+      .then((m) => m);
   }
 
   try {
