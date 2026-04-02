@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
+import dbConnect from '@/lib/mongodb';
 import Review from '@/models/Review';
 
-// GET-запрос: получаем только одобренные отзывы
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    await connectToDatabase();
-    const reviews = await Review.find({ isApproved: true }).sort({
-      createdAt: -1,
-    });
+    await dbConnect();
+    const { searchParams } = new URL(req.url);
+    const isAdmin = searchParams.get('admin') === 'true';
+
+    // Если админ — отдаем всё, если нет — только одобренные
+    const query = isAdmin ? {} : { isApproved: true };
+    const reviews = await Review.find(query).sort({ createdAt: -1 });
+
     return NextResponse.json(reviews);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Помилка при отриманні відгуків' },
+      { error: 'Помилка при отриманні' },
       { status: 500 },
     );
   }
 }
 
-// POST-запрос: сохраняем отзыв и отправляем уведомление
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, text } = body;
-
+    const { name, text } = await req.json();
     if (!name || !text) {
       return NextResponse.json(
         { error: "Ім'я та текст обов'язкові" },
@@ -31,27 +31,17 @@ export async function POST(req: Request) {
       );
     }
 
-    await connectToDatabase();
-    const newReview = new Review({ name, text });
-    await newReview.save();
+    await dbConnect();
+    const newReview = await Review.create({ name, text, isApproved: false });
 
-    // --- НАСТРОЙКИ TELEGRAM ---
+    // Уведомление в Telegram
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-
-    // Динамическая ссылка: берется из Vercel или ставится запасная
     const siteUrl =
       process.env.NEXT_PUBLIC_BASE_URL || 'https://www.velvetskinzp.com';
-    const adminLink = `${siteUrl.replace(/\/$/, '')}/admin`;
 
     if (botToken && chatId) {
-      // Используем HTML разметку (как в твоем первом файле с заявками) — она надежнее
-      const message =
-        `<b>✨ Новий відгук на сайті!</b>\n\n` +
-        `<b>👤 Ім'я:</b> ${name}\n` +
-        `<b>💬 Текст:</b> ${text}\n\n` +
-        `<a href="${adminLink}">👉 Перейти в адмінку</a>`;
-
+      const message = `<b>✨ Новий відгук!</b>\n\n<b>👤 Ім'я:</b> ${name}\n<b>💬 Текст:</b> ${text}\n\n<a href="${siteUrl}/admin">👉 В адмінку</a>`;
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,15 +53,40 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json(
-      { message: 'Відгук успішно додано' },
-      { status: 201 },
-    );
+    return NextResponse.json(newReview, { status: 201 });
   } catch (error) {
-    console.error('Review Error:', error);
     return NextResponse.json(
       { error: 'Помилка при збереженні' },
       { status: 500 },
     );
+  }
+}
+
+// Метод для одобрения отзыва
+export async function PATCH(req: Request) {
+  try {
+    await dbConnect();
+    const { id, isApproved } = await req.json();
+    const updatedReview = await Review.findByIdAndUpdate(
+      id,
+      { isApproved },
+      { new: true },
+    );
+    return NextResponse.json(updatedReview);
+  } catch (error) {
+    return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
+  }
+}
+
+// Метод для удаления
+export async function DELETE(req: Request) {
+  try {
+    await dbConnect();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    await Review.findByIdAndDelete(id);
+    return NextResponse.json({ message: 'Видалено' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { clsx } from 'clsx';
 // Импортируем компоненты вкладок
-// import ReviewsTab from '@/components/admin/ReviewsTab';
+import ReviewsTab from '@/components/admin/ReviewsTab';
 import LeadsTab from '@/components/admin/LeadsTab';
 
 export default function AdminDashboard() {
