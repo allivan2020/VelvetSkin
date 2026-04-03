@@ -21,12 +21,13 @@ const Hero = () => {
       </div>
 
       <video
+        poster="/img/hero-poster.jpg"
         autoPlay
         muted
         loop
         playsInline
         aria-hidden="true"
-        preload="auto"
+        preload="metadata"
         className="absolute inset-0 w-full h-full object-cover z-[1]"
       >
         <source src="/img/hero-video.webm" type="video/webm" />

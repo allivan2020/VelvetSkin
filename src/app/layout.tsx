@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from '@/components/layout/Footer';
+import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
-import BookingModal from '@/components/ui/BookingModal';
 import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
+
+const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
 export const metadata: Metadata = {
   verification: {
