@@ -16,7 +16,9 @@ export async function POST(req: Request) {
       contact,
       experience,
       selections: safeSelections,
+      type: 'Квіз',
       status: 'Новий',
+      createdAt: new Date(),
     });
 
     await newLead.save(); // Зберегли в MongoDB!

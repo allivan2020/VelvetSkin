@@ -19,7 +19,8 @@ export default function LeadsTab() {
 
   const fetchLeads = async () => {
     try {
-      const res = await fetch('/api/leads');
+      // ИСПРАВЛЕНО: Добавлен /admin
+      const res = await fetch('/api/admin/leads');
       if (res.ok) {
         const data = await res.json();
         setLeads(data);
@@ -40,32 +41,31 @@ export default function LeadsTab() {
       return;
 
     try {
-      // 1. Створюємо клієнта в Базі клієнтів
+      // 1. Створюємо клієнта в Базі клієнтів (тут путь остается /api/clients, если он так настроен)
       await fetch('/api/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: lead.name,
-          phone: lead.contact, // У лідах контакт лежить у полі contact
+          phone: lead.contact,
           source: lead.type || 'Сайт/Квіз',
           service: lead.selections?.join(', ') || 'Не вказано',
         }),
       });
 
       // 2. Видаляємо ліда з вкладки нових заявок
-      await fetch(`/api/leads?id=${lead._id}`, { method: 'DELETE' });
+      // ИСПРАВЛЕНО: Добавлен /admin
+      await fetch(`/api/admin/leads?id=${lead._id}`, { method: 'DELETE' });
 
-      // 3. Формуємо посилання на Google Календар (назва події та опис)
+      // 3. Формуємо посилання на Google Календар
       const eventTitle = encodeURIComponent(`Запис: ${lead.name}`);
       const eventDetails = encodeURIComponent(
         `Телефон: ${lead.contact}\nПослуга: ${lead.selections?.join(', ') || 'Не вказано'}`,
       );
       const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${eventDetails}`;
 
-      // 4. Відкриваємо календар у новій вкладці
       window.open(calendarUrl, '_blank');
 
-      // 5. Оновлюємо список заявок
       fetchLeads();
     } catch (error) {
       alert('Сталася помилка при обробці заявки');
@@ -75,7 +75,10 @@ export default function LeadsTab() {
   const deleteLead = async (id: string) => {
     if (!confirm('Точно видалити цю заявку назавжди?')) return;
     try {
-      const res = await fetch(`/api/leads?id=${id}`, { method: 'DELETE' });
+      // ИСПРАВЛЕНО: Добавлен /admin
+      const res = await fetch(`/api/admin/leads?id=${id}`, {
+        method: 'DELETE',
+      });
       if (res.ok) fetchLeads();
     } catch (err) {
       alert('Помилка видалення');

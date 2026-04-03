@@ -19,18 +19,24 @@ const About = () => {
 
   const handleQuizSubmit = async (data: QuizData) => {
     try {
-      const response = await fetch('/api/quiz', {
+      const response = await fetch('/api/admin/leads', {
+        // Змінили на загальний шлях лідів
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          type: 'Квіз', // Додаємо мітку, щоб в адмінці було видно, що це з квізу
+          status: 'Новий',
+        }),
       });
 
       if (response.ok) {
         alert(
           'Дякуємо! Ми звʼяжемося з вами найближчим часом та закріпимо бонус.',
         );
+        setIsQuizOpen(false); // Закриваємо модалку при успіху
       } else {
         alert('Упс, щось пішло не так. Спробуйте ще раз.');
       }
