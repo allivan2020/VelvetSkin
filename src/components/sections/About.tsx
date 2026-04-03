@@ -129,7 +129,7 @@ const About = () => {
               onClick={() => setIsQuizOpen(true)}
               className="px-8 py-4 bg-[#bd9b7d] text-white rounded-full font-poppins text-[12px] md:text-[13px] uppercase tracking-[2px] transition-all hover:bg-[#a6856a] shadow-lg active:scale-95"
             >
-              Підібрати час для візиту
+              Підібрати ідеальний догляд
             </button>
           </div>
         </article>
