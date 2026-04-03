@@ -101,7 +101,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
   const options =
     formData.experience === 'Новачок'
       ? [
-          'Максимальна безболісність',
+          'Мінімізація дискомфорту',
           'Догляд та рекомендації майстра',
           'Швидкість процедури',
           'Консультація щодо вростання',
@@ -255,11 +255,12 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
               <div className="bg-[#bd9b7d]/10 p-4 rounded-xl text-center mb-2">
                 <p className="font-poppins text-[13px] text-[#4a3f39]">
-                  Залиште контакти, щоб ми закріпили за вами{' '}
+                  Залиште ваші контакти, і ми надішлемо вам актуальні
                   <span className="font-semibold text-[#a6856a]">
-                    [ТУТ БУДЕ БОНУС ВІД ЗАМОВНИКА]
-                  </span>{' '}
-                  та надіслали вільні віконця.
+                    {' '}
+                    вільні віконця{' '}
+                  </span>
+                  для запису у Запоріжжі.
                 </p>
               </div>
 
@@ -344,10 +345,10 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
                 <button
                   type="submit"
-                  aria-label="Відправити дані та отримати бонус"
+                  aria-label="Відправити дані та отримати вільні віконця"
                   className="w-full mt-2 py-3.5 bg-[#bd9b7d] hover:bg-[#a6856a] text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px] font-medium transition-colors shadow-[0_4px_15px_rgba(189,155,125,0.3)] active:scale-95"
                 >
-                  Отримати бонус
+                  Підібрати час
                 </button>
               </form>
 
