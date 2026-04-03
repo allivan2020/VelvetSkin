@@ -3,8 +3,10 @@ import mongoose from 'mongoose';
 const LeadSchema = new mongoose.Schema({
   name: { type: String, required: true },
   contact: { type: String, required: true },
-  experience: { type: String }, // Новачок або Постійний
-  selections: [{ type: String }], // Що обрали (зони/болі)
+  service: { type: String }, // <-- Добавили (услуга из формы)
+  type: { type: String }, // <-- Добавили (Квіз или Кнопка)
+  experience: { type: String },
+  selections: [{ type: String }],
   status: {
     type: String,
     enum: ['Новий', 'В роботі', 'Конвертовано', 'Відмова'],

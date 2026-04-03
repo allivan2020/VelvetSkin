@@ -19,27 +19,46 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const body = await req.json();
-    const { name, phone, contact, service, experience, selections, type } =
-      body;
 
+    // 1. Извлекаем ВСЕ данные, которые могут прийти и из квиза, и из кнопки
+    const {
+      name,
+      phone,
+      contact,
+      service,
+      experience,
+      selections,
+      type,
+      answers,
+    } = body;
+
+    // 2. Формируем объект для базы максимально гибко
     const leadData = {
       name: name || 'Без імені',
       contact: contact || phone || 'Не вказано',
+      // Сохраняем и конкретную услугу, и результаты квиза (selections/answers)
+      service: service || 'Квіз/Інше',
       experience: experience || 'Не вказано',
-      selections: selections || (service ? [service] : []),
+      selections: selections || answers || (service ? [service] : []),
+      type: type || 'Загальна заявка', // Тот самый тип (Запис з кнопки или Квіз)
       status: 'Новий',
+      createdAt: new Date(), // Хорошим тоном будет явно указать дату
     };
 
+    // Сохраняем в базу
     const newLead = await Lead.create(leadData);
 
+    // 3. Telegram сообщение (уже работает, просто убедимся, что данные верны)
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
+
     if (botToken && chatId) {
       const message =
-        `<b>📌 Нова заявка (${type || 'Сайт'})</b>\n\n` +
+        `<b>📌 Нова заявка (${leadData.type})</b>\n\n` +
         `<b>👤 Ім'я:</b> ${leadData.name}\n` +
         `<b>📞 Контакт:</b> ${leadData.contact}\n` +
-        `<b>🛠 Послуга:</b> ${service || 'Не вказано'}`;
+        `<b>🛠 Послуга:</b> ${leadData.service}\n` +
+        `<b>📊 Квіз/Вибір:</b> ${Array.isArray(leadData.selections) ? leadData.selections.join(', ') : leadData.selections}`;
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -54,9 +73,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newLead, { status: 201 });
   } catch (error: unknown) {
-    const detail = error instanceof Error ? error.message : 'Unknown';
-    console.error('СБОЙ БАЗЫ:', detail);
-    return NextResponse.json({ error: detail }, { status: 500 });
+    console.error('СБОЙ БАЗЫ:', error);
+    return NextResponse.json({ error: 'Помилка на сервері' }, { status: 500 });
   }
 }
 
