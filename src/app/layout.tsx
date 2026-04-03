@@ -3,7 +3,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import BookingModal from '@/components/ui/BookingModal';
-import AdminHide from '@/components/layout/AdminHide'; // Додали наш новий компонент
+import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 

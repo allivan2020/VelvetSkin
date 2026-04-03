@@ -30,12 +30,33 @@ export async function POST(req: Request) {
     const newReview = await Review.create({
       name: name || 'Анонім',
       text,
-      isApproved: false, // По умолчанию отзывы не одобрены
+      isApproved: false,
     });
+
+    // Відправка сповіщення в Telegram
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (botToken && chatId) {
+      const message = `<b>💬 Новий відгук на сайті!</b>\n\n<b>👤 Від:</b> ${newReview.name}\n<b>📝 Текст:</b> ${newReview.text}\n\n<i>⏳ Відгук очікує на модерацію в адмін-панелі.</i>`;
+
+      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
+      });
+    }
 
     return NextResponse.json(newReview, { status: 201 });
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Помилка створення' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Помилка створення відгуку' },
+      { status: 500 },
+    );
   }
 }
 
