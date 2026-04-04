@@ -39,7 +39,8 @@ export default function LeadsTab() {
     if (!confirm(`Прийняти заявку від ${lead.name} та перейти до Календаря?`))
       return;
 
-    // ПРИБРАЛИ ВІДКРИТТЯ НОВОЇ ВКЛАДКИ, щоб Safari не блокував файл
+    // Відкриваємо вкладку ОДРАЗУ після кліку, щоб браузер (особливо iPhone) її не блокував
+    const calendarWindow = window.open('', '_blank');
 
     try {
       let serviceStr = 'Не вказано';
@@ -65,6 +66,7 @@ export default function LeadsTab() {
 
       if (!res.ok) {
         const responseData = await res.json();
+        if (calendarWindow) calendarWindow.close();
         alert(`Помилка сервера: ${responseData.error}`);
         return;
       }
@@ -72,41 +74,24 @@ export default function LeadsTab() {
       // 2. Видаляємо ліда зі списку нових
       await fetch(`/api/admin/leads?id=${lead._id}`, { method: 'DELETE' });
 
-      // 3. Формуємо файл для РІДНОГО календаря смартфона (.ics)
-      const now = new Date();
-      now.setHours(now.getHours() + 1);
-      const dtStart =
-        now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-      now.setHours(now.getHours() + 1);
-      const dtEnd = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      // 3. Формуємо СУЧАСНЕ МОБІЛЬНЕ посилання Google Календаря
+      const eventTitle = encodeURIComponent(`Запис: ${lead.name}`);
+      const eventDetails = encodeURIComponent(
+        `Тел: ${phoneStr}\nПослуга: ${serviceStr}`,
+      );
 
-      const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:Запис: ${lead.name}
-DESCRIPTION:Телефон: ${phoneStr}\\nПослуга: ${serviceStr}
-DTSTART:${dtStart}
-DTEND:${dtEnd}
-END:VEVENT
-END:VCALENDAR`.replace(/\n/g, '\r\n');
+      // Зверни увагу на /u/0/r/eventedit - це адаптивна версія (Responsive)
+      const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${eventTitle}&details=${eventDetails}`;
 
-      const blob = new Blob([icsContent], {
-        type: 'text/calendar;charset=utf-8',
-      });
-      const icsUrl = URL.createObjectURL(blob);
+      // Перенаправляємо заздалегідь відкриту вкладку на правильний URL
+      if (calendarWindow) {
+        calendarWindow.location.href = calendarUrl;
+      }
 
-      // 4. Ідеальний спосіб для iPhone: створюємо невидиме посилання і натискаємо його
-      const safeName = lead.name.replace(/\s+/g, '_');
-      const link = document.createElement('a');
-      link.href = icsUrl;
-      link.setAttribute('download', `Zapis_${safeName}.ics`);
-      document.body.appendChild(link);
-      link.click(); // Симулюємо клік по файлу
-      document.body.removeChild(link); // Прибираємо посилання
-
-      // 5. Оновлюємо список
+      // 4. Оновлюємо список
       fetchLeads();
     } catch (error: any) {
+      if (calendarWindow) calendarWindow.close();
       console.error('Критична помилка:', error);
       alert(`Помилка: ${error.message}`);
     }
