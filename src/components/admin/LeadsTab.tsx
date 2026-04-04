@@ -39,9 +39,6 @@ export default function LeadsTab() {
     if (!confirm(`Прийняти заявку від ${lead.name} та перейти до Календаря?`))
       return;
 
-    // Відкриваємо вкладку ОДРАЗУ після кліку, щоб браузер (особливо iPhone) її не блокував
-    const calendarWindow = window.open('', '_blank');
-
     try {
       let serviceStr = 'Не вказано';
       if (Array.isArray(lead.selections)) {
@@ -66,7 +63,6 @@ export default function LeadsTab() {
 
       if (!res.ok) {
         const responseData = await res.json();
-        if (calendarWindow) calendarWindow.close();
         alert(`Помилка сервера: ${responseData.error}`);
         return;
       }
@@ -80,18 +76,11 @@ export default function LeadsTab() {
         `Тел: ${phoneStr}\nПослуга: ${serviceStr}`,
       );
 
-      // Зверни увагу на /u/0/r/eventedit - це адаптивна версія (Responsive)
       const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${eventTitle}&details=${eventDetails}`;
 
-      // Перенаправляємо заздалегідь відкриту вкладку на правильний URL
-      if (calendarWindow) {
-        calendarWindow.location.href = calendarUrl;
-      }
-
-      // 4. Оновлюємо список
-      fetchLeads();
+      // 4. ПЕРЕХОДИМО В КАЛЕНДАР У ЦЬОМУ Ж ВІКНІ (тепер працюватиме ідеально)
+      window.location.href = calendarUrl;
     } catch (error: any) {
-      if (calendarWindow) calendarWindow.close();
       console.error('Критична помилка:', error);
       alert(`Помилка: ${error.message}`);
     }
