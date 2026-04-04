@@ -57,9 +57,25 @@ export default function ClientsTab() {
     }
   };
 
+  // НОВА ФУНКЦІЯ: ВИДАЛЕННЯ КЛІЄНТА
+  const deleteClient = async (id: string, name: string) => {
+    if (
+      !confirm(
+        `Ви точно хочете видалити клієнта ${name} та всю історію його візитів назавжди?`,
+      )
+    )
+      return;
+    try {
+      const res = await fetch(`/api/clients?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchClients();
+    } catch (err) {
+      alert('Помилка при видаленні');
+    }
+  };
+
   const addVisit = (client: Client) => {
     const date = prompt(
-      'Дата візиту (наприклад: 15.04.2026):',
+      'Дата виконаного візиту (наприклад: 15.04.2026):',
       new Date().toLocaleDateString('uk-UA'),
     );
     if (!date) return;
@@ -83,7 +99,7 @@ export default function ClientsTab() {
 
   const setNextAppointment = (client: Client) => {
     const date = prompt(
-      'Дата наступного сеансу (щоб не забути нагадати клієнту):',
+      'Дата НАСТУПНОГО сеансу (щоб не забути нагадати клієнту):',
       client.nextAppointment,
     );
     if (date !== null) {
@@ -134,9 +150,30 @@ export default function ClientsTab() {
           {displayedClients.map((client) => (
             <div
               key={client._id}
-              className="p-5 border rounded-2xl bg-white shadow-sm border-gray-100"
+              className="p-5 border rounded-2xl bg-white shadow-sm border-gray-100 relative"
             >
-              <div className="flex flex-col md:flex-row justify-between gap-4 mb-4 border-b border-gray-50 pb-4">
+              {/* Кнопка Видалення (Кошик) в правому верхньому куті */}
+              <button
+                onClick={() => deleteClient(client._id, client.name)}
+                className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                title="Видалити клієнта"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5 v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                  />
+                </svg>
+              </button>
+
+              <div className="flex flex-col md:flex-row justify-between gap-4 mb-4 border-b border-gray-50 pb-4 pr-10">
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     {client.name}
@@ -149,6 +186,7 @@ export default function ClientsTab() {
                   </p>
                 </div>
                 <div className="md:text-right shrink-0">
+                  {/* Кнопка "Наступний візит" (Майбутнє) */}
                   <button
                     onClick={() => setNextAppointment(client)}
                     className={`text-sm font-bold px-4 py-2 rounded-xl transition-all ${
@@ -158,22 +196,43 @@ export default function ClientsTab() {
                     }`}
                   >
                     {client.nextAppointment
-                      ? `Наступний запис: ${client.nextAppointment}`
-                      : 'Призначити наступний візит 🗓'}
+                      ? `🗓 Заплановано на: ${client.nextAppointment}`
+                      : '🗓 Запланувати наступний візит'}
                   </button>
                 </div>
+              </div>
+
+              {/* НОВЕ: ПОЛЕ ДЛЯ ЗАМІТОК */}
+              <div className="mb-5 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+                <h4 className="font-bold text-xs text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  📝 Замітки про клієнта (автозбереження)
+                </h4>
+                <textarea
+                  className="w-full p-2 text-sm bg-white border border-gray-200 focus:border-purple-300 rounded-lg transition-all outline-none resize-y"
+                  placeholder="Особливості шкіри, алергії, побажання..."
+                  rows={2}
+                  defaultValue={client.generalNotes || ''}
+                  onBlur={(e) => {
+                    if (e.target.value !== (client.generalNotes || '')) {
+                      updateClient(client._id, {
+                        generalNotes: e.target.value,
+                      });
+                    }
+                  }}
+                />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h4 className="font-bold text-sm text-gray-700">
-                    Історія візитів ({client.visits?.length || 0}):
+                    Історія виконаних процедур ({client.visits?.length || 0}):
                   </h4>
+                  {/* Кнопка "Додати візит" (Минуле/Історія) */}
                   <button
                     onClick={() => addVisit(client)}
-                    className="text-xs bg-gray-100 text-gray-700 font-bold px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all"
+                    className="text-xs bg-green-50 text-green-700 font-bold px-3 py-1.5 rounded-lg hover:bg-green-100 transition-all flex items-center gap-1"
                   >
-                    + Додати візит
+                    <span>+</span> Записати в історію
                   </button>
                 </div>
 
