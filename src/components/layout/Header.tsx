@@ -5,16 +5,12 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 
 const Header = () => {
-  // По умолчанию считаем, что мы на самом верху (isScrolled = false)
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
-
-    // Проверяем скролл сразу при монтировании компонента (полезно при рефреше страницы)
     handleScroll();
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -46,51 +42,22 @@ const Header = () => {
       >
         <div className="container mx-auto flex items-center justify-between w-full">
           {/* Логотип */}
-          <div className="flex flex-col items-start min-w-[150px]">
+          <div className="flex flex-col items-start min-w-[120px] sm:min-w-[150px] relative z-[2001]">
             <Link
               href="#hero"
               className={clsx(
-                'font-cormorant text-[26px] tracking-[2px] uppercase no-underline leading-none transition-colors duration-500',
-                isScrolled ? 'text-[#4a3f39]' : 'text-[#fdfbf7]',
+                'font-cormorant text-[22px] sm:text-[26px] tracking-[2px] uppercase no-underline leading-none transition-colors duration-500',
+                isScrolled && !isMenuOpen ? 'text-[#4a3f39]' : 'text-[#fdfbf7]',
               )}
             >
               Velvet
-              <span className="italic font-light text-[#dcb38a] lowercase text-[28px]">
+              <span className="italic font-light text-[#dcb38a] lowercase text-[24px] sm:text-[28px]">
                 Skin
               </span>
             </Link>
           </div>
 
-          {/* Бургер для мобилки */}
-          <button
-            className="lg:hidden flex flex-col gap-[6px] p-2 bg-transparent border-none z-[2001]"
-            aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <span
-              className={clsx(
-                'w-[24px] h-[1.5px] transition-all duration-300',
-                isMenuOpen || !isScrolled ? 'bg-[#fdfbf7]' : 'bg-[#4a3f39]',
-                isMenuOpen && 'rotate-45 translate-y-[7.5px]',
-              )}
-            ></span>
-            <span
-              className={clsx(
-                'w-[24px] h-[1.5px] transition-all duration-300',
-                isMenuOpen || !isScrolled ? 'bg-[#fdfbf7]' : 'bg-[#4a3f39]',
-                isMenuOpen && 'opacity-0',
-              )}
-            ></span>
-            <span
-              className={clsx(
-                'w-[24px] h-[1.5px] transition-all duration-300',
-                isMenuOpen || !isScrolled ? 'bg-[#fdfbf7]' : 'bg-[#4a3f39]',
-                isMenuOpen && '-rotate-45 -translate-y-[7.5px]',
-              )}
-            ></span>
-          </button>
-
-          {/* Меню */}
+          {/* Меню (Центр) */}
           <nav
             className={clsx(
               'flex gap-8 justify-center flex-grow transition-all duration-500',
@@ -118,20 +85,57 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Кнопка */}
-          <div className="hidden sm:flex items-center">
+          {/* Правая часть: CTA Кнопка + Бургер */}
+          <div className="flex items-center gap-3 sm:gap-6 relative z-[2001]">
+            {/* CTA Кнопка (теперь видима всегда) */}
             <Link
               href="#booking-modal"
               aria-label="Записатись"
+              onClick={() => setIsMenuOpen(false)}
               className={clsx(
-                'inline-block px-8 py-2.5 rounded-full text-[11px] uppercase tracking-[2px] font-medium whitespace-nowrap transition-all duration-500 active:scale-95',
-                isScrolled
+                'inline-block px-5 py-2 sm:px-8 sm:py-2.5 rounded-full text-[10px] sm:text-[11px] uppercase tracking-[2px] font-medium whitespace-nowrap transition-all duration-500 active:scale-95',
+                isScrolled && !isMenuOpen
                   ? 'bg-[#bd9b7d] text-white border border-transparent hover:bg-[#a6856a] shadow-[0_4px_15px_rgba(189,155,125,0.3)]'
                   : 'bg-white/10 border border-[#fdfbf7]/30 text-[#fdfbf7] backdrop-blur-md hover:bg-[#fdfbf7] hover:text-[#231d19]',
               )}
             >
               Записатись
             </Link>
+
+            {/* Бургер для мобилки */}
+            <button
+              className="lg:hidden flex flex-col gap-[6px] p-2 bg-transparent border-none"
+              aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <span
+                className={clsx(
+                  'w-[24px] h-[1.5px] transition-all duration-300',
+                  isMenuOpen || (!isScrolled && !isMenuOpen)
+                    ? 'bg-[#fdfbf7]'
+                    : 'bg-[#4a3f39]',
+                  isMenuOpen && 'rotate-45 translate-y-[7.5px]',
+                )}
+              ></span>
+              <span
+                className={clsx(
+                  'w-[24px] h-[1.5px] transition-all duration-300',
+                  isMenuOpen || (!isScrolled && !isMenuOpen)
+                    ? 'bg-[#fdfbf7]'
+                    : 'bg-[#4a3f39]',
+                  isMenuOpen && 'opacity-0',
+                )}
+              ></span>
+              <span
+                className={clsx(
+                  'w-[24px] h-[1.5px] transition-all duration-300',
+                  isMenuOpen || (!isScrolled && !isMenuOpen)
+                    ? 'bg-[#fdfbf7]'
+                    : 'bg-[#4a3f39]',
+                  isMenuOpen && '-rotate-45 -translate-y-[7.5px]',
+                )}
+              ></span>
+            </button>
           </div>
         </div>
       </div>
