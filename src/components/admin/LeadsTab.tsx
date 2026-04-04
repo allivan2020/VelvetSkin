@@ -39,7 +39,7 @@ export default function LeadsTab() {
     if (!confirm(`Прийняти заявку від ${lead.name} та перейти до Календаря?`))
       return;
 
-    // Відкриваємо вкладку заздалегідь (щоб браузер не блокував)
+    // Відкриваємо вкладку заздалегідь
     const calendarWindow = window.open('', '_blank');
 
     try {
@@ -68,21 +68,40 @@ export default function LeadsTab() {
         const responseData = await res.json();
         if (calendarWindow) calendarWindow.close();
         alert(`Помилка сервера: ${responseData.error}`);
-        return; // Зупиняємо, якщо сервер дійсно впав
+        return;
       }
 
       // 2. Видаляємо ліда зі списку нових
       await fetch(`/api/admin/leads?id=${lead._id}`, { method: 'DELETE' });
 
-      // 3. Формуємо календар
-      const eventTitle = encodeURIComponent(`Запис: ${lead.name}`);
-      const eventDetails = encodeURIComponent(
-        `Тел: ${phoneStr}\nПослуга: ${serviceStr}`,
-      );
-      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${eventDetails}`;
+      // 3. Формуємо файл для РІДНОГО календаря смартфона (.ics)
+      const now = new Date();
+      now.setHours(now.getHours() + 1); // Ставимо час просто як заглушку
+      const dtStart =
+        now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      now.setHours(now.getHours() + 1); // Тривалість процедури - умовно 1 година
+      const dtEnd = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
+      // Формуємо вміст файлу. Формат вимагає перенесення рядків \r\n
+      const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:Запис: ${lead.name}
+DESCRIPTION:Телефон: ${phoneStr}\\nПослуга: ${serviceStr}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+END:VEVENT
+END:VCALENDAR`.replace(/\n/g, '\r\n');
+
+      // Перетворюємо текст на файл
+      const blob = new Blob([icsContent], {
+        type: 'text/calendar;charset=utf-8',
+      });
+      const icsUrl = URL.createObjectURL(blob);
+
+      // Передаємо файл у підготовлену вкладку
       if (calendarWindow) {
-        calendarWindow.location.href = calendarUrl;
+        calendarWindow.location.href = icsUrl;
       }
 
       // 4. Оновлюємо список
@@ -117,7 +136,6 @@ export default function LeadsTab() {
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {leads.map((lead) => {
-            // Безпечно обробляємо послуги для відображення в UI
             let displayService = 'Не вказано';
             if (Array.isArray(lead.selections)) {
               displayService = lead.selections.join(', ') || 'Не вказано';
