@@ -25,11 +25,13 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const body = await req.json();
-    const { name, text } = body;
+    // Добавили source
+    const { name, text, source } = body;
 
     const newReview = await Review.create({
       name: name || 'Анонім',
       text,
+      source: source || 'Сайт', // Сохраняем источник
       isApproved: false,
     });
 
@@ -38,7 +40,8 @@ export async function POST(req: Request) {
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (botToken && chatId) {
-      const message = `<b>💬 Новий відгук на сайті!</b>\n\n<b>👤 Від:</b> ${newReview.name}\n<b>📝 Текст:</b> ${newReview.text}\n\n<i>⏳ Відгук очікує на модерацію в адмін-панелі.</i>`;
+      // Добавили джерело в повідомлення
+      const message = `<b>💬 Новий відгук!</b>\n\n<b>👤 Від:</b> ${newReview.name}\n<b>📱 Джерело:</b> ${newReview.source}\n<b>📝 Текст:</b> ${newReview.text}\n\n<i>⏳ Відгук очікує на модерацію.</i>`;
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',

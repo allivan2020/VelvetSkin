@@ -8,9 +8,9 @@ interface ReviewType {
   _id: string;
   name: string;
   text: string;
-  date: string;
-  source: string;
-  link: string;
+  createdAt: string; // ВИПРАВЛЕНО З date НА createdAt
+  source?: string;
+  link?: string;
 }
 
 const Reviews = () => {
@@ -18,7 +18,7 @@ const Reviews = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSending, setIsSending] = useState(false); // Захист від подвійного кліку
+  const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({ name: '', text: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -86,7 +86,6 @@ const Reviews = () => {
 
       <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-16">
-          {/* Збільшено жирність для проходження тесту на контрастність */}
           <p className="font-poppins text-[10px] md:text-[12px] uppercase tracking-[6px] text-[#917152] mb-4 font-black">
             Відгуки
           </p>
@@ -120,6 +119,11 @@ const Reviews = () => {
                 if (offset < -Math.floor(total / 2)) offset += total;
 
                 const isActive = offset === 0;
+
+                // ФОРМАТУВАННЯ ДАТИ
+                const formattedDate = review.createdAt
+                  ? new Date(review.createdAt).toLocaleDateString('uk-UA')
+                  : '';
 
                 return (
                   <motion.div
@@ -161,26 +165,35 @@ const Reviews = () => {
                       </p>
                     </div>
 
+                    {/* НИЖНІЙ БЛОК: ІМ'Я, ДАТА ТА ДЖЕРЕЛО */}
                     <div className="flex items-end justify-between border-t border-[#bd9b7d]/10 pt-4">
                       <div>
                         <h3 className="font-poppins text-[13px] uppercase tracking-[2px] text-[#1a1614] font-bold">
                           {review.name}
                         </h3>
                         <span className="text-[#917152] text-[10px] font-medium tracking-[1px] block mt-1">
-                          {review.date}
+                          {formattedDate}
                         </span>
                       </div>
-                      {review.link && review.link !== '#' && (
-                        <Link
-                          href={review.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => !isActive && e.preventDefault()}
-                          className="text-[9px] uppercase tracking-[1px] text-[#bd9b7d] hover:text-[#1a1614] transition-colors font-bold"
-                        >
-                          {review.source} ↗
-                        </Link>
-                      )}
+
+                      {/* ВИВІД ДЖЕРЕЛА (Тепер показується завжди) */}
+                      <div className="text-[9px] uppercase tracking-[1px] font-bold text-right">
+                        {review.link && review.link !== '#' ? (
+                          <Link
+                            href={review.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => !isActive && e.preventDefault()}
+                            className="text-[#bd9b7d] hover:text-[#1a1614] transition-colors"
+                          >
+                            {review.source || 'Сайт'} ↗
+                          </Link>
+                        ) : (
+                          <span className="text-[#917152]/70 cursor-default">
+                            {review.source || 'Сайт'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 );
