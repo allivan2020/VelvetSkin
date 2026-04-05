@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from '@/components/layout/Footer';
 import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
@@ -89,14 +88,28 @@ export default function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
       <head>
+        {/* GA4 script для Search Console */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-JXCXNT6D8B"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-JXCXNT6D8B');
+            `,
+          }}
+        />
+        {/* JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className={`${poppins.className} relative`}>
-        <GoogleAnalytics gaId="G-JXCXNT6D8B" />
-
         <AdminHide>
           <Header />
         </AdminHide>
