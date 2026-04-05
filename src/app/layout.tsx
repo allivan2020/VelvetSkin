@@ -5,19 +5,22 @@ import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
+// Об'єкт метаданих — Next.js сам розставить теги у <head>
 export const metadata: Metadata = {
-  verification: {
-    google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
-  },
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
   description:
     'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладка шкіра, безпечні методики та дбайливий догляд за тілом. Записуйтесь онлайн!',
   alternates: {
-    canonical: 'https://www.velvetskinzp.com/',
+    canonical: '/',
+  },
+  verification: {
+    // 🔑 Офіційний спосіб додати верифікацію Google в Next.js
+    google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
   },
   openGraph: {
     title: 'VelvetSkin — Твоя історія ідеально гладкої шкіри',
@@ -87,29 +90,13 @@ export default function RootLayout({
       lang="uk"
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
-      <head>
-        {/* GA4 script для Search Console */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-JXCXNT6D8B"
-        ></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-JXCXNT6D8B');
-            `,
-          }}
-        />
-        {/* JSON-LD */}
+      <body className={`${poppins.className} relative`}>
+        {/* JSON-LD додаємо на початку body або через Script */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </head>
-      <body className={`${poppins.className} relative`}>
+
         <AdminHide>
           <Header />
         </AdminHide>
@@ -120,6 +107,9 @@ export default function RootLayout({
           <Footer />
           <BookingModal />
         </AdminHide>
+
+        {/* Google Analytics краще тримати в кінці body */}
+        <GoogleAnalytics gaId="G-JXCXNT6D8B" />
       </body>
     </html>
   );
