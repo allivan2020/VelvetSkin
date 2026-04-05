@@ -95,7 +95,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${poppins.className} relative`}>
-        <GoogleAnalytics gaId="G-D2VMY46VL3" />
+        <GoogleAnalytics gaId="G-JXCXNT6D8B" />
 
         <AdminHide>
           <Header />
