@@ -9,7 +9,6 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
-// Об'єкт метаданих — Next.js сам розставить теги у <head>
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
@@ -18,8 +17,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  // 🔑 ЦЕ ТЕ, ЩО ШУКАЄ GOOGLE SEARCH CONSOLE
   verification: {
-    // 🔑 Офіційний спосіб додати верифікацію Google в Next.js
     google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
   },
   openGraph: {
@@ -91,7 +90,7 @@ export default function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
       <body className={`${poppins.className} relative`}>
-        {/* JSON-LD додаємо на початку body або через Script */}
+        {/* JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -108,7 +107,7 @@ export default function RootLayout({
           <BookingModal />
         </AdminHide>
 
-        {/* Google Analytics краще тримати в кінці body */}
+        {/* Правильний проп gaId замість measurementId */}
         <GoogleAnalytics gaId="G-JXCXNT6D8B" />
       </body>
     </html>
