@@ -5,7 +5,7 @@ import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from 'next/script'; // Використовуємо стандартний компонент для скриптів
 
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
-  // 🔑 ЦЕ ТЕ, ЩО ШУКАЄ GOOGLE SEARCH CONSOLE
+  // 🔑 Верифікація для Google Search Console
   verification: {
     google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
   },
@@ -89,6 +89,21 @@ export default function RootLayout({
       lang="uk"
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
+      <head>
+        {/* 🚀 Google Tag (gtag.js) — Вставляємо прямо в head, як просить Google */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-XJCXNT6D8B"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XJCXNT6D8B');
+          `}
+        </Script>
+      </head>
       <body className={`${poppins.className} relative`}>
         {/* JSON-LD */}
         <script
@@ -106,9 +121,6 @@ export default function RootLayout({
           <Footer />
           <BookingModal />
         </AdminHide>
-
-        {/* Правильний проп gaId замість measurementId */}
-        <GoogleAnalytics gaId="G-JXCXNT6D8B" />
       </body>
     </html>
   );
