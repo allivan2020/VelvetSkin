@@ -99,7 +99,7 @@ const Header = () => {
                   : 'bg-white/10 border border-[#fdfbf7]/30 text-[#fdfbf7] backdrop-blur-md hover:bg-[#fdfbf7] hover:text-[#231d19]',
               )}
             >
-              Записатись
+              Безкоштовна консультація
             </Link>
 
             {/* Бургер для мобилки */}
