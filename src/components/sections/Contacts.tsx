@@ -74,7 +74,7 @@ const Contacts = () => {
                 Instagram
               </a>
               <a
-                href="https://t.me/velvetskin.zp/"
+                href="https://t.me/velvetskinzp/"
                 aria-label="Наш Telegram"
                 rel="noopener noreferrer"
                 suppressHydrationWarning={true}
