@@ -64,7 +64,7 @@ const Contacts = () => {
             {/* Соціальні мережі — зробив кнопки темнішими для контрасту */}
             <div className="mt-16 flex flex-wrap gap-6 max-lg:justify-center">
               <a
-                href="https://www.instagram.com/sandy_waxing/"
+                href="https://www.instagram.com/velvetskin.zp/"
                 aria-label="Наш Instagram"
                 rel="noopener noreferrer"
                 suppressHydrationWarning={true}
@@ -74,7 +74,7 @@ const Contacts = () => {
                 Instagram
               </a>
               <a
-                href="https://t.me/sandy_waxing/"
+                href="https://t.me/velvetskin.zp/"
                 aria-label="Наш Telegram"
                 rel="noopener noreferrer"
                 suppressHydrationWarning={true}
