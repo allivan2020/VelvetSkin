@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://epil-story.vercel.app';
+  // МЕНЯЕМ НА ОСНОВНОЙ ДОМЕН:
+  const baseUrl = 'https://www.velvetskinzp.com';
 
   return [
     {
