@@ -5,8 +5,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/private/',
+      disallow: '/private/', // Здесь всё верно, закрываем админку от любопытных глаз
     },
-    sitemap: 'https://epil-story.vercel.app/sitemap.xml',
+    // МЕНЯЕМ ЗДЕСЬ:
+    sitemap: 'https://www.velvetskinzp.com/sitemap.xml',
   };
 }

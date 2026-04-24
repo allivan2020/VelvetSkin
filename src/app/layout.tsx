@@ -6,13 +6,16 @@ import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 import Script from 'next/script'; // Використовуємо стандартний компонент для скриптів
-import FloatingBookingButton from '@/components/ui/FloatingBookingButton';
+const FloatingBookingButton = dynamic(
+  () => import('@/components/ui/FloatingBookingButton'),
+  { ssr: false },
+);
 
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.velvetskinzp.com'),
-  title: 'VelvetSkin — Воскова депіляція у Запоріжжі',
+  title: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
   description:
     'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладка шкіра, безпечні методики та дбайливий догляд за тілом. Записуйтесь онлайн!',
   alternates: {
@@ -60,6 +63,7 @@ const jsonLd = {
     longitude: '35.1764',
   },
   url: 'https://www.velvetskinzp.com',
+  sameAs: ['https://www.instagram.com/velvetskin.zp/'],
   telephone: '+380971950698',
   priceRange: '₴₴',
   openingHoursSpecification: [
