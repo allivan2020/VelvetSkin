@@ -6,6 +6,7 @@ import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
 import Script from 'next/script'; // Використовуємо стандартний компонент для скриптів
+import FloatingBookingButton from '@/components/ui/FloatingBookingButton';
 
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
 
@@ -120,6 +121,7 @@ export default function RootLayout({
         <AdminHide>
           <Footer />
           <BookingModal />
+          <FloatingBookingButton />
         </AdminHide>
       </body>
     </html>
