@@ -1,34 +1,21 @@
 import type { Metadata } from 'next';
 import Footer from '@/components/layout/Footer';
-import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from './fonts';
 import './globals.css';
-import Script from 'next/script'; // Використовуємо стандартний компонент для скриптів
-const FloatingBookingButton = dynamic(
-  () => import('@/components/ui/FloatingBookingButton'),
-  { ssr: false },
-);
-
-const BookingModal = dynamic(() => import('@/components/ui/BookingModal'));
+import Script from 'next/script';
+import ClientProviders from '@/components/layout/ClientProviders';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
-  description:
-    'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладка шкіра, безпечні методики та дбайливий догляд за тілом. Записуйтесь онлайн!',
-  alternates: {
-    canonical: '/',
-  },
-  // 🔑 Верифікація для Google Search Console
-  verification: {
-    google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
-  },
+  description: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin...',
+  alternates: { canonical: '/' },
+  verification: { google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8' },
   openGraph: {
     title: 'VelvetSkin — Твоя історія ідеально гладкої шкіри',
-    description:
-      'Професійна воскова депіляція у Запоріжжі. Дбайливий догляд, якому довіряють.',
+    description: 'Професійна воскова депіляція у Запоріжжі.',
     url: 'https://www.velvetskinzp.com/',
     siteName: 'VelvetSkin',
     images: [
@@ -48,40 +35,13 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BeautySalon',
   name: 'VelvetSkin',
-  description: 'Студія професійної воскової депіляції у Запоріжжі.',
-  image: 'https://www.velvetskinzp.com/og-preview.png',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'вул. Українська, 43',
     addressLocality: 'Запоріжжя',
-    postalCode: '69000',
     addressCountry: 'UA',
   },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: '47.8223',
-    longitude: '35.1764',
-  },
-  url: 'https://www.velvetskinzp.com',
-  sameAs: ['https://www.instagram.com/velvetskin.zp/'],
   telephone: '+380971950698',
-  priceRange: '₴₴',
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
-      ],
-      opens: '09:00',
-      closes: '20:00',
-    },
-  ],
 };
 
 export default function RootLayout({
@@ -95,7 +55,6 @@ export default function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
       <head>
-        {/* 🚀 Google Tag (gtag.js) — Вставляємо прямо в head, як просить Google */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XJCXNT6D8B"
           strategy="afterInteractive"
@@ -110,7 +69,6 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${poppins.className} relative`}>
-        {/* JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -124,8 +82,10 @@ export default function RootLayout({
 
         <AdminHide>
           <Footer />
-          <BookingModal />
-          <FloatingBookingButton />
+          {/* ✅ ВОТ ТУТ ОДНА ОБЕРТКА ДЛЯ ВСЕГО КЛИЕНТСКОГО.
+             Удали отсюда <BookingModal /> и <FloatingBookingButton /> 
+          */}
+          <ClientProviders />
         </AdminHide>
       </body>
     </html>
