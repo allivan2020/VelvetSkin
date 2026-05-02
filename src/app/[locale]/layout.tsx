@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
@@ -10,58 +10,87 @@ import ClientProviders from '@/components/layout/ClientProviders';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  // Метаданные пока оставляем как есть.
-  // На 5-м этапе мы сделаем их динамическими для разных языков!
-  metadataBase: new URL('https://www.velvetskinzp.com'),
-  title: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
-  description: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin...',
-  alternates: { canonical: '/' },
-  verification: { google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8' },
-  openGraph: {
-    title: 'VelvetSkin — Твоя історія ідеально гладкої шкіри',
-    description: 'Професійна воскова депіляція у Запоріжжі.',
-    url: 'https://www.velvetskinzp.com/',
-    siteName: 'VelvetSkin',
-    images: [
-      {
-        url: '/og-preview.png',
-        width: 1200,
-        height: 630,
-        alt: 'VelvetSkin Запоріжжя',
+// 1. ДИНАМИЧЕСКИЕ МЕТАДАННЫЕ (Для SEO и hreflang)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const baseUrl = 'https://www.velvetskinzp.com';
+
+  // Локализация заголовков и описаний для Google
+  const titles: Record<string, string> = {
+    uk: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
+    ru: 'VelvetSkin — Восковая депиляция Запорожье | Записаться онлайн',
+    en: 'VelvetSkin — Professional Waxing in Zaporizhzhia | Book Online',
+  };
+
+  const descriptions: Record<string, string> = {
+    uk: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладенька шкіра, преміальні матеріали та комфорт.',
+    ru: 'Профессиональная восковая депиляция в Запорожье от VelvetSkin. Идеально гладкая кожа, премиальные материалы и комфорт.',
+    en: 'Professional waxing in Zaporizhzhia by VelvetSkin. Flawless skin, premium products, and absolute comfort.',
+  };
+
+  return {
+    metadataBase: new URL(baseUrl),
+    title: titles[locale] || titles.uk,
+    description: descriptions[locale] || descriptions.uk,
+
+    // ТЕ САМЫЕ ТЕГИ HREFLANG, КОТОРЫЕ НУЖНЫ ГУГЛУ
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'uk-UA': `${baseUrl}/uk`,
+        'ru-RU': `${baseUrl}/ru`,
+        'en-US': `${baseUrl}/en`,
+        'x-default': `${baseUrl}/uk`, // Украинский как основной
       },
-    ],
-    locale: 'uk_UA',
-    type: 'website',
-  },
-};
+    },
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BeautySalon',
-  name: 'VelvetSkin',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'вул. Українська, 43',
-    addressLocality: 'Запоріжжя',
-    addressCountry: 'UA',
-  },
-  telephone: '+380971950698',
-};
+    openGraph: {
+      title: titles[locale],
+      description: descriptions[locale],
+      url: `${baseUrl}/${locale}`,
+      siteName: 'VelvetSkin',
+      images: [{ url: '/og-preview.png', width: 1200, height: 630 }],
+      locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uk_UA',
+      type: 'website',
+    },
+    verification: {
+      google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
+    },
+  };
+}
 
-// 1. Делаем функцию async и добавляем типизацию для params
 export default async function RootLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>; // <-- 1. Указываем, что это Promise
+  params: Promise<{ locale: string }>;
 }) {
-  // 2. Явно дожидаемся распаковки параметров
   const { locale } = await params;
-
-  // 3. Дальше всё как раньше
   const messages = await getMessages();
+
+  // Локализованный JSON-LD (для красоты в поиске)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BeautySalon',
+    name: 'VelvetSkin',
+    description:
+      locale === 'en'
+        ? 'Professional waxing studio'
+        : 'Студія воскової депіляції',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'вул. Українська, 43',
+      addressLocality: 'Запоріжжя',
+      addressCountry: 'UA',
+    },
+    telephone: '+380971950698',
+    url: `https://www.velvetskinzp.com/${locale}`,
+  };
 
   return (
     <html
@@ -88,7 +117,6 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        {/* 4. Оборачиваем ВЕСЬ контент в провайдер переводов */}
         <NextIntlClientProvider messages={messages}>
           <AdminHide>
             <Header />
