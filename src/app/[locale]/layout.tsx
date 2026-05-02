@@ -6,11 +6,10 @@ import { poppins, cormorant, vibes } from '../fonts';
 import '../globals.css';
 import Script from 'next/script';
 import ClientProviders from '@/components/layout/ClientProviders';
-
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
-// 1. ДИНАМИЧЕСКИЕ МЕТАДАННЫЕ (Для SEO и hreflang)
+// 1. ТЕПЕР ТУТ ВСЕ: і статичні, і динамічні дані
 export async function generateMetadata({
   params,
 }: {
@@ -19,7 +18,6 @@ export async function generateMetadata({
   const { locale } = await params;
   const baseUrl = 'https://www.velvetskinzp.com';
 
-  // Локализация заголовков и описаний для Google
   const titles: Record<string, string> = {
     uk: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
     ru: 'VelvetSkin — Восковая депиляция Запорожье | Записаться онлайн',
@@ -28,23 +26,28 @@ export async function generateMetadata({
 
   const descriptions: Record<string, string> = {
     uk: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладенька шкіра, преміальні матеріали та комфорт.',
-    ru: 'Профессиональная восковая депиляция в Запорожье от VelvetSkin. Идеально гладкая кожа, премиальные материалы и комфорт.',
-    en: 'Professional waxing in Zaporizhzhia by VelvetSkin. Flawless skin, premium products, and absolute comfort.',
+    ru: 'Профессиональная восковая депиляция в Запорожье от VelvetSkin. Идеально гладкая кожа и комфорт.',
+    en: 'Professional waxing in Zaporizhzhia by VelvetSkin. Flawless skin and premium products.',
   };
 
   return {
+    // Всі "статичні" поля тепер тут
     metadataBase: new URL(baseUrl),
+    verification: {
+      google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
+    },
+
+    // Динамічні поля
     title: titles[locale] || titles.uk,
     description: descriptions[locale] || descriptions.uk,
 
-    // ТЕ САМЫЕ ТЕГИ HREFLANG, КОТОРЫЕ НУЖНЫ ГУГЛУ
     alternates: {
       canonical: `${baseUrl}/${locale}`,
       languages: {
         'uk-UA': `${baseUrl}/uk`,
         'ru-RU': `${baseUrl}/ru`,
         'en-US': `${baseUrl}/en`,
-        'x-default': `${baseUrl}/uk`, // Украинский как основной
+        'x-default': `${baseUrl}/uk`,
       },
     },
 
@@ -56,9 +59,6 @@ export async function generateMetadata({
       images: [{ url: '/og-preview.png', width: 1200, height: 630 }],
       locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uk_UA',
       type: 'website',
-    },
-    verification: {
-      google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
     },
   };
 }
@@ -73,15 +73,10 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
-  // Локализованный JSON-LD (для красоты в поиске)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BeautySalon',
     name: 'VelvetSkin',
-    description:
-      locale === 'en'
-        ? 'Professional waxing studio'
-        : 'Студія воскової депіляції',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'вул. Українська, 43',
@@ -100,14 +95,14 @@ export default async function RootLayout({
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XJCXNT6D8B"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-XJCXNT6D8B');
+            gtag('config', 'G-XJCXNT6D8B', { 'send_page_view': false });
           `}
         </Script>
       </head>
@@ -116,14 +111,11 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-
         <NextIntlClientProvider messages={messages}>
           <AdminHide>
             <Header />
           </AdminHide>
-
           <main className="relative">{children}</main>
-
           <AdminHide>
             <Footer />
             <ClientProviders />
