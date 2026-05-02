@@ -215,6 +215,7 @@ const BookingModal = () => {
                 )}
 
                 <button
+                  aria-label="Close modal"
                   type="submit"
                   disabled={status === 'loading' || !captchaToken}
                   className="w-full py-4 rounded-full text-white font-bold uppercase tracking-wider text-[11px] bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"

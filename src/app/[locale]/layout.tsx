@@ -4,12 +4,12 @@ import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
 import { poppins, cormorant, vibes } from '../fonts';
 import '../globals.css';
-import Script from 'next/script';
 import ClientProviders from '@/components/layout/ClientProviders';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+// 1. Импортируем новый оптимизированный компонент
+import { GoogleTagManager } from '@next/third-parties/google';
 
-// 1. ТЕПЕР ТУТ ВСЕ: і статичні, і динамічні дані
 export async function generateMetadata({
   params,
 }: {
@@ -31,13 +31,11 @@ export async function generateMetadata({
   };
 
   return {
-    // Всі "статичні" поля тепер тут
     metadataBase: new URL(baseUrl),
     verification: {
       google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
     },
-
-    // Динамічні поля
+    // Добавляем fallback (значение по умолчанию), чтобы Google не видел пустоту
     title: titles[locale] || titles.uk,
     description: descriptions[locale] || descriptions.uk,
 
@@ -52,8 +50,8 @@ export async function generateMetadata({
     },
 
     openGraph: {
-      title: titles[locale],
-      description: descriptions[locale],
+      title: titles[locale] || titles.uk,
+      description: descriptions[locale] || descriptions.uk,
       url: `${baseUrl}/${locale}`,
       siteName: 'VelvetSkin',
       images: [{ url: '/og-preview.png', width: 1200, height: 630 }],
@@ -92,21 +90,11 @@ export default async function RootLayout({
       lang={locale}
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
-      <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XJCXNT6D8B"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XJCXNT6D8B', { 'send_page_view': false });
-          `}
-        </Script>
-      </head>
       <body className={`${poppins.className} relative`}>
+        {/* 2. Вставляем новый GoogleTagManager сразу после <body> */}
+        {/* Это ОЧЕНЬ сильно разгрузит основной поток (Performance) */}
+        <GoogleTagManager gtmId="G-XJCXNT6D8B" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

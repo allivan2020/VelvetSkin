@@ -116,6 +116,7 @@ const Header = () => {
 
             {/* Бургер */}
             <button
+              aria-label="Close modal"
               className="lg:hidden p-2 flex flex-col gap-[5px] flex-shrink-0 bg-transparent border-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >

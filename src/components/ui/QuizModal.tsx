@@ -110,6 +110,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
         </div>
 
         <button
+          aria-label="Close modal"
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 text-[#4a3f39]/50 hover:text-[#4a3f39]"
         >
