@@ -41,7 +41,10 @@ export default function ClientsTab() {
   };
 
   useEffect(() => {
-    fetchClients();
+    const loadData = async () => {
+      await fetchClients();
+    };
+    loadData();
   }, []);
 
   const updateClient = async (id: string, updates: Partial<Client>) => {
@@ -52,7 +55,7 @@ export default function ClientsTab() {
         body: JSON.stringify({ id, ...updates }),
       });
       if (res.ok) fetchClients();
-    } catch (err) {
+    } catch {
       alert('Помилка оновлення');
     }
   };
@@ -68,7 +71,7 @@ export default function ClientsTab() {
     try {
       const res = await fetch(`/api/clients?id=${id}`, { method: 'DELETE' });
       if (res.ok) fetchClients();
-    } catch (err) {
+    } catch  {
       alert('Помилка при видаленні');
     }
   };

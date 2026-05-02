@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const reviews = await Review.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json(reviews);
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { error: 'Помилка завантаження відгуків' },
       { status: 500 },
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(newReview, { status: 201 });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { error: 'Помилка створення відгуку' },
       { status: 500 },
@@ -76,7 +76,7 @@ export async function PATCH(req: Request) {
     );
 
     return NextResponse.json(updatedReview);
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
   }
 }
@@ -88,7 +88,7 @@ export async function DELETE(req: Request) {
     const id = searchParams.get('id');
     await Review.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Видалено' });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }

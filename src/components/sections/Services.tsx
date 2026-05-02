@@ -3,52 +3,20 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 interface ServiceItem {
   name: string;
   price: number;
 }
 
-interface ScrollCardProps {
-  title: string;
-  imgSrc: string;
-  services: ServiceItem[];
-  isFirst: boolean;
-}
-
-const maleServices = [
-  { name: 'Глибоке бікіні повністю', price: 800 },
-  { name: 'Бікіні глибоке частково', price: 650 },
-  { name: 'Спина повністю', price: 600 },
-  { name: 'Груди', price: 400 },
-  { name: 'Пахви', price: 200 },
-  { name: 'Живіт', price: 400 },
-  { name: 'Поперек', price: 200 },
-  { name: 'Сідниці', price: 300 },
-  { name: 'Корекція бороди', price: 300 },
-  { name: 'Ніс/Вуха', price: 100 },
-  { name: 'Міжбрівка', price: 50 },
-];
-
-const femaleServices = [
-  { name: 'Класичне бікіні', price: 350 },
-  { name: 'Глибоке бікіні', price: 500 },
-  { name: 'Ноги повністю', price: 550 },
-  { name: 'Ноги до колін/бедра', price: 350 },
-  { name: 'Руки повністю', price: 400 },
-  { name: 'Руки до ліктя', price: 250 },
-  { name: 'Пахви', price: 150 },
-  { name: 'Сідниці', price: 250 },
-  { name: 'Поперек', price: 200 },
-  { name: 'Живіт', price: 200 },
-  { name: 'Ніс', price: 100 },
-  { name: 'Корекція брів', price: 100 },
-  { name: 'Міжбрівка', price: 50 },
-  { name: 'Вусики', price: 150 },
-  { name: 'Обличчя повністю', price: 250 },
-];
-
 const Services = () => {
+  const t = useTranslations('Services');
+
+  // Получаем массивы услуг из JSON
+  const maleServices = t.raw('lists.male') as ServiceItem[];
+  const femaleServices = t.raw('lists.female') as ServiceItem[];
+
   return (
     <section
       id="story"
@@ -56,35 +24,39 @@ const Services = () => {
       itemScope
       itemType="https://schema.org/Service"
     >
-      <meta
-        itemProp="serviceType"
-        content="Депіляція воском та шугаринг Запоріжжя"
-      />
+      {/* Локализованные мета-теги для SEO */}
+      <meta itemProp="serviceType" content={t('meta.serviceType')} />
       <meta itemProp="provider" content="VelvetSkin" />
-      <meta itemProp="areaServed" content="Запоріжжя" />
+      <meta itemProp="areaServed" content={t('meta.city')} />
 
       <div className="relative container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-20 md:mb-32">
           <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
-            Прайс-лист
+            {t('subtitle')}
           </p>
           <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9]">
-            Інвестиція у <span className="text-[#917152]">красу</span>
+            {t.rich('title', {
+              span: (chunks) => (
+                <span className="text-[#917152]">{chunks}</span>
+              ),
+            })}
           </h2>
         </header>
 
         <div className="relative max-w-[1200px] mx-auto space-y-32 lg:space-y-48">
           <ScrollCard
-            title="Чоловіча депіляція"
+            title={t('maleTitle')}
             imgSrc="/img/man-price.jpg"
             services={maleServices}
             isFirst={true}
+            currency={t('currency')}
           />
           <ScrollCard
-            title="Жіноча депіляція"
+            title={t('femaleTitle')}
             imgSrc="/img/woman-price.jpg"
             services={femaleServices}
             isFirst={false}
+            currency={t('currency')}
           />
         </div>
       </div>
@@ -92,8 +64,21 @@ const Services = () => {
   );
 };
 
-const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
-  const containerRef = useRef<HTMLDivElement>(null); // Для TS тоже лучше уточнить тип рефа
+// Вспомогательный компонент карточки
+const ScrollCard = ({
+  title,
+  imgSrc,
+  services,
+  isFirst,
+  currency,
+}: {
+  title: string;
+  imgSrc: string;
+  services: ServiceItem[];
+  isFirst: boolean;
+  currency: string;
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -109,11 +94,7 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
   const y = useTransform(scrollYProgress, [0, 0.4], [100, 0]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full"
-      style={{ position: 'relative' }}
-    >
+    <div ref={containerRef} className="relative w-full">
       <motion.article
         style={{ opacity, scale, y }}
         className="relative rounded-[40px] md:rounded-[60px] overflow-hidden min-h-[700px] flex items-center justify-center p-4 md:p-12 shadow-2xl"
@@ -126,7 +107,6 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1200px"
             priority={isFirst}
-            quality={75}
           />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(26,22,20,0.35),rgba(26,22,20,0.85))]" />
         </div>
@@ -136,19 +116,20 @@ const ScrollCard = ({ title, imgSrc, services, isFirst }: ScrollCardProps) => {
             {title}
           </h3>
 
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 md:p-14 shadow-[0_30px_60px_rgba(0,0,0,0.3)]">
-            {/* ТУТ ОШИБКА ИСЧЕЗНЕТ: теперь TS знает, что item — это ServiceItem */}
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 md:p-14">
             {services.map((item, idx) => (
               <li
                 key={idx}
-                className="flex justify-between items-end border-b border-white/10 pb-4 text-[#fdfbf7] group hover:border-[#dcb38a] transition-colors duration-300"
+                className="flex justify-between items-end border-b border-white/10 pb-4 text-[#fdfbf7] group hover:border-[#dcb38a] transition-colors"
               >
-                <span className="text-[15px] md:text-[17px] font-medium tracking-wide group-hover:text-white">
+                <span className="text-[15px] md:text-[17px] font-medium group-hover:text-white">
                   {item.name}
                 </span>
                 <span className="font-poppins text-[15px] md:text-[16px] font-bold text-[#dcb38a]">
                   {item.price}{' '}
-                  <span className="text-[10px] opacity-70 uppercase">грн</span>
+                  <span className="text-[10px] opacity-70 uppercase">
+                    {currency}
+                  </span>
                 </span>
               </li>
             ))}

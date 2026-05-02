@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Review {
   _id: string;
@@ -14,8 +14,8 @@ export default function ReviewsTab() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Функція завантаження - шлях ТОЧНО як ти перевіряв у браузері
-  const fetchReviews = async () => {
+  // Оборачиваем в useCallback, чтобы функция не пересоздавалась при каждом рендере
+  const fetchReviews = useCallback(async () => {
     try {
       const res = await fetch('/api/reviews?admin=true');
       if (!res.ok) throw new Error('Помилка сервера');
@@ -26,11 +26,15 @@ export default function ReviewsTab() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchReviews();
   }, []);
+
+  // Вызываем через асинхронную обертку, чтобы избежать cascading renders
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchReviews();
+    };
+    loadData();
+  }, [fetchReviews]);
 
   const toggleApprove = async (id: string, currentStatus: boolean) => {
     try {
@@ -39,8 +43,10 @@ export default function ReviewsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, isApproved: !currentStatus }),
       });
-      if (res.ok) fetchReviews();
-    } catch (err) {
+      if (res.ok) {
+        await fetchReviews();
+      }
+    } catch {
       alert('Не вдалося змінити статус');
     }
   };
@@ -49,8 +55,10 @@ export default function ReviewsTab() {
     if (!confirm('Видалити цей відгук назавжди?')) return;
     try {
       const res = await fetch(`/api/reviews?id=${id}`, { method: 'DELETE' });
-      if (res.ok) fetchReviews();
-    } catch (err) {
+      if (res.ok) {
+        await fetchReviews();
+      }
+    } catch {
       alert('Помилка видалення');
     }
   };

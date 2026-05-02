@@ -1,4 +1,8 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin'; // <-- 1. Импортируем плагин
+
+// <-- 2. Указываем путь к нашему файлу i18n
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const securityHeaders = [
   {
@@ -64,8 +68,11 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  reactCompiler: true,
+  experimental: {
+    reactCompiler: true,
+  },
   compress: true,
 };
 
-export default nextConfig;
+// <-- 3. Оборачиваем твой конфиг при экспорте
+export default withNextIntl(nextConfig);

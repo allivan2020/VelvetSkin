@@ -1,0 +1,250 @@
+{
+  "Header": {
+    "Free": "Free",
+    "Nav": {
+      "home": "Home",
+      "about": "About",
+      "services": "Services",
+      "atmosphere": "Atmosphere",
+      "faq": "FAQ",
+      "reviews": "Reviews",
+      "contacts": "Contacts"
+    },
+    "Button": {
+      "mobile": "Consultation",
+      "desktop": "Free Consultation"
+    }
+  },
+  "Hero": {
+    "subtitle": "Professional Waxing Studio",
+    "title": "Waxing",
+    "titleAccent": "pure art",
+    "description": "Experience flawless smoothness and premium skincare in the heart of the city.",
+    "scroll": "Scroll"
+  },
+  "About": {
+    "subtitle": "Aesthetic Skincare",
+    "title": "Professional care for <span>your</span> skin",
+    "description1": "We believe beauty is more than just an appearance—it's about an inner sense of confidence and harmony.",
+    "description2": "Velvet <brand>Skin</brand> — where self-care becomes an art form.",
+    "features": {
+      "item1": "Certified Professionals",
+      "item2": "Premium Products"
+    },
+    "ctaButton": "Choose your treatment",
+    "images": {
+      "mainAlt": "Waxing specialist at work",
+      "certAlt": "Professional certification"
+    },
+    "messages": {
+      "success": "Thank you! We will contact you shortly to confirm your bonus.",
+      "error": "Oops, something went wrong. Please try again."
+    }
+  },
+  "Services": {
+    "subtitle": "Service Menu",
+    "title": "An investment in <span>beauty</span>",
+    "maleTitle": "Men's Waxing",
+    "femaleTitle": "Women's Waxing",
+    "currency": "UAH",
+    "meta": {
+      "serviceType": "Professional waxing and sugaring in Zaporizhzhia",
+      "city": "Zaporizhzhia"
+    },
+    "lists": {
+      "male": [
+        { "name": "Full Brazilian (Deep)", "price": 800 },
+        { "name": "Partial Brazilian", "price": 650 },
+        { "name": "Full Back", "price": 600 },
+        { "name": "Chest", "price": 400 },
+        { "name": "Underarms", "price": 200 },
+        { "name": "Stomach", "price": 400 },
+        { "name": "Lower Back", "price": 200 },
+        { "name": "Buttocks", "price": 300 },
+        { "name": "Beard Shaping", "price": 300 },
+        { "name": "Nose/Ears", "price": 100 },
+        { "name": "Between Brows", "price": 50 }
+      ],
+      "female": [
+        { "name": "Classic Bikini", "price": 350 },
+        { "name": "Full Brazilian", "price": 500 },
+        { "name": "Full Legs", "price": 550 },
+        { "name": "Half Legs (Upper/Lower)", "price": 350 },
+        { "name": "Full Arms", "price": 400 },
+        { "name": "Half Arms", "price": 250 },
+        { "name": "Underarms", "price": 150 },
+        { "name": "Buttocks", "price": 250 },
+        { "name": "Lower Back", "price": 200 },
+        { "name": "Stomach", "price": 200 },
+        { "name": "Nose", "price": 100 },
+        { "name": "Eyebrow Shaping", "price": 100 },
+        { "name": "Between Brows", "price": 50 },
+        { "name": "Upper Lip", "price": 150 },
+        { "name": "Full Face", "price": 250 }
+      ]
+    }
+  },
+  "Gallery": {
+    "subtitle": "Result Aesthetics",
+    "title": "Luxe <span>Moments</span>",
+    "ariaLabel": "Waxing results gallery",
+    "imageAlt": "Professional waxing in Zaporizhzhia – VelvetSkin result №{id}",
+    "imageTitle": "VelvetSkin treatment result №{id}",
+    "closeLabel": "Close gallery",
+    "prev": "PREV",
+    "next": "NEXT"
+  },
+  "Reviews": {
+    "subtitle": "Client Reviews",
+    "title": "Your <span>stories</span> of smoothness",
+    "loading": "Loading reviews...",
+    "emptyTitle": "No reviews yet.",
+    "emptySubtitle": "Be the first to share your experience!",
+    "sourceDefault": "Website",
+    "prev": "Prev",
+    "next": "Next",
+    "prevAria": "Previous review",
+    "nextAria": "Next review",
+    "ctaButton": "Leave a review",
+    "closeAria": "Close",
+    "modal": {
+      "title": "Your Review",
+      "namePlaceholder": "Your name",
+      "textPlaceholder": "Share your experience...",
+      "send": "Submit",
+      "sending": "Sending...",
+      "successTitle": "Thank you!",
+      "successText": "Your review has been submitted and will appear after moderation."
+    }
+  },
+  "FAQ": {
+    "subtitle": "FAQ",
+    "title": "Common <span>Questions</span>",
+    "items": [
+      {
+        "q": "What is the ideal hair length?",
+        "a": "For your first visit, 5–7 mm is ideal (about 2 weeks after shaving). For subsequent visits, 3–5 mm is sufficient."
+      },
+      {
+        "q": "Is it painful?",
+        "a": "Sensations vary by person, but we use professional techniques and premium products to minimize discomfort. It gets easier with every session!"
+      },
+      {
+        "q": "Will there be irritation after the treatment?",
+        "a": "Slight redness is a normal reaction that typically fades within a few hours. We apply soothing care and provide post-treatment advice for your home routine."
+      },
+      {
+        "q": "How often should I get waxed?",
+        "a": "We recommend a visit every 3–4 weeks. This allows the hair to reach the optimal length for the most effective removal."
+      },
+      {
+        "q": "How long do the results last?",
+        "a": "Your skin will stay smooth for an average of 2–4 weeks, depending on the area, hair type, and your natural growth cycle."
+      }
+    ]
+  },
+  "Contacts": {
+    "subtitle": "Contact Us",
+    "title": "Your <span>beauty</span> begins here",
+    "address": "43 Ukrainska St, Zaporizhzhia",
+    "hours": "Open 7 days a week",
+    "labels": {
+      "location": "Location",
+      "phone": "Phone",
+      "hours": "Hours"
+    },
+    "map": {
+      "alt": "VelvetSkin studio on Zaporizhzhia map",
+      "button": "View on map",
+      "title": "Directions to VelvetSkin studio"
+    }
+  },
+  "Footer": {
+    "backToTop": "Back to top",
+    "rights": "All rights reserved. Zaporizhzhia",
+    "tagline": "Studio of aesthetics and comfort",
+    "catchphrase": "Made with love <span>for your skin</span>",
+    "nav": {
+      "about": "About",
+      "story": "Services",
+      "contacts": "Contacts"
+    }
+  },
+  "BookingModal": {
+    "title": "Book an Appointment",
+    "description": "Leave your details, and we will find the perfect time for your visit",
+    "placeholders": {
+      "name": "Your name",
+      "service": "Select service"
+    },
+    "services": {
+      "female": "Women's Waxing",
+      "male": "Men's Waxing"
+    },
+    "buttons": {
+      "send": "Book Now",
+      "sending": "Processing..."
+    },
+    "success": {
+      "title": "Thank You!",
+      "text": "Your request has been received. We will contact you shortly."
+    },
+    "errors": {
+      "phone": "Please enter a valid phone number.",
+      "captcha": "Please verify that you are not a robot.",
+      "server": "Submission error. Please try again later."
+    }
+  },
+  "FloatingButton": {
+    "text": "Book now"
+  },
+  "Quiz": {
+    "steps": {
+      "step1": {
+        "title": "Have you visited us before?",
+        "options": {
+          "new": "No, it's my first visit",
+          "regular": "Yes, I'm a regular client"
+        }
+      },
+      "step2": {
+        "titleNew": "What is most important to you?",
+        "titleRegular": "Which areas would you like to treat?",
+        "hint": "You can select multiple options",
+        "options": {
+          "new": [
+            "Pain management & comfort",
+            "Aftercare & expert guidance",
+            "Speed of the procedure",
+            "Ingrown hair consultation"
+          ],
+          "regular": [
+            "Full Brazilian",
+            "Full Legs",
+            "Lower / Upper Legs",
+            "Underarms",
+            "Face (Upper lip)"
+          ]
+        }
+      },
+      "step3": {
+        "title": "Almost there!",
+        "description": "Leave your contact details, and we will send you the current <span>available slots</span> for booking in Zaporizhzhia."
+      }
+    },
+    "placeholders": {
+      "name": "Your name",
+      "contact": "+380 XX XXX XX XX or @telegram"
+    },
+    "buttons": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Check availability"
+    },
+    "errors": {
+      "name": "Name must be at least 2 characters long",
+      "contact": "Enter a valid number (+380...) or @username",
+      "telegram": "Enter a valid Telegram handle (e.g., @username)"
+    }
+  }
+}

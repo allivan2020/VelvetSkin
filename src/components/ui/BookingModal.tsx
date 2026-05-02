@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { useTranslations } from 'next-intl';
 
 const turnstileOptions = { theme: 'light' as const };
 
 const BookingModal = () => {
+  const t = useTranslations('BookingModal');
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
@@ -17,6 +19,7 @@ const BookingModal = () => {
     service: '',
   });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -33,7 +36,6 @@ const BookingModal = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
@@ -45,6 +47,7 @@ const BookingModal = () => {
     setTimeout(() => {
       setStatus('idle');
       setCaptchaToken(null);
+      setValidationError(null);
     }, 500);
   };
 
@@ -57,28 +60,28 @@ const BookingModal = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError(null);
 
     if (formData.phone.length !== 13) {
-      alert('Будь ласка, введіть коректний номер телефону.');
+      setValidationError(t('errors.phone'));
       return;
     }
 
     if (!captchaToken) {
-      alert('Будь ласка, підтвердіть, що ви не робот.');
+      setValidationError(t('errors.captcha'));
       return;
     }
 
     setStatus('loading');
 
     try {
-      // ИЗМЕНЕНО: Теперь отправляем данные в API лидов, чтобы они появились в админке
       const res = await fetch('/api/admin/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          status: 'Новий', // Добавляем статус для админки
-          type: 'Запис з кнопки', // Пометка для тебя, откуда пришел лид
+          status: 'Новий',
+          type: 'Запис з кнопки',
           captcha: captchaToken,
         }),
       });
@@ -89,13 +92,11 @@ const BookingModal = () => {
         setCaptchaToken(null);
         setTimeout(closeModal, 4000);
       } else {
-        const data = await res.json();
-        throw new Error(data.error || 'Server error');
+        throw new Error('Server error');
       }
     } catch (error) {
-      console.error('Помилка відправки:', error);
+      console.error('Submit error:', error);
       setStatus('error');
-      setCaptchaToken(null);
     }
   };
 
@@ -119,7 +120,7 @@ const BookingModal = () => {
           >
             <button
               onClick={closeModal}
-              className="absolute top-6 right-6 text-[#535353] hover:text-[#fcb25e] transition-colors"
+              className="absolute top-6 right-6 text-[#535353] hover:text-[#bd9b7d] transition-colors"
             >
               <svg
                 width="24"
@@ -134,22 +135,22 @@ const BookingModal = () => {
             </button>
 
             <h3 className="font-vibes text-4xl text-[#535353] text-center mb-2">
-              Записатися на візит
+              {t('title')}
             </h3>
             <p className="text-center text-sm text-gray-500 mb-6 font-medium">
-              Залиште контакти, і ми підберемо ідеальний час у Запоріжжі
+              {t('description')}
             </p>
 
             {status === 'success' ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-[#fcb25e]/20 text-[#fcb25e] rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     width="32"
                     height="32"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="3"
                   >
                     <path
                       d="M20 6L9 17l-5-5"
@@ -158,19 +159,17 @@ const BookingModal = () => {
                     />
                   </svg>
                 </div>
-                <h4 className="text-2xl font-medium text-[#d4a373] mb-3">
-                  Дякуємо!
+                <h4 className="text-2xl font-medium text-[#bd9b7d] mb-3">
+                  {t('success.title')}
                 </h4>
-                <p className="text-[#535353]">
-                  Ваша заявка отримана. Ми зателефонуємо вам найближчим часом.
-                </p>
+                <p className="text-[#535353]">{t('success.text')}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
                   type="text"
                   required
-                  placeholder="Ваше ім'я"
+                  placeholder={t('placeholders.name')}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -194,10 +193,10 @@ const BookingModal = () => {
                   className="w-full px-5 py-3 rounded-xl bg-[#f6f4f0] outline-none cursor-pointer"
                 >
                   <option value="" disabled>
-                    Оберіть послугу
+                    {t('placeholders.service')}
                   </option>
-                  <option value="Жіноча депіляція">Жіноча депіляція</option>
-                  <option value="Чоловіча депіляція">Чоловіча депіляція</option>
+                  <option value="Women's Waxing">{t('services.female')}</option>
+                  <option value="Men's Waxing">{t('services.male')}</option>
                 </select>
 
                 <div className="flex justify-center my-2">
@@ -209,18 +208,20 @@ const BookingModal = () => {
                   />
                 </div>
 
-                {status === 'error' && (
-                  <p className="text-red-500 text-sm text-center">
-                    Помилка. Спробуйте ще раз.
+                {(status === 'error' || validationError) && (
+                  <p className="text-red-500 text-xs text-center font-medium">
+                    {validationError || t('errors.server')}
                   </p>
                 )}
 
                 <button
                   type="submit"
                   disabled={status === 'loading' || !captchaToken}
-                  className="w-full py-4 rounded-full text-white font-medium bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] disabled:opacity-50"
+                  className="w-full py-4 rounded-full text-white font-bold uppercase tracking-wider text-[11px] bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
                 >
-                  {status === 'loading' ? 'Надсилаємо...' : 'Надіслати'}
+                  {status === 'loading'
+                    ? t('buttons.sending')
+                    : t('buttons.send')}
                 </button>
               </form>
             )}

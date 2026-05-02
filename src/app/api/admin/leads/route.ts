@@ -7,7 +7,7 @@ export async function GET() {
     await connectToDatabase();
     const leads = await Lead.find({}).sort({ createdAt: -1 });
     return NextResponse.json(leads);
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { error: 'Помилка завантаження' },
       { status: 500 },
@@ -103,7 +103,7 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json(updatedLead);
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
   }
 }
@@ -115,7 +115,7 @@ export async function DELETE(req: Request) {
     const id = searchParams.get('id');
     await Lead.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Видалено' });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }

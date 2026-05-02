@@ -9,7 +9,7 @@ export async function GET() {
     // Сортуємо так, щоб ті, з ким працювали найновіше, були зверху
     const clients = await Client.find({}).sort({ updatedAt: -1 });
     return NextResponse.json(clients);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Помилка завантаження бази клієнтів' },
       { status: 500 },
@@ -86,7 +86,7 @@ export async function PATCH(req: Request) {
     );
 
     return NextResponse.json(updatedClient);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Помилка оновлення клієнта' },
       { status: 500 },
@@ -106,7 +106,7 @@ export async function DELETE(req: Request) {
 
     await Client.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Клієнта видалено' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
   }
 }

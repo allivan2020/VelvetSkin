@@ -3,15 +3,20 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { clsx } from 'clsx';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 // Іконка/Бейдж "Free"
-const FreeIcon = () => (
+const FreeIcon = ({ text }: { text: string }) => (
   <span className="flex items-center justify-center bg-[#dcb38a] text-[#231d19] text-[7px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-tighter mr-2 shadow-sm">
-    Free
+    {text}
   </span>
 );
 
 const Header = () => {
+  // 1. Инициализируем хук для раздела "Header" из нашего JSON
+  const t = useTranslations('Header');
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -22,14 +27,15 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // 2. Заменяем хардкод на ключи из словаря
   const navLinks = [
-    { name: 'Головна', href: '#hero' },
-    { name: 'Про нас', href: '#about' },
-    { name: 'Послуги', href: '#story' },
-    { name: 'Атмосфера', href: '#gallery' },
-    { name: 'Питання', href: '#faq' },
-    { name: 'Відгуки', href: '#reviews' },
-    { name: 'Контакти', href: '#contacts' },
+    { name: t('Nav.home'), href: '#hero' },
+    { name: t('Nav.about'), href: '#about' },
+    { name: t('Nav.services'), href: '#story' },
+    { name: t('Nav.atmosphere'), href: '#gallery' },
+    { name: t('Nav.faq'), href: '#faq' },
+    { name: t('Nav.reviews'), href: '#reviews' },
+    { name: t('Nav.contacts'), href: '#contacts' },
   ];
 
   return (
@@ -84,6 +90,10 @@ const Header = () => {
 
           {/* Кнопка + Бургер */}
           <div className="flex items-center gap-2 sm:gap-4 relative z-[2001] flex-shrink-0">
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+              {/* <button className="...">{t('Button.desktop')}</button> */}
+            </div>
             {/* CTA Кнопка */}
             <Link
               href="#booking-modal"
@@ -95,12 +105,12 @@ const Header = () => {
                   : 'bg-white/10 border border-[#fdfbf7]/30 text-[#fdfbf7] backdrop-blur-md hover:bg-[#fdfbf7] hover:text-[#231d19]',
               )}
             >
-              <FreeIcon />
+              {/* 3. Передаем переведенный текст в иконку */}
+              <FreeIcon text={t('Free')} />
               <span className="font-poppins text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-[1px] font-medium whitespace-nowrap">
-                <span className="lg:hidden">Консультація</span>
-                <span className="hidden lg:inline">
-                  Безкоштовна консультація
-                </span>
+                {/* 4. Заменяем текст кнопок */}
+                <span className="lg:hidden">{t('Button.mobile')}</span>
+                <span className="hidden lg:inline">{t('Button.desktop')}</span>
               </span>
             </Link>
 

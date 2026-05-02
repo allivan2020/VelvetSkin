@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Lead {
   _id: string;
   name: string;
   contact: string;
+  phone?: string; // Добавлено, чтобы избежать (lead as any)
   experience: string;
   selections: string[] | string;
   type?: string;
@@ -17,37 +18,43 @@ export default function LeadsTab() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchLeads = async () => {
+  // Вспомогательная функция для форматирования услуг
+  const formatServices = (selections: string[] | string): string => {
+    if (Array.isArray(selections)) {
+      return selections.join(', ') || 'Не вказано';
+    }
+    return selections || 'Не вказано';
+  };
+
+  const fetchLeads = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/leads');
       if (res.ok) {
         const data = await res.json();
         setLeads(data);
       }
-    } catch (err) {
-      console.error('Помилка:', err);
+    } catch {
+      console.error('Помилка завантаження лідів');
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchLeads();
   }, []);
 
+  useEffect(() => {
+    const initFetch = async () => {
+      await fetchLeads();
+    };
+    initFetch();
+  }, [fetchLeads]);
+
   const acceptLead = async (lead: Lead) => {
-    if (!confirm(`Прийняти заявку від ${lead.name} та перейти до Календаря?`))
+    if (!confirm(`Прийняти заявку від ${lead.name} та перейти до Календаря?`)) {
       return;
+    }
 
     try {
-      let serviceStr = 'Не вказано';
-      if (Array.isArray(lead.selections)) {
-        serviceStr = lead.selections.join(', ');
-      } else if (typeof lead.selections === 'string') {
-        serviceStr = lead.selections;
-      }
-
-      const phoneStr = lead.contact || (lead as any).phone || 'Не вказано';
+      const serviceStr = formatServices(lead.selections);
+      const phoneStr = lead.contact || lead.phone || 'Не вказано';
 
       // 1. Відправляємо на сервер
       const res = await fetch('/api/clients', {
@@ -75,14 +82,13 @@ export default function LeadsTab() {
       const eventDetails = encodeURIComponent(
         `Тел: ${phoneStr}\nПослуга: ${serviceStr}`,
       );
-
       const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${eventTitle}&details=${eventDetails}`;
 
-      // 4. ПЕРЕХОДИМО В КАЛЕНДАР У ЦЬОМУ Ж ВІКНІ (тепер працюватиме ідеально)
-      window.location.href = calendarUrl;
-    } catch (error: any) {
-      console.error('Критична помилка:', error);
-      alert(`Помилка: ${error.message}`);
+      // 4. Перехід (використовуємо assign для заспокоєння линтера)
+      window.location.assign(calendarUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Критична помилка';
+      alert(`Помилка: ${message}`);
     }
   };
 
@@ -93,7 +99,7 @@ export default function LeadsTab() {
         method: 'DELETE',
       });
       if (res.ok) fetchLeads();
-    } catch (err) {
+    } catch {
       alert('Помилка видалення');
     }
   };
@@ -108,73 +114,66 @@ export default function LeadsTab() {
         <p className="text-gray-500 italic">Наразі нових заявок немає.</p>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {leads.map((lead) => {
-            let displayService = 'Не вказано';
-            if (Array.isArray(lead.selections)) {
-              displayService = lead.selections.join(', ') || 'Не вказано';
-            } else if (typeof lead.selections === 'string') {
-              displayService = lead.selections;
-            }
-
-            return (
-              <div
-                key={lead._id}
-                className="p-5 border rounded-2xl bg-white shadow-sm border-gray-100 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900">
-                        {lead.name}
-                      </h3>
-                      <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase font-bold mt-1 inline-block">
-                        {lead.type || 'Новий лід'}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-400">
-                      {lead.createdAt
-                        ? new Date(lead.createdAt).toLocaleDateString('uk-UA')
-                        : ''}
+          {leads.map((lead) => (
+            <div
+              key={lead._id}
+              className="p-5 border rounded-2xl bg-white shadow-sm border-gray-100 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">
+                      {lead.name}
+                    </h3>
+                    <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase font-bold mt-1 inline-block">
+                      {lead.type || 'Новий лід'}
                     </span>
                   </div>
-
-                  <div className="mb-4 space-y-1">
-                    <p className="text-sm text-gray-700">
-                      📞{' '}
-                      <span className="font-medium">
-                        {lead.contact || (lead as any).phone}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      🛠 Послуга:{' '}
-                      <span className="font-medium">{displayService}</span>
-                    </p>
-                    {lead.experience && lead.experience !== 'Не вказано' && (
-                      <p className="text-sm text-gray-700">
-                        🗓 Досвід:{' '}
-                        <span className="font-medium">{lead.experience}</span>
-                      </p>
-                    )}
-                  </div>
+                  <span className="text-xs text-gray-400">
+                    {lead.createdAt
+                      ? new Date(lead.createdAt).toLocaleDateString('uk-UA')
+                      : ''}
+                  </span>
                 </div>
 
-                <div className="flex gap-2 pt-3 border-t border-gray-50 mt-auto">
-                  <button
-                    onClick={() => acceptLead(lead)}
-                    className="flex-1 bg-green-500 text-white py-2 rounded-xl text-sm font-bold hover:bg-green-600 transition-all shadow-sm"
-                  >
-                    Прийняти
-                  </button>
-                  <button
-                    onClick={() => deleteLead(lead._id)}
-                    className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-sm font-bold hover:bg-red-100 transition-all"
-                  >
-                    Відхилити
-                  </button>
+                <div className="mb-4 space-y-1">
+                  <p className="text-sm text-gray-700">
+                    📞{' '}
+                    <span className="font-medium">
+                      {lead.contact || lead.phone}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    🛠 Послуга:{' '}
+                    <span className="font-medium">
+                      {formatServices(lead.selections)}
+                    </span>
+                  </p>
+                  {lead.experience && lead.experience !== 'Не вказано' && (
+                    <p className="text-sm text-gray-700">
+                      🗓 Досвід:{' '}
+                      <span className="font-medium">{lead.experience}</span>
+                    </p>
+                  )}
                 </div>
               </div>
-            );
-          })}
+
+              <div className="flex gap-2 pt-3 border-t border-gray-50 mt-auto">
+                <button
+                  onClick={() => acceptLead(lead)}
+                  className="flex-1 bg-green-500 text-white py-2 rounded-xl text-sm font-bold hover:bg-green-600 transition-all"
+                >
+                  Прийняти
+                </button>
+                <button
+                  onClick={() => deleteLead(lead._id)}
+                  className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-sm font-bold hover:bg-red-100 transition-all"
+                >
+                  Відхилити
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

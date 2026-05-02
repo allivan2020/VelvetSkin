@@ -2,12 +2,17 @@ import type { Metadata } from 'next';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
-import { poppins, cormorant, vibes } from './fonts';
-import './globals.css';
+import { poppins, cormorant, vibes } from '../fonts';
+import '../globals.css';
 import Script from 'next/script';
 import ClientProviders from '@/components/layout/ClientProviders';
 
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+
 export const metadata: Metadata = {
+  // Метаданные пока оставляем как есть.
+  // На 5-м этапе мы сделаем их динамическими для разных языков!
   metadataBase: new URL('https://www.velvetskinzp.com'),
   title: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
   description: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin...',
@@ -44,14 +49,23 @@ const jsonLd = {
   telephone: '+380971950698',
 };
 
-export default function RootLayout({
+// 1. Делаем функцию async и добавляем типизацию для params
+export default async function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>; // <-- 1. Указываем, что это Promise
 }) {
+  // 2. Явно дожидаемся распаковки параметров
+  const { locale } = await params;
+
+  // 3. Дальше всё как раньше
+  const messages = await getMessages();
+
   return (
     <html
-      lang="uk"
+      lang={locale}
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
     >
       <head>
@@ -74,19 +88,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        <AdminHide>
-          <Header />
-        </AdminHide>
+        {/* 4. Оборачиваем ВЕСЬ контент в провайдер переводов */}
+        <NextIntlClientProvider messages={messages}>
+          <AdminHide>
+            <Header />
+          </AdminHide>
 
-        <main className="relative">{children}</main>
+          <main className="relative">{children}</main>
 
-        <AdminHide>
-          <Footer />
-          {/* ✅ ВОТ ТУТ ОДНА ОБЕРТКА ДЛЯ ВСЕГО КЛИЕНТСКОГО.
-             Удали отсюда <BookingModal /> и <FloatingBookingButton /> 
-          */}
-          <ClientProviders />
-        </AdminHide>
+          <AdminHide>
+            <Footer />
+            <ClientProviders />
+          </AdminHide>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
