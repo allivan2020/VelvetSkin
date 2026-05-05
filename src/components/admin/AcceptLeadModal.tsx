@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react'; // Если используешь lucide-react, если нет — можно заменить на текст
 
 interface Lead {
   _id: string;
@@ -20,7 +21,8 @@ interface AcceptLeadModalProps {
   isOpen: boolean;
   lead: Lead | null;
   onClose: () => void;
-  onConfirm: (date: string, time: string) => void;
+  // Меняем на Promise, чтобы модалка знала, когда запрос завершился
+  onConfirm: (date: string, time: string) => Promise<void>;
 }
 
 export default function AcceptLeadModal({
@@ -29,16 +31,28 @@ export default function AcceptLeadModal({
   onClose,
   onConfirm,
 }: AcceptLeadModalProps) {
-  // Инициализируем стейт сразу при рендере, избавляясь от useEffect
   const [date, setDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [time, setTime] = useState('10:00');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen || !lead) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date || !time) return;
-    onConfirm(date, time);
+    if (!date || !time || isLoading) return;
+
+    try {
+      setIsLoading(true);
+      // Ждем завершения запроса в родительском компоненте
+      await onConfirm(date, time);
+      // Если все ок — родитель сам закроет модалку через isOpen,
+      // либо можно вызвать onClose() здесь, если логика позволяет.
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert('Помилка при збереженні. Спробуйте ще раз.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const services = Array.isArray(lead.selections)
@@ -56,41 +70,47 @@ export default function AcceptLeadModal({
           <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-2 text-sm">
             <p>
               <span className="text-gray-500">Клієнт:</span>{' '}
-              <span className="font-semibold">{lead.name}</span>
+              <span className="font-semibold text-gray-900">{lead.name}</span>
             </p>
             <p>
               <span className="text-gray-500">Телефон:</span>{' '}
-              <span className="font-semibold">
+              <span className="font-semibold text-gray-900">
                 {lead.contact || lead.phone}
               </span>
             </p>
             <p>
               <span className="text-gray-500">Послуга:</span>{' '}
-              <span className="font-semibold">{services || 'Не вказано'}</span>
+              <span className="font-semibold text-gray-900">
+                {services || 'Не вказано'}
+              </span>
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                   Дата
                 </label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all disabled:opacity-50"
                   required
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Час</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  Час
+                </label>
                 <input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all disabled:opacity-50"
                   required
                 />
               </div>
@@ -100,16 +120,24 @@ export default function AcceptLeadModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl font-medium transition-all"
+                disabled={isLoading}
+                className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl font-medium transition-all disabled:opacity-50"
               >
                 Скасувати
               </button>
               <button
                 type="submit"
-                disabled={!date || !time}
-                className="flex-1 px-4 py-2.5 text-white bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-sm shadow-green-200"
+                disabled={isLoading || !date || !time}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-white bg-green-500 hover:bg-green-600 disabled:bg-green-300 rounded-xl font-bold transition-all shadow-sm shadow-green-100"
               >
-                Підтвердити
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Збереження...</span>
+                  </>
+                ) : (
+                  'Підтвердити'
+                )}
               </button>
             </div>
           </form>

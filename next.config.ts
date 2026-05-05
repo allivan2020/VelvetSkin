@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
-import createNextIntlPlugin from 'next-intl/plugin'; // <-- 1. Импортируем плагин
+import createNextIntlPlugin from 'next-intl/plugin';
 
-// <-- 2. Указываем путь к нашему файлу i18n
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const securityHeaders = [
@@ -9,18 +8,20 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      // СКРИПТЫ: Объединяем Google и Cloudflare в одну строку
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com;",
-      // СТИЛИ: Добавляем шрифты Google
+      // СКРИПТЫ: Добавляем 'unsafe-inline' и 'unsafe-eval' (для Next.js и Cloudflare), а также домены Vercel
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com https://va.vercel-scripts.com;",
+      // СТИЛИ: Шрифты + инлайновые стили (нужны для анимаций Framer Motion)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      // СОЕДИНЕНИЯ: Аналитика, Cloudflare и API карт
-      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com;",
-      // КАРТИНКИ: Аналитика + все домены Google для плиток карты
+      // СОЕДИНЕНИЯ: Аналитика, API и Vercel
+      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com https://maps.googleapis.com https://va.vercel-scripts.com;",
+      // КАРТИНКИ: Разрешаем blob и data для карт и оптимизированных изображений
       "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com;",
-      // ФРЕЙМИ: И Cloudflare Turnstile, и Google Maps вместе
-      "frame-src 'self' https://challenges.cloudflare.com https://www.google.com https://www.google.com/maps/ https://maps.google.com;",
+      // ФРЕЙМЫ: Важно для работы Turnstile и Карт
+      "frame-src 'self' https://challenges.cloudflare.com https://www.google.com;",
       // ШРИФТЫ
       "font-src 'self' data: https://fonts.gstatic.com;",
+      // TRUSTED TYPES: Чтобы убрать ошибки из консоли и разрешить Cloudflare работать
+      'trusted-types goog#html nextjs#vitals cloudflare-turnstile-policy; allow-duplicates;',
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';",
@@ -32,47 +33,22 @@ const securityHeaders = [
     key: 'Strict-Transport-Security',
     value: 'max-age=31536000; includeSubDomains; preload',
   },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
 ];
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ];
+    return [{ source: '/:path*', headers: securityHeaders }];
   },
-
   images: {
+    qualities: [70, 75, 80, 90],
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
   },
-
-  experimental: {
-    reactCompiler: true,
-  },
+  experimental: { reactCompiler: true },
   compress: true,
 };
 
-// <-- 3. Оборачиваем твой конфиг при экспорте
 export default withNextIntl(nextConfig);
