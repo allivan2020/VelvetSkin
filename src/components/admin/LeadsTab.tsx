@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import ConfirmModal from './ConfirmModal';
+import AcceptLeadModal from './AcceptLeadModal';
 import { format } from 'date-fns';
+import { generateAndDownloadICS } from '@/lib/ics';
 
 interface Lead {
   _id: string;
@@ -49,7 +51,6 @@ export default function LeadsTab() {
     }
   }, []);
 
-  // ИСПРАВЛЕННЫЙ ЭФФЕКТ: используем асинхронную обертку, чтобы избежать синхронного setState
   useEffect(() => {
     let isMounted = true;
 
@@ -66,7 +67,7 @@ export default function LeadsTab() {
     };
   }, [fetchLeads]);
 
-  const handleAccept = async () => {
+  const handleAccept = async (date: string, time: string) => {
     const lead = actionModal.lead;
     if (!lead) return;
 
@@ -91,10 +92,9 @@ export default function LeadsTab() {
 
       await fetch(`/api/admin/leads?id=${lead._id}`, { method: 'DELETE' });
 
-      const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${encodeURIComponent(`Запис: ${lead.name}`)}&details=${encodeURIComponent(`Тел: ${phoneStr}\nПослуга: ${serviceStr}`)}`;
-      window.open(calendarUrl, '_blank');
+      generateAndDownloadICS(lead.name, phoneStr, serviceStr, date, time);
 
-      toast.success('Заявку успішно прийнято!');
+      toast.success('Заявку прийнято, календар завантажено!');
     } catch {
       toast.error('Сталася помилка');
       fetchLeads();
@@ -126,6 +126,9 @@ export default function LeadsTab() {
     }
   };
 
+  const closeModal = () =>
+    setActionModal({ isOpen: false, type: null, lead: null });
+
   if (loading)
     return (
       <div className="p-10 text-gray-400 text-center animate-pulse font-medium">
@@ -137,24 +140,25 @@ export default function LeadsTab() {
     <div className="space-y-4">
       <Toaster position="top-right" />
 
+      {/* Модалка ТОЛЬКО для удаления */}
       <ConfirmModal
-        isOpen={actionModal.isOpen}
-        title={
-          actionModal.type === 'accept' ? 'Прийняти заявку' : 'Видалити заявку'
-        }
-        message={
-          actionModal.type === 'accept'
-            ? `Прийняти від ${actionModal.lead?.name}?`
-            : `Видалити ${actionModal.lead?.name}?`
-        }
-        confirmText={
-          actionModal.type === 'accept' ? 'Так, прийняти' : 'Так, видалити'
-        }
-        isDanger={actionModal.type === 'delete'}
-        onCancel={() =>
-          setActionModal({ isOpen: false, type: null, lead: null })
-        }
-        onConfirm={actionModal.type === 'accept' ? handleAccept : handleDelete}
+        isOpen={actionModal.isOpen && actionModal.type === 'delete'}
+        title="Видалити заявку"
+        message={`Видалити ${actionModal.lead?.name}?`}
+        confirmText="Так, видалити"
+        isDanger={true}
+        onCancel={closeModal}
+        onConfirm={handleDelete}
+      />
+
+      {/* Новая модалка ТОЛЬКО для принятия */}
+      {/* Атрибут key заставляет React пересобрать компонент при смене лида, сбрасывая state */}
+      <AcceptLeadModal
+        key={actionModal.lead?._id || 'empty-modal'}
+        isOpen={actionModal.isOpen && actionModal.type === 'accept'}
+        lead={actionModal.lead}
+        onClose={closeModal}
+        onConfirm={handleAccept}
       />
 
       <h2 className="text-xl font-bold text-gray-800">Нові заявки</h2>
