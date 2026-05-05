@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+// import { Metadata } from 'next';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import AdminHide from '@/components/layout/AdminHide';
@@ -10,6 +10,8 @@ import { getMessages } from 'next-intl/server';
 import { Toaster } from 'react-hot-toast';
 // 1. Импортируем новый оптимизированный компонент
 import { GoogleTagManager } from '@next/third-parties/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 export async function generateMetadata({
   params,
@@ -115,6 +117,8 @@ export default async function RootLayout({
             <ClientProviders />
           </AdminHide>
         </NextIntlClientProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
