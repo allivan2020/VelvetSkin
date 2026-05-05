@@ -1,14 +1,17 @@
-'use client';
+'use client'; // Обязательно клиентский компонент, так как нам нужен доступ к текущему URL
 
 import { usePathname } from 'next/navigation';
 
 export default function AdminHide({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
 
-  // Якщо ми в адмінці, нічого не рендеримо
-  if (isAdmin) return null;
+  // Проверяем, включает ли путь слово /admin.
+  // Это покроет варианты /admin, /ru/admin, /uk/admin, /en/admin/dashboard и т.д.
+  const isAdminPage = pathname.includes('/admin');
 
-  // Якщо ми на звичайному сайті, показуємо Header/Footer
-  return <>{children}</>;
+  if (isAdminPage) {
+    return null; // Если это админка, возвращаем пустоту (хедер и футер скрываются)
+  }
+
+  return <>{children}</>; // Если это обычная страница, рендерим переданный хедер/футер
 }

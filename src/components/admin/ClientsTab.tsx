@@ -1,6 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import ConfirmModal from './ConfirmModal';
+import AddVisitModal from './AddVisitModal';
+import NextAppointmentModal from './NextAppointmentModal'; // 👈 Додали імпорт
 
 interface Visit {
   date: string;
@@ -26,7 +30,35 @@ export default function ClientsTab() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'newest' | 'upcoming'>('newest');
 
-  const fetchClients = async () => {
+  // Стейт для модалок
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    clientId: string | null;
+    clientName: string;
+  }>({
+    isOpen: false,
+    clientId: null,
+    clientName: '',
+  });
+
+  const [visitModal, setVisitModal] = useState<{
+    isOpen: boolean;
+    client: Client | null;
+  }>({
+    isOpen: false,
+    client: null,
+  });
+
+  // 👈 Стейт для нової модалки запису
+  const [appointmentModal, setAppointmentModal] = useState<{
+    isOpen: boolean;
+    client: Client | null;
+  }>({
+    isOpen: false,
+    client: null,
+  });
+
+  const fetchClients = useCallback(async () => {
     try {
       const res = await fetch('/api/clients');
       if (res.ok) {
@@ -35,17 +67,18 @@ export default function ClientsTab() {
       }
     } catch (err) {
       console.error('Помилка:', err);
+      toast.error('Помилка завантаження бази');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
       await fetchClients();
     };
     loadData();
-  }, []);
+  }, [fetchClients]);
 
   const updateClient = async (id: string, updates: Partial<Client>) => {
     try {
@@ -54,77 +87,127 @@ export default function ClientsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, ...updates }),
       });
-      if (res.ok) fetchClients();
+      if (res.ok) {
+        // Миттєво не перезапитуємо всю базу, UI вже оновлено (Optimistic UI)
+        toast.success('Оновлено!');
+      } else {
+        throw new Error('Помилка');
+      }
     } catch {
-      alert('Помилка оновлення');
+      toast.error('Помилка оновлення');
+      fetchClients(); // Відкат у разі помилки
     }
   };
 
-  // НОВА ФУНКЦІЯ: ВИДАЛЕННЯ КЛІЄНТА
-  const deleteClient = async (id: string, name: string) => {
-    if (
-      !confirm(
-        `Ви точно хочете видалити клієнта ${name} та всю історію його візитів назавжди?`,
-      )
-    )
-      return;
+  const confirmDeleteClient = async () => {
+    if (!deleteModal.clientId) return;
     try {
-      const res = await fetch(`/api/clients?id=${id}`, { method: 'DELETE' });
-      if (res.ok) fetchClients();
-    } catch  {
-      alert('Помилка при видаленні');
+      const res = await fetch(`/api/clients?id=${deleteModal.clientId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast.success('Клієнта видалено');
+        fetchClients();
+      } else {
+        throw new Error('Помилка');
+      }
+    } catch {
+      toast.error('Помилка при видаленні');
+    } finally {
+      setDeleteModal({ isOpen: false, clientId: null, clientName: '' });
     }
   };
 
-  const addVisit = (client: Client) => {
-    const date = prompt(
-      'Дата виконаного візиту (наприклад: 15.04.2026):',
-      new Date().toLocaleDateString('uk-UA'),
-    );
-    if (!date) return;
-    const zonesStr = prompt('Що робили? (наприклад: Глибоке бікіні, Пахви):');
-    const notes = prompt(
-      'Нотатки по процедурі (наприклад: було вростання, або просто ОК):',
-    );
-    const priceStr = prompt(
-      'Скільки заплатили? (тільки цифри, наприклад: 800):',
-    );
+  const handleSaveVisit = (visitData: Visit) => {
+    if (!visitModal.client) return;
 
-    const newVisit = {
-      date,
-      zones: zonesStr ? zonesStr.split(',').map((s) => s.trim()) : [],
-      notes: notes || '',
-      price: Number(priceStr) || 0,
-    };
+    const updatedClients = clients.map((c) =>
+      c._id === visitModal.client!._id
+        ? { ...c, visits: [...c.visits, visitData] }
+        : c,
+    );
+    setClients(updatedClients);
 
-    updateClient(client._id, { visits: [...client.visits, newVisit] });
+    updateClient(visitModal.client._id, {
+      visits: [...visitModal.client.visits, visitData],
+    });
   };
 
-  const setNextAppointment = (client: Client) => {
-    const date = prompt(
-      'Дата НАСТУПНОГО сеансу (щоб не забути нагадати клієнту):',
-      client.nextAppointment,
+  // 👈 Нова функція для збереження дати з модалки (з Optimistic UI)
+  const handleSaveAppointment = (date: string) => {
+    if (!appointmentModal.client) return;
+    const clientId = appointmentModal.client._id;
+
+    // Миттєво оновлюємо інтерфейс
+    setClients((prev) =>
+      prev.map((c) =>
+        c._id === clientId ? { ...c, nextAppointment: date } : c,
+      ),
     );
-    if (date !== null) {
-      updateClient(client._id, { nextAppointment: date });
-    }
+
+    // Відправляємо на сервер
+    updateClient(clientId, { nextAppointment: date });
+
+    // Закриваємо модалку
+    setAppointmentModal({ isOpen: false, client: null });
   };
 
-  // Логіка сортування
+  // Функція для гарного форматування дати
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('uk-UA', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
   const displayedClients = [...clients].sort((a, b) => {
     if (sortBy === 'upcoming') {
       if (!a.nextAppointment) return 1;
       if (!b.nextAppointment) return -1;
+      // Оскільки тепер дата у форматі YYYY-MM-DD, localeCompare відпрацює ідеально хронологічно
       return a.nextAppointment.localeCompare(b.nextAppointment);
     }
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
   if (loading)
-    return <div className="p-4 text-gray-500">Завантаження бази...</div>;
+    return (
+      <div className="p-4 text-gray-500 animate-pulse">
+        Завантаження бази...
+      </div>
+    );
 
   return (
     <div className="space-y-4">
+      <Toaster position="top-right" />
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Видалення клієнта"
+        message={`Ви точно хочете видалити клієнта ${deleteModal.clientName} та всю історію візитів назавжди?`}
+        onCancel={() =>
+          setDeleteModal({ isOpen: false, clientId: null, clientName: '' })
+        }
+        onConfirm={confirmDeleteClient}
+      />
+
+      <AddVisitModal
+        isOpen={visitModal.isOpen}
+        onClose={() => setVisitModal({ isOpen: false, client: null })}
+        onSave={handleSaveVisit}
+      />
+
+      {/* 👈 Підключаємо нову модалку */}
+      <NextAppointmentModal
+        isOpen={appointmentModal.isOpen}
+        client={appointmentModal.client}
+        onClose={() => setAppointmentModal({ isOpen: false, client: null })}
+        onSave={handleSaveAppointment}
+      />
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-xl font-bold text-gray-800">
           База клієнтів ({clients.length})
@@ -155,9 +238,14 @@ export default function ClientsTab() {
               key={client._id}
               className="p-5 border rounded-2xl bg-white shadow-sm border-gray-100 relative"
             >
-              {/* Кнопка Видалення (Кошик) в правому верхньому куті */}
               <button
-                onClick={() => deleteClient(client._id, client.name)}
+                onClick={() =>
+                  setDeleteModal({
+                    isOpen: true,
+                    clientId: client._id,
+                    clientName: client.name,
+                  })
+                }
                 className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
                 title="Видалити клієнта"
               >
@@ -189,23 +277,24 @@ export default function ClientsTab() {
                   </p>
                 </div>
                 <div className="md:text-right shrink-0">
-                  {/* Кнопка "Наступний візит" (Майбутнє) */}
+                  {/* 👈 Змінили onClick: тепер він відкриває нашу модалку */}
                   <button
-                    onClick={() => setNextAppointment(client)}
-                    className={`text-sm font-bold px-4 py-2 rounded-xl transition-all ${
+                    onClick={() =>
+                      setAppointmentModal({ isOpen: true, client })
+                    }
+                    className={`text-sm font-bold px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95 ${
                       client.nextAppointment
-                        ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                        : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border border-dashed border-gray-300'
+                        ? 'bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-200'
+                        : 'bg-white text-gray-500 hover:bg-gray-50 border border-dashed border-gray-300'
                     }`}
                   >
                     {client.nextAppointment
-                      ? `🗓 Заплановано на: ${client.nextAppointment}`
-                      : '🗓 Запланувати наступний візит'}
+                      ? `🗓 Заплановано: ${formatDate(client.nextAppointment)}` // 👈 Форматуємо для красивого виводу
+                      : '🗓 Запланувати візит'}
                   </button>
                 </div>
               </div>
 
-              {/* НОВЕ: ПОЛЕ ДЛЯ ЗАМІТОК */}
               <div className="mb-5 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
                 <h4 className="font-bold text-xs text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                   📝 Замітки про клієнта (автозбереження)
@@ -228,14 +317,13 @@ export default function ClientsTab() {
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h4 className="font-bold text-sm text-gray-700">
-                    Історія виконаних процедур ({client.visits?.length || 0}):
+                    Історія процедур ({client.visits?.length || 0}):
                   </h4>
-                  {/* Кнопка "Додати візит" (Минуле/Історія) */}
                   <button
-                    onClick={() => addVisit(client)}
-                    className="text-xs bg-green-50 text-green-700 font-bold px-3 py-1.5 rounded-lg hover:bg-green-100 transition-all flex items-center gap-1"
+                    onClick={() => setVisitModal({ isOpen: true, client })}
+                    className="text-xs bg-green-50 text-green-700 font-bold px-3 py-1.5 rounded-lg hover:bg-green-100 transition-all flex items-center gap-1 active:scale-95"
                   >
-                    <span>+</span> Записати в історію
+                    <span>+</span> Записати візит
                   </button>
                 </div>
 
@@ -263,7 +351,11 @@ export default function ClientsTab() {
                         )}
                         {visit.price > 0 && (
                           <span className="font-bold text-green-700 whitespace-nowrap bg-green-50 px-2 py-1 rounded ml-auto">
-                            {visit.price} ₴
+                            {new Intl.NumberFormat('uk-UA', {
+                              style: 'currency',
+                              currency: 'UAH',
+                              maximumFractionDigits: 0,
+                            }).format(visit.price)}
                           </span>
                         )}
                       </li>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import toast from 'react-hot-toast'; // 👈 Додали імпорт
 import QuizModal from '@/components/ui/QuizModal';
 
 interface QuizData {
@@ -17,25 +18,34 @@ const About = () => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   const handleQuizSubmit = async (data: QuizData) => {
+    // Створюємо id для тоста завантаження, щоб потім його оновити
+    const toastId = toast.loading('Відправляємо заявку...');
+
     try {
       const response = await fetch('/api/admin/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
-          type: 'Квіз', // Можно оставить статичным или тоже брать из t.raw
+          type: 'Квіз',
           status: 'Новий',
         }),
       });
 
       if (response.ok) {
-        alert(t('messages.success'));
+        // Оновлюємо тост на успішний і закриваємо модалку
+        toast.success(t('messages.success'), { id: toastId });
         setIsQuizOpen(false);
       } else {
-        alert(t('messages.error'));
+        // Оновлюємо тост на помилку
+        toast.error(t('messages.error'), { id: toastId });
       }
     } catch (error) {
       console.error('Submit error:', error);
+      // Ловимо винятки (наприклад, зник інтернет)
+      toast.error('Сталася помилка при відправці. Спробуйте ще раз.', {
+        id: toastId,
+      });
     }
   };
 

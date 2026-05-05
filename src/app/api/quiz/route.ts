@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import Lead from '@/models/Lead'; // Подключаем модель Лида
+import Lead from '@/models/Lead';
+import { generateLeadSummary } from '@/lib/groq'; // Импортируем наш ИИ-сервис
 
 export async function POST(req: Request) {
   try {
@@ -21,9 +22,22 @@ export async function POST(req: Request) {
       createdAt: new Date(),
     });
 
-    await newLead.save(); // Зберегли в MongoDB!
+    await newLead.save(); // Зберегли базу — это фундамент!
 
-    // 2. ВІДПРАВЛЯЄМО В TELEGRAM
+    // --- БЛОК ІІ-АНАЛІТИКИ (запускаємо у фоні) ---
+    // Ми не використовуємо await тут, щоб не змушувати користувача чекати
+    generateLeadSummary({ experience, selections: safeSelections })
+      .then(async (summary) => {
+        if (summary) {
+          // Оновлюємо документ в базі, додаючи пораду від ІІ
+          await Lead.findByIdAndUpdate(newLead._id, { aiSummary: summary });
+          console.log(`✨ AI порада для ліда ${newLead._id} готова!`);
+        }
+      })
+      .catch((err) => console.error('AI Error:', err));
+    // --------------------------------------------
+
+    // 2. ВІДПРАВЛЯЄМО В TELEGRAM (твій оригінальний код)
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 

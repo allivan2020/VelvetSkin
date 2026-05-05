@@ -22,20 +22,19 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
     experience: '',
     selections: [] as string[],
     name: '',
-    contact: '',
+    contact: '+380',
   });
 
   const [errors, setErrors] = useState({ name: '', contact: '' });
 
   const handleClose = () => {
     setStep(1);
-    setFormData({ experience: '', selections: [], name: '', contact: '' });
+    setFormData({ experience: '', selections: [], name: '', contact: '+380' });
     setErrors({ name: '', contact: '' });
     onClose();
   };
 
   const handleExperienceSelect = (key: 'new' | 'regular') => {
-    // Сохраняем переведенное значение для админки, но используем ключ для логики
     setFormData((prev) => ({
       ...prev,
       experience: t(`steps.step1.options.${key}`),
@@ -65,15 +64,17 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
       isValid = false;
     }
 
-    const contactStr = formData.contact.replace(/\s/g, '').trim();
-    if (contactStr.startsWith('@')) {
-      if (contactStr.length < 4) {
+    // 🔥 ОЧИЩАЕМ НОМЕР от пробелов, скобок и тире перед проверкой
+    const cleanContact = formData.contact.replace(/[\s\-\(\)]/g, '');
+
+    if (cleanContact.startsWith('@')) {
+      if (cleanContact.length < 4) {
         newErrors.contact = t('errors.telegram');
         isValid = false;
       }
     } else {
       const phoneRegex = /^\+380\d{9}$/;
-      if (!phoneRegex.test(contactStr)) {
+      if (!phoneRegex.test(cleanContact)) {
         newErrors.contact = t('errors.contact');
         isValid = false;
       }
@@ -86,14 +87,15 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      // 🔥 ОТПРАВЛЯЕМ ОЧИЩЕННЫЙ НОМЕР, чтобы в CRM все было в едином формате
+      const cleanContact = formData.contact.replace(/[\s\-\(\)]/g, '');
+      onSubmit({ ...formData, contact: cleanContact });
       handleClose();
     }
   };
 
   if (!isOpen) return null;
 
-  // Динамическое получение опций в зависимости от выбора на 1 шаге
   const experienceKey =
     formData.experience === t('steps.step1.options.new') ? 'new' : 'regular';
   const options = t.raw(`steps.step2.options.${experienceKey}`) as string[];
@@ -247,6 +249,8 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                 <div>
                   <input
                     type="text"
+                    name="name"
+                    autoComplete="name"
                     placeholder={t('placeholders.name')}
                     value={formData.name}
                     onChange={(e) =>
@@ -269,6 +273,8 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                 <div>
                   <input
                     type="tel"
+                    name="phone"
+                    autoComplete="tel"
                     placeholder={t('placeholders.contact')}
                     value={formData.contact}
                     onChange={(e) =>

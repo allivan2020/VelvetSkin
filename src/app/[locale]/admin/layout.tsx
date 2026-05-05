@@ -4,8 +4,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="uk">
-      <body>{children}</body>
-    </html>
+    <>{children}</>
   );
 }

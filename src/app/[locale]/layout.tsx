@@ -7,6 +7,7 @@ import '../globals.css';
 import ClientProviders from '@/components/layout/ClientProviders';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import { Toaster } from 'react-hot-toast';
 // 1. Импортируем новый оптимизированный компонент
 import { GoogleTagManager } from '@next/third-parties/google';
 
@@ -89,10 +90,15 @@ export default async function RootLayout({
     <html
       lang={locale}
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
+      suppressHydrationWarning
     >
       <body className={`${poppins.className} relative`}>
-        {/* 2. Вставляем новый GoogleTagManager сразу после <body> */}
-        {/* Это ОЧЕНЬ сильно разгрузит основной поток (Performance) */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: { zIndex: 99999 }, // Це гарантує, що він буде поверх будь-якої модалки
+          }}
+        />
         <GoogleTagManager gtmId="G-XJCXNT6D8B" />
 
         <script

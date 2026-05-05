@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast, { Toaster } from 'react-hot-toast'; // ДОДАНО
+import ConfirmModal from './ConfirmModal'; // Шлях до твого компонента
 
 interface Review {
   _id: string;
@@ -14,7 +16,15 @@ export default function ReviewsTab() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Оборачиваем в useCallback, чтобы функция не пересоздавалась при каждом рендере
+  // ДОДАНО: Стан для модалки видалення
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    reviewId: string | null;
+  }>({
+    isOpen: false,
+    reviewId: null,
+  });
+
   const fetchReviews = useCallback(async () => {
     try {
       const res = await fetch('/api/reviews?admin=true');
@@ -23,50 +33,84 @@ export default function ReviewsTab() {
       setReviews(data);
     } catch (err) {
       console.error('Помилка завантаження відгуків:', err);
+      toast.error('Не вдалося завантажити відгуки'); // ДОДАНО
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Вызываем через асинхронную обертку, чтобы избежать cascading renders
-  useEffect(() => {
-    const loadData = async () => {
-      await fetchReviews();
-    };
-    loadData();
-  }, [fetchReviews]);
+useEffect(() => {
+  const loadData = async () => {
+    await fetchReviews();
+  };
+  loadData();
+}, [fetchReviews]);
 
   const toggleApprove = async (id: string, currentStatus: boolean) => {
+    // Optimistic UI: одразу змінюємо стан локально для швидкості
+    setReviews((prev) =>
+      prev.map((r) =>
+        r._id === id ? { ...r, isApproved: !currentStatus } : r,
+      ),
+    );
+
     try {
       const res = await fetch('/api/reviews', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, isApproved: !currentStatus }),
       });
+
       if (res.ok) {
-        await fetchReviews();
+        toast.success(currentStatus ? 'Відгук приховано' : 'Відгук схвалено'); // ДОДАНО
+      } else {
+        throw new Error('Помилка');
       }
     } catch {
-      alert('Не вдалося змінити статус');
+      toast.error('Не вдалося змінити статус'); // ДОДАНО
+      fetchReviews(); // Відкочуємо зміни, якщо сталася помилка
     }
   };
 
-  const deleteReview = async (id: string) => {
-    if (!confirm('Видалити цей відгук назавжди?')) return;
+  const confirmDelete = async () => {
+    if (!deleteModal.reviewId) return;
+
+    const id = deleteModal.reviewId;
+    // Оптимістичне видалення з UI
+    setReviews((prev) => prev.filter((r) => r._id !== id));
+
     try {
       const res = await fetch(`/api/reviews?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
-        await fetchReviews();
+        toast.success('Відгук назавжди видалено');
+      } else {
+        throw new Error('Помилка');
       }
     } catch {
-      alert('Помилка видалення');
+      toast.error('Помилка видалення');
+      fetchReviews(); // Відкочуємо, якщо помилка
     }
   };
 
-  if (loading) return <div className="p-4 text-gray-500">Завантаження...</div>;
+  if (loading)
+    return (
+      <div className="p-4 text-gray-500 animate-pulse">Завантаження...</div>
+    );
 
   return (
     <div className="space-y-4">
+      {/* ДОДАНО: Компонент для відображення тостів */}
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+
+      {/* ДОДАНО: Наша нова модалка */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Видалення відгуку"
+        message="Ви впевнені, що хочете видалити цей відгук? Цю дію неможливо скасувати."
+        onCancel={() => setDeleteModal({ isOpen: false, reviewId: null })}
+        onConfirm={confirmDelete}
+      />
+
       <h2 className="text-xl font-bold text-gray-800">Керування відгуками</h2>
 
       {reviews.length === 0 ? (
@@ -111,7 +155,10 @@ export default function ReviewsTab() {
                     {review.isApproved ? 'Приховати' : 'Схвалити'}
                   </button>
                   <button
-                    onClick={() => deleteReview(review._id)}
+                    // ЗМІНЕНО: Замість confirm() відкриваємо модалку
+                    onClick={() =>
+                      setDeleteModal({ isOpen: true, reviewId: review._id })
+                    }
                     className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                   >
                     Видалити
