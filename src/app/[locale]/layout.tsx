@@ -3,7 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { Toaster } from 'react-hot-toast';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -94,6 +94,7 @@ export default async function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
       suppressHydrationWarning
     >
+      <GoogleTagManager gtmId="GTM-MKRCDF8N" />
       <body className={`${poppins.className} relative`}>
         <Toaster
           position="top-center"
