@@ -29,6 +29,7 @@ export default function ClientsTab() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'newest' | 'upcoming'>('newest');
+  const [search, setSearch] = useState('');
 
   // Стейт для модалок
   const [deleteModal, setDeleteModal] = useState<{
@@ -163,15 +164,30 @@ export default function ClientsTab() {
     });
   };
 
-  const displayedClients = [...clients].sort((a, b) => {
-    if (sortBy === 'upcoming') {
-      if (!a.nextAppointment) return 1;
-      if (!b.nextAppointment) return -1;
-      // Оскільки тепер дата у форматі YYYY-MM-DD, localeCompare відпрацює ідеально хронологічно
-      return a.nextAppointment.localeCompare(b.nextAppointment);
-    }
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
+  const displayedClients = [...clients]
+    .filter((client) => {
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        client.name.toLowerCase().includes(q) ||
+        client.phone.toLowerCase().includes(q) ||
+        (client.telegram || '').toLowerCase().includes(q) ||
+        (client.source || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === 'upcoming') {
+        if (!a.nextAppointment) return 1;
+        if (!b.nextAppointment) return -1;
+        return a.nextAppointment.localeCompare(b.nextAppointment);
+      }
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+
+  const upcomingSoon = clients
+    .filter((c) => c.nextAppointment)
+    .sort((a, b) => a.nextAppointment.localeCompare(b.nextAppointment))
+    .slice(0, 5);
 
   if (loading)
     return (
@@ -208,29 +224,69 @@ export default function ClientsTab() {
         onSave={handleSaveAppointment}
       />
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-xl font-bold text-gray-800">
-          База клієнтів ({clients.length})
-        </h2>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h2 className="text-xl font-bold text-gray-800">
+            База клієнтів ({clients.length})
+          </h2>
 
-        <div className="bg-gray-100 p-1 rounded-xl inline-flex text-sm">
-          <button
-            onClick={() => setSortBy('newest')}
-            className={`px-4 py-2 rounded-lg font-bold transition-all ${sortBy === 'newest' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Останні активні
-          </button>
-          <button
-            onClick={() => setSortBy('upcoming')}
-            className={`px-4 py-2 rounded-lg font-bold transition-all ${sortBy === 'upcoming' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Найближчі записи
-          </button>
+          <div className="bg-[#f3efe8] p-1 rounded-xl inline-flex text-sm">
+            <button
+              type="button"
+              onClick={() => setSortBy('newest')}
+              className={`px-4 py-2 rounded-lg font-bold transition-all ${sortBy === 'newest' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Останні активні
+            </button>
+            <button
+              type="button"
+              onClick={() => setSortBy('upcoming')}
+              className={`px-4 py-2 rounded-lg font-bold transition-all ${sortBy === 'upcoming' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Найближчі записи
+            </button>
+          </div>
         </div>
+
+        <label className="block">
+          <span className="sr-only">Пошук клієнта</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Пошук за імʼям, телефоном, Telegram..."
+            className="w-full md:max-w-md px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-[#c49f2d] focus:ring-2 focus:ring-[#c49f2d]/15"
+          />
+        </label>
+
+        {sortBy === 'upcoming' && upcomingSoon.length > 0 && !search && (
+          <div className="rounded-2xl border border-[#e8dfd2] bg-[#fbf7f1] p-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#856142] mb-3">
+              Найближчі
+            </p>
+            <ul className="space-y-2">
+              {upcomingSoon.map((c) => (
+                <li
+                  key={c._id}
+                  className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                >
+                  <span className="font-semibold text-gray-900">{c.name}</span>
+                  <span className="text-[#856142] font-medium">
+                    {formatDate(c.nextAppointment)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {displayedClients.length === 0 ? (
-        <p className="text-gray-500 italic">База клієнтів поки порожня.</p>
+        <p className="text-gray-500 italic">
+          {search
+            ? 'Нікого не знайдено за цим запитом.'
+            : 'База клієнтів поки порожня.'}
+        </p>
       ) : (
         <div className="grid gap-4">
           {displayedClients.map((client) => (

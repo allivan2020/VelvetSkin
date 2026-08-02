@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 
@@ -94,6 +94,25 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setStep(1);
+        setFormData({
+          experience: '',
+          selections: [],
+          name: '',
+          contact: '+380',
+        });
+        setErrors({ name: '', contact: '' });
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const experienceKey =
@@ -101,7 +120,12 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
   const options = t.raw(`steps.step2.options.${experienceKey}`) as string[];
 
   return (
-    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#231d19]/80 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#231d19]/80 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quiz-modal-title"
+    >
       <div className="relative w-full max-w-md bg-[#fcfaf8] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
         {/* Progress Bar */}
         <div className="w-full h-1 bg-[#4a3f39]/10">
@@ -112,6 +136,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
         </div>
 
         <button
+          type="button"
           aria-label="Close modal"
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 text-[#4a3f39]/50 hover:text-[#4a3f39]"
@@ -135,8 +160,10 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
           {/* STEP 1 */}
           {step === 1 && (
             <div className="flex flex-col gap-6">
-              <h3 className="font-cormorant text-3xl text-[#4a3f39] text-center mb-2">
-                {t('steps.step1.title')}
+              <h3
+                id="quiz-modal-title"
+                className="font-cormorant text-3xl text-[#4a3f39] text-center mb-2"
+              >                {t('steps.step1.title')}
               </h3>
               <div className="flex flex-col gap-3">
                 <button

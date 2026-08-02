@@ -4,16 +4,19 @@ import Services from '@/components/sections/Services';
 import Gallery from '@/components/sections/Gallery';
 import Reviews from '@/components/sections/Reviews';
 import FAQ from '@/components/sections/FAQ';
-import Contacts from '@/components/sections//Contacts';
+import Contacts from '@/components/sections/Contacts';
+import { getApprovedReviews } from '@/lib/reviews';
 
-export default function Home() {
+export default async function Home() {
+  const initialReviews = await getApprovedReviews();
+
   return (
     <>
       <Hero />
       <About />
       <Services />
       <Gallery />
-      <Reviews />
+      <Reviews initialReviews={initialReviews} />
       <FAQ />
       <Contacts />
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -58,8 +58,17 @@ const Gallery = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: (index % 4) * 0.1 }}
+              role="button"
+              tabIndex={0}
+              aria-label={img.alt}
               onClick={() => setSelectedIndex(index)}
-              className="relative aspect-square overflow-hidden bg-[#f0ede8] cursor-zoom-in group"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedIndex(index);
+                }
+              }}
+              className="relative aspect-square overflow-hidden bg-[#f0ede8] cursor-zoom-in group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#917152]"
             >
               <Image
                 src={img.src}
@@ -111,6 +120,20 @@ const Lightbox = ({
   setIndex,
   labels,
 }: LightboxProps) => {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') {
+        setIndex((index - 1 + images.length) % images.length);
+      }
+      if (e.key === 'ArrowRight') {
+        setIndex((index + 1) % images.length);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [images.length, index, onClose, setIndex]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -120,6 +143,7 @@ const Lightbox = ({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      aria-label={images[index]?.alt}
     >
       <button
         className="absolute top-6 right-6 md:top-10 md:right-10 text-white/50 text-4xl font-light hover:text-white transition-colors z-[10001] p-4"
@@ -154,7 +178,9 @@ const Lightbox = ({
         onClick={(e) => e.stopPropagation()}
       >
         <button
+          type="button"
           className="hover:text-[#bd9b7d] transition-colors py-4 px-2"
+          aria-label={labels.prev}
           onClick={() => setIndex((index - 1 + images.length) % images.length)}
         >
           {labels.prev}
@@ -163,7 +189,9 @@ const Lightbox = ({
           {index + 1} / {images.length}
         </span>
         <button
+          type="button"
           className="hover:text-[#bd9b7d] transition-colors py-4 px-2"
+          aria-label={labels.next}
           onClick={() => setIndex((index + 1) % images.length)}
         >
           {labels.next}

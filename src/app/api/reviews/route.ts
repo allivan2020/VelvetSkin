@@ -1,94 +1,56 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import Review from '@/models/Review'; // Убедись, что модель существует!
+import Review from '@/models/Review';
+import {
+  errorResponse,
+  escapeHtml,
+  getClientIp,
+  notifyTelegram,
+  rateLimit,
+} from '@/lib/api-helpers';
+import { createReviewSchema } from '@/lib/validation';
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     await connectToDatabase();
-    const { searchParams } = new URL(req.url);
-    const isAdmin = searchParams.get('admin');
-
-    // Если запрос из админки, отдаем все отзывы. Иначе - только одобренные.
-    const query = isAdmin ? {} : { isApproved: true };
-    const reviews = await Review.find(query).sort({ createdAt: -1 });
-
+    const reviews = await Review.find({ isApproved: true }).sort({
+      createdAt: -1,
+    });
     return NextResponse.json(reviews);
-  } catch {
-    return NextResponse.json(
-      { error: 'Помилка завантаження відгуків' },
-      { status: 500 },
-    );
+  } catch (e) {
+    return errorResponse('Помилка завантаження відгуків', 500, e);
   }
 }
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const limited = rateLimit(`reviews:${ip}`, 5, 60_000);
+    if (!limited.ok) {
+      return errorResponse('Забагато запитів. Спробуйте пізніше.', 429);
+    }
+
     await connectToDatabase();
     const body = await req.json();
-    // Добавили source
-    const { name, text, source } = body;
+    const parsed = createReviewSchema.safeParse(body);
+    if (!parsed.success) {
+      return errorResponse('Невірні дані відгуку', 400);
+    }
+
+    const { name, text, source } = parsed.data;
 
     const newReview = await Review.create({
       name: name || 'Анонім',
       text,
-      source: source || 'Сайт', // Сохраняем источник
+      source: source || 'Сайт',
       isApproved: false,
     });
 
-    // Відправка сповіщення в Telegram
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-
-    if (botToken && chatId) {
-      // Добавили джерело в повідомлення
-      const message = `<b>💬 Новий відгук!</b>\n\n<b>👤 Від:</b> ${newReview.name}\n<b>📱 Джерело:</b> ${newReview.source}\n<b>📝 Текст:</b> ${newReview.text}\n\n<i>⏳ Відгук очікує на модерацію.</i>`;
-
-      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      });
-    }
+    const message = `<b>💬 Новий відгук!</b>\n\n<b>👤 Від:</b> ${escapeHtml(newReview.name)}\n<b>📱 Джерело:</b> ${escapeHtml(newReview.source)}\n<b>📝 Текст:</b> ${escapeHtml(newReview.text)}\n\n<i>⏳ Відгук очікує на модерацію.</i>`;
+    void notifyTelegram(message);
 
     return NextResponse.json(newReview, { status: 201 });
-  } catch {
-    return NextResponse.json(
-      { error: 'Помилка створення відгуку' },
-      { status: 500 },
-    );
-  }
-}
-
-export async function PATCH(req: Request) {
-  try {
-    await connectToDatabase();
-    const body = await req.json();
-    const { id, isApproved } = body;
-
-    const updatedReview = await Review.findByIdAndUpdate(
-      id,
-      { isApproved },
-      { new: true },
-    );
-
-    return NextResponse.json(updatedReview);
-  } catch {
-    return NextResponse.json({ error: 'Помилка оновлення' }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    await connectToDatabase();
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-    await Review.findByIdAndDelete(id);
-    return NextResponse.json({ message: 'Видалено' });
-  } catch {
-    return NextResponse.json({ error: 'Помилка видалення' }, { status: 500 });
+  } catch (e) {
+    return errorResponse('Помилка створення відгуку', 500, e);
   }
 }

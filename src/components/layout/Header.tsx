@@ -116,7 +116,10 @@ const Header = () => {
 
             {/* Бургер */}
             <button
-              aria-label="Close modal"
+              type="button"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-nav"
               className="lg:hidden p-2 flex flex-col gap-[5px] flex-shrink-0 bg-transparent border-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -154,6 +157,8 @@ const Header = () => {
 
       {/* Мобільне меню */}
       <nav
+        id="mobile-nav"
+        aria-hidden={!isMenuOpen}
         className={clsx(
           'fixed inset-0 w-full h-[100dvh] bg-[#231d19]/98 backdrop-blur-3xl flex flex-col items-center justify-center z-[2000] transition-all duration-500',
           isMenuOpen

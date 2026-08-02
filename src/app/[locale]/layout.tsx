@@ -12,6 +12,7 @@ import ClientProviders from '@/components/layout/ClientProviders';
 
 import { poppins, cormorant, vibes } from '../fonts';
 import '../globals.css';
+import { localePath } from '@/lib/locales';
 
 const baseUrl = 'https://www.velvetskinzp.com';
 
@@ -33,6 +34,8 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const canonicalPath = localePath(locale);
+  const canonicalUrl = `${baseUrl}${canonicalPath === '/' ? '' : canonicalPath}`;
 
   return {
     metadataBase: new URL(baseUrl),
@@ -43,19 +46,19 @@ export async function generateMetadata({
     description: descriptions[locale] || descriptions.uk,
 
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
+      canonical: canonicalUrl || baseUrl,
       languages: {
-        'uk-UA': `${baseUrl}/uk`,
+        'uk-UA': baseUrl,
         'ru-RU': `${baseUrl}/ru`,
         'en-US': `${baseUrl}/en`,
-        'x-default': `${baseUrl}/uk`,
+        'x-default': baseUrl,
       },
     },
 
     openGraph: {
       title: titles[locale] || titles.uk,
       description: descriptions[locale] || descriptions.uk,
-      url: `${baseUrl}/${locale}`,
+      url: canonicalUrl || baseUrl,
       siteName: 'VelvetSkin',
       images: [{ url: '/og-preview.png', width: 1200, height: 630 }],
       locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uk_UA',
@@ -85,7 +88,7 @@ export default async function RootLayout({
       addressCountry: 'UA',
     },
     telephone: '+380971950698',
-    url: `${baseUrl}/${locale}`,
+    url: `${baseUrl}${localePath(locale) === '/' ? '' : localePath(locale)}`,
   };
 
   return (
@@ -109,11 +112,19 @@ export default async function RootLayout({
         />
 
         <NextIntlClientProvider messages={messages}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:bg-white focus:text-[#231d19] focus:px-4 focus:py-2 focus:rounded-lg"
+          >
+            Skip to content
+          </a>
           <AdminHide>
             <Header />
           </AdminHide>
 
-          <main className="relative">{children}</main>
+          <main id="main-content" className="relative">
+            {children}
+          </main>
 
           <AdminHide>
             <Footer />

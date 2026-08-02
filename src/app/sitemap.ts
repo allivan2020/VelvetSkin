@@ -1,14 +1,13 @@
 import { MetadataRoute } from 'next';
+import { locales, localePath } from '@/lib/locales';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.velvetskinzp.com';
-  const locales = ['uk', 'ru', 'en'];
 
-  // Генерируем пути для всех языков
   return locales.map((locale) => ({
-    url: `${baseUrl}/${locale}`,
+    url: `${baseUrl}${localePath(locale)}`,
     lastModified: new Date(),
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const,
     priority: locale === 'uk' ? 1.0 : 0.8,
   }));
 }

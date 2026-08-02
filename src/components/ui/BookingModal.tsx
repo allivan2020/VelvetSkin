@@ -6,7 +6,8 @@ import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTranslations } from 'next-intl';
 import { X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
-const TURNSTILE_SITE_KEY = '0x4AAAAAACppbzwvZa1GFBX5';
+const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAACppbzwvZa1GFBX5';
 
 const BookingModal = () => {
   const t = useTranslations('BookingModal');
@@ -49,13 +50,20 @@ const BookingModal = () => {
     return () => document.removeEventListener('click', handleGlobalClick);
   }, []);
 
-  // Блокировка прокрутки
+  // Блокировка прокрутки + Escape
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (!isOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', onKeyDown);
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, closeModal]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -81,7 +89,7 @@ const BookingModal = () => {
     setStatus('loading');
 
     try {
-      const res = await fetch('/api/admin/leads', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -126,9 +134,13 @@ const BookingModal = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-modal-title"
             className="relative w-full max-w-md bg-white rounded-[32px] p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <button
+              type="button"
               onClick={closeModal}
               className="absolute top-6 right-6 text-gray-400 hover:text-[#bd9b7d] transition-colors p-1"
               aria-label="Close"
@@ -136,7 +148,10 @@ const BookingModal = () => {
               <X size={24} />
             </button>
 
-            <h3 className="font-vibes text-4xl text-[#535353] text-center mb-2">
+            <h3
+              id="booking-modal-title"
+              className="font-vibes text-4xl text-[#535353] text-center mb-2"
+            >
               {t('title')}
             </h3>
             <p className="text-center text-sm text-gray-500 mb-8 font-medium">
@@ -162,45 +177,63 @@ const BookingModal = () => {
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className="space-y-4">
-                  <input
-                    type="text"
-                    required
-                    disabled={status === 'loading'}
-                    placeholder={t('placeholders.name')}
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, name: e.target.value }))
-                    }
-                    className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
-                  />
+                  <div>
+                    <label htmlFor="booking-name" className="sr-only">
+                      {t('placeholders.name')}
+                    </label>
+                    <input
+                      id="booking-name"
+                      type="text"
+                      required
+                      disabled={status === 'loading'}
+                      placeholder={t('placeholders.name')}
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, name: e.target.value }))
+                      }
+                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
+                    />
+                  </div>
 
-                  <input
-                    type="tel"
-                    required
-                    disabled={status === 'loading'}
-                    placeholder="+380 (__) ___ __ __"
-                    value={formData.phone}
-                    onChange={handlePhoneChange}
-                    className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
-                  />
+                  <div>
+                    <label htmlFor="booking-phone" className="sr-only">
+                      Phone
+                    </label>
+                    <input
+                      id="booking-phone"
+                      type="tel"
+                      required
+                      disabled={status === 'loading'}
+                      placeholder="+380 (__) ___ __ __"
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
+                    />
+                  </div>
 
-                  <select
-                    required
-                    disabled={status === 'loading'}
-                    value={formData.service}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, service: e.target.value }))
-                    }
-                    className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none cursor-pointer transition-all disabled:opacity-50 appearance-none"
-                  >
-                    <option value="" disabled>
+                  <div>
+                    <label htmlFor="booking-service" className="sr-only">
                       {t('placeholders.service')}
-                    </option>
-                    <option value="Women's Waxing">
-                      {t('services.female')}
-                    </option>
-                    <option value="Men's Waxing">{t('services.male')}</option>
-                  </select>
+                    </label>
+                    <select
+                      id="booking-service"
+                      required
+                      disabled={status === 'loading'}
+                      value={formData.service}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, service: e.target.value }))
+                      }
+                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none cursor-pointer transition-all disabled:opacity-50 appearance-none"
+                    >
+                      <option value="" disabled>
+                        {t('placeholders.service')}
+                      </option>
+                      <option value="Women's Waxing">
+                        {t('services.female')}
+                      </option>
+                      <option value="Men's Waxing">{t('services.male')}</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex justify-center my-4 min-h-[65px]">

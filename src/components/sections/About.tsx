@@ -18,34 +18,27 @@ const About = () => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   const handleQuizSubmit = async (data: QuizData) => {
-    // Створюємо id для тоста завантаження, щоб потім його оновити
-    const toastId = toast.loading('Відправляємо заявку...');
+    const toastId = toast.loading(t('messages.loading'));
 
     try {
-      const response = await fetch('/api/admin/leads', {
+      const response = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
           type: 'Квіз',
-          status: 'Новий',
         }),
       });
 
       if (response.ok) {
-        // Оновлюємо тост на успішний і закриваємо модалку
         toast.success(t('messages.success'), { id: toastId });
         setIsQuizOpen(false);
       } else {
-        // Оновлюємо тост на помилку
         toast.error(t('messages.error'), { id: toastId });
       }
     } catch (error) {
       console.error('Submit error:', error);
-      // Ловимо винятки (наприклад, зник інтернет)
-      toast.error('Сталася помилка при відправці. Спробуйте ще раз.', {
-        id: toastId,
-      });
+      toast.error(t('messages.error'), { id: toastId });
     }
   };
 

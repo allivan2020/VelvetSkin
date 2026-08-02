@@ -5,9 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/private/', // Здесь всё верно, закрываем админку от любопытных глаз
+      disallow: ['/admin', '/admin/', '/ru/admin', '/en/admin'],
     },
-    // МЕНЯЕМ ЗДЕСЬ:
     sitemap: 'https://www.velvetskinzp.com/sitemap.xml',
   };
 }

@@ -27,7 +27,7 @@ export default function ReviewsTab() {
 
   const fetchReviews = useCallback(async () => {
     try {
-      const res = await fetch('/api/reviews?admin=true');
+      const res = await fetch('/api/admin/reviews');
       if (!res.ok) throw new Error('Помилка сервера');
       const data = await res.json();
       setReviews(data);
@@ -55,7 +55,7 @@ useEffect(() => {
     );
 
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch('/api/admin/reviews', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, isApproved: !currentStatus }),
@@ -80,7 +80,9 @@ useEffect(() => {
     setReviews((prev) => prev.filter((r) => r._id !== id));
 
     try {
-      const res = await fetch(`/api/reviews?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/reviews?id=${id}`, {
+        method: 'DELETE',
+      });
       if (res.ok) {
         toast.success('Відгук назавжди видалено');
       } else {

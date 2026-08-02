@@ -37,6 +37,7 @@
       "certAlt": "Professional certification"
     },
     "messages": {
+      "loading": "Sending your request...",
       "success": "Thank you! We will contact you shortly to confirm your bonus.",
       "error": "Oops, something went wrong. Please try again."
     }

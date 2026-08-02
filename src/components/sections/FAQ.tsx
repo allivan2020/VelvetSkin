@@ -63,10 +63,12 @@ const FAQ = () => {
                 className="border-b border-[#bd9b7d]/20 transition-all duration-500"
               >
                 <button
+                  type="button"
+                  aria-expanded={openIndex === index}
                   onClick={() =>
                     setOpenIndex(openIndex === index ? null : index)
                   }
-                  className="w-full flex justify-between items-center py-8 md:py-10 text-left focus:outline-none group"
+                  className="w-full flex justify-between items-center py-8 md:py-10 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#917152] group"
                 >
                   <span className="text-[18px] md:text-[22px] font-cormorant text-[#1a1614] font-medium tracking-wide transition-colors group-hover:text-[#917152]">
                     {item.q}

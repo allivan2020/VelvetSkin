@@ -45,6 +45,7 @@ export default function LanguageSwitcher() {
 
   return (
     <select
+      aria-label="Language"
       value={locale}
       onChange={onSelectChange}
       disabled={isPending}

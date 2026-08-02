@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
+import type { ApprovedReview } from '@/lib/reviews';
 
 interface ReviewType {
   _id: string;
@@ -14,12 +15,16 @@ interface ReviewType {
   link?: string;
 }
 
-const Reviews = () => {
+const Reviews = ({
+  initialReviews = [],
+}: {
+  initialReviews?: ApprovedReview[];
+}) => {
   const t = useTranslations('Reviews');
-  const locale = useLocale(); // Получаем текущий язык (uk, ru, en)
+  const locale = useLocale();
 
-  const [reviews, setReviews] = useState<ReviewType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [reviews, setReviews] = useState<ReviewType[]>(initialReviews);
+  const [isLoading, setIsLoading] = useState(initialReviews.length === 0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -27,21 +32,36 @@ const Reviews = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
+    if (initialReviews.length > 0) return;
+
+    let cancelled = false;
     const fetchApprovedReviews = async () => {
       try {
         const response = await fetch('/api/reviews');
         if (response.ok) {
           const data = await response.json();
-          setReviews(data);
+          if (!cancelled) setReviews(data);
         }
       } catch (error) {
         console.error('Error loading reviews', error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
     fetchApprovedReviews();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [initialReviews.length]);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsModalOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isModalOpen]);
 
   const nextReview = () => {
     if (reviews.length > 0)
@@ -247,7 +267,12 @@ const Reviews = () => {
       {/* Модалка */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="review-modal-title"
+          >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -262,6 +287,7 @@ const Reviews = () => {
               className="relative w-full max-w-lg p-8 md:p-10 rounded-[2rem] bg-white/90 backdrop-blur-2xl shadow-2xl"
             >
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 aria-label={t('closeAria')}
                 className="absolute top-6 right-6 text-[#1a1614]/50 hover:text-[#1a1614] p-2"
@@ -280,30 +306,45 @@ const Reviews = () => {
                 </div>
               ) : (
                 <>
-                  <h3 className="font-vibes text-[42px] text-[#1a1614] mb-6 text-center">
+                  <h3
+                    id="review-modal-title"
+                    className="font-vibes text-[42px] text-[#1a1614] mb-6 text-center"
+                  >
                     {t('modal.title')}
                   </h3>
                   <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    <input
-                      type="text"
-                      required
-                      placeholder={t('modal.namePlaceholder')}
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px]"
-                    />
-                    <textarea
-                      required
-                      placeholder={t('modal.textPlaceholder')}
-                      rows={4}
-                      value={formData.text}
-                      onChange={(e) =>
-                        setFormData({ ...formData, text: e.target.value })
-                      }
-                      className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px] resize-none"
-                    />
+                    <div>
+                      <label htmlFor="review-name" className="sr-only">
+                        {t('modal.namePlaceholder')}
+                      </label>
+                      <input
+                        id="review-name"
+                        type="text"
+                        required
+                        placeholder={t('modal.namePlaceholder')}
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="review-text" className="sr-only">
+                        {t('modal.textPlaceholder')}
+                      </label>
+                      <textarea
+                        id="review-text"
+                        required
+                        placeholder={t('modal.textPlaceholder')}
+                        rows={4}
+                        value={formData.text}
+                        onChange={(e) =>
+                          setFormData({ ...formData, text: e.target.value })
+                        }
+                        className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px] resize-none"
+                      />
+                    </div>
                     <button
                       type="submit"
                       disabled={isSending}

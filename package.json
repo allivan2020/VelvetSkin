@@ -9,11 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@marsidev/react-turnstile": "^1.5.0",
-    "@next/third-parties": "^16.2.4",
-    "@studio-freight/react-lenis": "^0.0.47",
+    "@next/third-parties": "^15.5.15",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
@@ -22,7 +20,7 @@
     "groq-sdk": "^1.1.2",
     "lucide-react": "^1.7.0",
     "mongoose": "^9.3.3",
-    "next": "^15.2.0",
+    "next": "^15.5.15",
     "next-intl": "^4.11.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -32,14 +30,14 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.27",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "15.5.15",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.3"
@@ -48,6 +46,5 @@
     "last 2 versions",
     "> 0.5%",
     "not dead"
-  ],
-  "editor.renderValidationDecorations": "on"
+  ]
 }
