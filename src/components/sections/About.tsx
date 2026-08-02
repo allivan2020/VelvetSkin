@@ -11,6 +11,7 @@ interface QuizData {
   selections: string[];
   name: string;
   contact: string;
+  captcha: string;
 }
 
 const About = () => {
@@ -25,8 +26,12 @@ const About = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...data,
+          name: data.name,
+          contact: data.contact,
+          experience: data.experience,
+          selections: data.selections,
           type: 'Квіз',
+          captcha: data.captcha,
         }),
       });
 

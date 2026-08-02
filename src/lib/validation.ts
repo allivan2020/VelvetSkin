@@ -17,7 +17,7 @@ export const createLeadSchema = z.object({
   experience: z.string().trim().max(500).optional(),
   selections: z.array(z.string().trim().max(200)).max(30).optional(),
   type: z.string().trim().max(100).optional(),
-  captcha: z.string().min(1).optional(),
+  captcha: z.string().min(1, 'Капча обовʼязкова'),
 });
 
 export const patchLeadSchema = z.object({

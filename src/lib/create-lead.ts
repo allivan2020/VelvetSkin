@@ -15,7 +15,7 @@ import { NextResponse } from 'next/server';
 /** Shared public lead creation — used by /api/leads and legacy /api/admin/leads POST. */
 export async function createPublicLead(req: Request) {
   const ip = getClientIp(req);
-  const limited = rateLimit(`leads:${ip}`, 8, 60_000);
+  const limited = rateLimit(`leads:${ip}`, 3, 60_000);
   if (!limited.ok) {
     return errorResponse('Забагато запитів. Спробуйте пізніше.', 429);
   }
@@ -29,15 +29,9 @@ export async function createPublicLead(req: Request) {
   const { name, contact, experience, selections, type, captcha } = parsed.data;
   const leadType = type?.trim() || 'Квіз';
 
-  const requiresCaptcha =
-    Boolean(process.env.TURNSTILE_SECRET_KEY) &&
-    (leadType === 'Запис з кнопки' || Boolean(captcha));
-
-  if (requiresCaptcha) {
-    const captchaResult = await verifyTurnstile(captcha);
-    if (!captchaResult.ok) {
-      return errorResponse(captchaResult.error, 403);
-    }
+  const captchaResult = await verifyTurnstile(captcha);
+  if (!captchaResult.ok) {
+    return errorResponse(captchaResult.error, 403);
   }
 
   await connectToDatabase();

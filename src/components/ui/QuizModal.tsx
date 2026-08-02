@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
+
+const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAACppbzwvZa1GFBX5';
 
 interface QuizModalProps {
   isOpen: boolean;
@@ -12,11 +16,13 @@ interface QuizModalProps {
     selections: string[];
     name: string;
     contact: string;
+    captcha: string;
   }) => void;
 }
 
 const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
   const t = useTranslations('Quiz');
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     experience: '',
@@ -24,13 +30,19 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
     name: '',
     contact: '+380',
   });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [errors, setErrors] = useState({ name: '', contact: '', captcha: '' });
 
-  const [errors, setErrors] = useState({ name: '', contact: '' });
-
-  const handleClose = () => {
+  const resetForm = () => {
     setStep(1);
     setFormData({ experience: '', selections: [], name: '', contact: '+380' });
-    setErrors({ name: '', contact: '' });
+    setErrors({ name: '', contact: '', captcha: '' });
+    setCaptchaToken(null);
+    turnstileRef.current?.reset();
+  };
+
+  const handleClose = () => {
+    resetForm();
     onClose();
   };
 
@@ -57,14 +69,13 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { name: '', contact: '' };
+    const newErrors = { name: '', contact: '', captcha: '' };
 
     if (formData.name.trim().length < 2) {
       newErrors.name = t('errors.name');
       isValid = false;
     }
 
-    // 🔥 ОЧИЩАЕМ НОМЕР от пробелов, скобок и тире перед проверкой
     const cleanContact = formData.contact.replace(/[\s\-\(\)]/g, '');
 
     if (cleanContact.startsWith('@')) {
@@ -80,16 +91,20 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
       }
     }
 
+    if (!captchaToken) {
+      newErrors.captcha = t('errors.captcha');
+      isValid = false;
+    }
+
     setErrors(newErrors);
     return isValid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      // 🔥 ОТПРАВЛЯЕМ ОЧИЩЕННЫЙ НОМЕР, чтобы в CRM все было в едином формате
+    if (validateForm() && captchaToken) {
       const cleanContact = formData.contact.replace(/[\s\-\(\)]/g, '');
-      onSubmit({ ...formData, contact: cleanContact });
+      onSubmit({ ...formData, contact: cleanContact, captcha: captchaToken });
       handleClose();
     }
   };
@@ -105,7 +120,8 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
           name: '',
           contact: '+380',
         });
-        setErrors({ name: '', contact: '' });
+        setErrors({ name: '', contact: '', captcha: '' });
+        setCaptchaToken(null);
         onClose();
       }
     };
@@ -126,8 +142,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
       aria-modal="true"
       aria-labelledby="quiz-modal-title"
     >
-      <div className="relative w-full max-w-md bg-[#fcfaf8] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-        {/* Progress Bar */}
+      <div className="relative w-full max-w-md bg-[#fcfaf8] rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <div className="w-full h-1 bg-[#4a3f39]/10">
           <div
             className="h-full bg-[#bd9b7d] transition-all duration-500 ease-out"
@@ -139,7 +154,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
           type="button"
           aria-label="Close modal"
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 text-[#4a3f39]/50 hover:text-[#4a3f39]"
+          className="absolute top-4 right-4 p-2 text-[#4a3f39]/50 hover:text-[#4a3f39] z-10"
         >
           <svg
             className="w-6 h-6"
@@ -157,22 +172,24 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
         </button>
 
         <div className="p-8">
-          {/* STEP 1 */}
           {step === 1 && (
             <div className="flex flex-col gap-6">
               <h3
                 id="quiz-modal-title"
                 className="font-cormorant text-3xl text-[#4a3f39] text-center mb-2"
-              >                {t('steps.step1.title')}
+              >
+                {t('steps.step1.title')}
               </h3>
               <div className="flex flex-col gap-3">
                 <button
+                  type="button"
                   onClick={() => handleExperienceSelect('new')}
                   className="w-full py-4 px-6 text-left border border-[#bd9b7d]/30 rounded-xl font-poppins text-[14px] text-[#4a3f39] hover:bg-[#bd9b7d]/10 transition-colors"
                 >
                   {t('steps.step1.options.new')}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleExperienceSelect('regular')}
                   className="w-full py-4 px-6 text-left border border-[#bd9b7d]/30 rounded-xl font-poppins text-[14px] text-[#4a3f39] hover:bg-[#bd9b7d]/10 transition-colors"
                 >
@@ -182,7 +199,6 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
             </div>
           )}
 
-          {/* STEP 2 */}
           {step === 2 && (
             <div className="flex flex-col gap-6">
               <div className="text-center mb-2">
@@ -201,6 +217,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                   const isSelected = formData.selections.includes(option);
                   return (
                     <button
+                      type="button"
                       key={option}
                       onClick={() => toggleSelection(option)}
                       className={clsx(
@@ -238,6 +255,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
               <div className="flex flex-col gap-2 mt-2">
                 <button
+                  type="button"
                   onClick={() => setStep(3)}
                   disabled={formData.selections.length === 0}
                   className="w-full py-3.5 bg-[#4a3f39] disabled:opacity-30 text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px]"
@@ -245,6 +263,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                   {t('buttons.next')}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setStep(1)}
                   className="text-[12px] font-poppins text-[#bd9b7d] underline mt-2"
                 >
@@ -254,7 +273,6 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
             </div>
           )}
 
-          {/* STEP 3 */}
           {step === 3 && (
             <div className="flex flex-col gap-4">
               <h3 className="font-cormorant text-3xl text-[#4a3f39] text-center mb-1">
@@ -274,7 +292,11 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div>
+                  <label htmlFor="quiz-name" className="sr-only">
+                    {t('placeholders.name')}
+                  </label>
                   <input
+                    id="quiz-name"
                     type="text"
                     name="name"
                     autoComplete="name"
@@ -298,7 +320,11 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                 </div>
 
                 <div>
+                  <label htmlFor="quiz-contact" className="sr-only">
+                    {t('placeholders.contact')}
+                  </label>
                   <input
+                    id="quiz-contact"
                     type="tel"
                     name="phone"
                     autoComplete="tel"
@@ -321,15 +347,36 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                   )}
                 </div>
 
+                <div className="flex justify-center min-h-[65px]">
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={TURNSTILE_SITE_KEY}
+                    onSuccess={(token) => {
+                      setCaptchaToken(token);
+                      setErrors((prev) => ({ ...prev, captcha: '' }));
+                    }}
+                    onError={() => setCaptchaToken(null)}
+                    onExpire={() => setCaptchaToken(null)}
+                    options={{ theme: 'light' }}
+                  />
+                </div>
+                {errors.captcha && (
+                  <p className="text-red-500 text-[11px] text-center">
+                    {errors.captcha}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full mt-2 py-3.5 bg-[#bd9b7d] hover:bg-[#a6856a] text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px] font-medium shadow-lg active:scale-95 transition-all"
+                  disabled={!captchaToken}
+                  className="w-full mt-2 py-3.5 bg-[#bd9b7d] hover:bg-[#a6856a] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px] font-medium shadow-lg active:scale-95 transition-all"
                 >
                   {t('buttons.submit')}
                 </button>
               </form>
 
               <button
+                type="button"
                 onClick={() => setStep(2)}
                 className="text-[12px] font-poppins text-[#bd9b7d] underline mt-2 text-center"
               >

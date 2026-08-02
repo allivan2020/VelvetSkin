@@ -245,7 +245,8 @@
     "errors": {
       "name": "Name must be at least 2 characters long",
       "contact": "Enter a valid number (+380...) or @username",
-      "telegram": "Enter a valid Telegram handle (e.g., @username)"
+      "telegram": "Enter a valid Telegram handle (e.g., @username)",
+      "captcha": "Please verify that you are not a robot."
     }
   }
 }
