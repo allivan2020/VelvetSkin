@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useTranslations, useLocale } from 'next-intl';
+import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import type { ApprovedReview } from '@/lib/reviews';
 
 interface ReviewType {
@@ -21,7 +22,6 @@ const Reviews = ({
   initialReviews?: ApprovedReview[];
 }) => {
   const t = useTranslations('Reviews');
-  const locale = useLocale();
 
   const [reviews, setReviews] = useState<ReviewType[]>(initialReviews);
   const [isLoading, setIsLoading] = useState(initialReviews.length === 0);
@@ -148,9 +148,9 @@ const Reviews = ({
 
                 const isActive = offset === 0;
 
-                // ЛОКАЛИЗАЦИЯ ДАТЫ
+                // Fixed format avoids SSR/client locale mismatch (React #418)
                 const formattedDate = review.createdAt
-                  ? new Date(review.createdAt).toLocaleDateString(locale)
+                  ? format(new Date(review.createdAt), 'dd.MM.yyyy')
                   : '';
 
                 return (

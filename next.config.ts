@@ -15,7 +15,7 @@ const securityHeaders = [
       "img-src 'self' blob: data: https://www.googletagmanager.com https://www.google-analytics.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com https://www.google.com https://www.google.com.ua https://stats.g.doubleclick.net https://*.google.com https://*.google.com.ua;",
       "frame-src 'self' https://challenges.cloudflare.com https://www.google.com;",
       "font-src 'self' data: https://fonts.gstatic.com;",
-      'trusted-types goog#html nextjs#vitals nextjs#bundler cloudflare-turnstile-policy; allow-duplicates;',
+      "trusted-types goog#html nextjs#vitals nextjs#bundler cloudflare-turnstile-policy 'allow-duplicates';",
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';",
