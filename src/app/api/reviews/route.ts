@@ -8,14 +8,12 @@ import {
   notifyTelegram,
   rateLimit,
 } from '@/lib/api-helpers';
+import { getApprovedReviews } from '@/lib/reviews';
 import { createReviewSchema } from '@/lib/validation';
 
 export async function GET() {
   try {
-    await connectToDatabase();
-    const reviews = await Review.find({ isApproved: true }).sort({
-      createdAt: -1,
-    });
+    const reviews = await getApprovedReviews();
     return NextResponse.json(reviews);
   } catch (e) {
     return errorResponse('Помилка завантаження відгуків', 500, e);

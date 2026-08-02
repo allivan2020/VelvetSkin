@@ -26,7 +26,10 @@ const Footer = () => {
             </span>
           </Link>
           <div className="space-y-1">
-            <p className="text-[10px] md:text-[11px] text-[#4a3f39]/40 tracking-[3px] uppercase font-light">
+            <p
+              suppressHydrationWarning
+              className="text-[10px] md:text-[11px] text-[#4a3f39]/40 tracking-[3px] uppercase font-light"
+            >
               © {currentYear} {t('rights')}
             </p>
             <p className="text-[9px] text-[#bd9b7d]/50 tracking-[2px] uppercase font-light">

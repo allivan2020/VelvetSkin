@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { format } from 'date-fns';
 import { useTranslations } from 'next-intl';
-import type { ApprovedReview } from '@/lib/reviews';
+import {
+  formatReviewDateUTC,
+  type ApprovedReview,
+} from '@/lib/review-date';
 
 interface ReviewType {
   _id: string;
   name: string;
   text: string;
   createdAt: string;
+  formattedDate?: string;
   source?: string;
   link?: string;
 }
@@ -40,7 +43,16 @@ const Reviews = ({
         const response = await fetch('/api/reviews');
         if (response.ok) {
           const data = await response.json();
-          if (!cancelled) setReviews(data);
+          if (!cancelled) {
+            setReviews(
+              (data as ReviewType[]).map((review) => ({
+                ...review,
+                formattedDate:
+                  review.formattedDate ||
+                  formatReviewDateUTC(review.createdAt),
+              })),
+            );
+          }
         }
       } catch (error) {
         console.error('Error loading reviews', error);
@@ -104,7 +116,6 @@ const Reviews = ({
       id="reviews"
       className="relative py-24 md:py-32 overflow-hidden bg-[#fdfbf7]"
     >
-      {/* Декор */}
       <div className="absolute top-10 left-[-10%] w-[500px] h-[500px] bg-[#bd9b7d]/20 blur-[100px] rounded-full pointer-events-none" />
       <div className="absolute bottom-10 right-[-10%] w-[600px] h-[600px] bg-[#e3d5c8]/40 blur-[120px] rounded-full pointer-events-none" />
 
@@ -147,11 +158,9 @@ const Reviews = ({
                 if (offset < -Math.floor(total / 2)) offset += total;
 
                 const isActive = offset === 0;
-
-                // Fixed format avoids SSR/client locale mismatch (React #418)
-                const formattedDate = review.createdAt
-                  ? format(new Date(review.createdAt), 'dd.MM.yyyy')
-                  : '';
+                const formattedDate =
+                  review.formattedDate ||
+                  formatReviewDateUTC(review.createdAt);
 
                 return (
                   <motion.div
@@ -220,7 +229,6 @@ const Reviews = ({
           )}
         </div>
 
-        {/* Навигация */}
         {reviews.length > 1 && (
           <div className="flex justify-center items-center gap-12 md:gap-16 mb-16 relative z-20">
             <button
@@ -264,7 +272,6 @@ const Reviews = ({
         </div>
       </div>
 
-      {/* Модалка */}
       <AnimatePresence>
         {isModalOpen && (
           <div

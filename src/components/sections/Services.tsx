@@ -24,10 +24,16 @@ const Services = () => {
       itemScope
       itemType="https://schema.org/Service"
     >
-      {/* Локализованные мета-теги для SEO */}
-      <meta itemProp="serviceType" content={t('meta.serviceType')} />
-      <meta itemProp="provider" content="VelvetSkin" />
-      <meta itemProp="areaServed" content={t('meta.city')} />
+      {/* Microdata via spans — <meta> in <section> is hoisted to <head> and breaks hydration */}
+      <span itemProp="serviceType" className="sr-only">
+        {t('meta.serviceType')}
+      </span>
+      <span itemProp="provider" className="sr-only">
+        VelvetSkin
+      </span>
+      <span itemProp="areaServed" className="sr-only">
+        {t('meta.city')}
+      </span>
 
       <div className="relative container mx-auto px-4 md:px-[5%]">
         <header className="text-center mb-20 md:mb-32">

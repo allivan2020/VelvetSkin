@@ -1,13 +1,12 @@
 import connectToDatabase from '@/lib/mongodb';
 import Review from '@/models/Review';
+import {
+  formatReviewDateUTC,
+  type ApprovedReview,
+} from '@/lib/review-date';
 
-export type ApprovedReview = {
-  _id: string;
-  name: string;
-  text: string;
-  createdAt: string;
-  source?: string;
-};
+export type { ApprovedReview };
+export { formatReviewDateUTC };
 
 export async function getApprovedReviews(): Promise<ApprovedReview[]> {
   try {
@@ -16,16 +15,20 @@ export async function getApprovedReviews(): Promise<ApprovedReview[]> {
       .sort({ createdAt: -1 })
       .lean();
 
-    return reviews.map((review) => ({
-      _id: String(review._id),
-      name: review.name,
-      text: review.text,
-      createdAt:
+    return reviews.map((review) => {
+      const createdAt =
         review.createdAt instanceof Date
           ? review.createdAt.toISOString()
-          : String(review.createdAt),
-      source: review.source,
-    }));
+          : String(review.createdAt);
+      return {
+        _id: String(review._id),
+        name: review.name,
+        text: review.text,
+        createdAt,
+        formattedDate: formatReviewDateUTC(createdAt),
+        source: review.source,
+      };
+    });
   } catch (error) {
     console.error('Failed to load approved reviews:', error);
     return [];

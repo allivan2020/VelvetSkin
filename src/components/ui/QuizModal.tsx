@@ -355,9 +355,19 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                       setCaptchaToken(token);
                       setErrors((prev) => ({ ...prev, captcha: '' }));
                     }}
-                    onError={() => setCaptchaToken(null)}
+                    onError={() => {
+                      setCaptchaToken(null);
+                      setErrors((prev) => ({
+                        ...prev,
+                        captcha: t('errors.captcha'),
+                      }));
+                    }}
                     onExpire={() => setCaptchaToken(null)}
-                    options={{ theme: 'light' }}
+                    options={{
+                      theme: 'light',
+                      retry: 'auto',
+                      refreshExpired: 'auto',
+                    }}
                   />
                 </div>
                 {errors.captcha && (

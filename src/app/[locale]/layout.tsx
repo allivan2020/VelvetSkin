@@ -97,8 +97,8 @@ export default async function RootLayout({
       className={`${poppins.variable} ${cormorant.variable} ${vibes.variable}`}
       suppressHydrationWarning
     >
-      <GoogleTagManager gtmId="GTM-MKRCDF8N" />
       <body className={`${poppins.className} relative`}>
+        <GoogleTagManager gtmId="GTM-MKRCDF8N" />
         <Toaster
           position="top-center"
           toastOptions={{

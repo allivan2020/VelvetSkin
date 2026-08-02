@@ -240,10 +240,21 @@ const BookingModal = () => {
                   <Turnstile
                     ref={turnstileRef}
                     siteKey={TURNSTILE_SITE_KEY}
-                    onSuccess={setCaptchaToken}
-                    onError={() => setStatus('error')}
+                    onSuccess={(token) => {
+                      setCaptchaToken(token);
+                      setValidationError(null);
+                      if (status === 'error') setStatus('idle');
+                    }}
+                    onError={() => {
+                      setCaptchaToken(null);
+                      setValidationError(t('errors.captcha'));
+                    }}
                     onExpire={() => setCaptchaToken(null)}
-                    options={{ theme: 'light' }}
+                    options={{
+                      theme: 'light',
+                      retry: 'auto',
+                      refreshExpired: 'auto',
+                    }}
                   />
                 </div>
 
