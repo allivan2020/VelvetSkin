@@ -23,9 +23,9 @@ const titles: Record<string, string> = {
 };
 
 const descriptions: Record<string, string> = {
-  uk: 'Професійна воскова депіляція у Запоріжжі від VelvetSkin. Ідеально гладенька шкіра, преміальні матеріали та комфорт.',
-  ru: 'Профессиональная восковая депиляция в Запорожье от VelvetSkin. Идеально гладкая кожа и комфорт.',
-  en: 'Professional waxing in Zaporizhzhia by VelvetSkin. Flawless skin and premium products.',
+  uk: 'Воскова депіляція у Запоріжжі. Преміальний догляд і ідеальна гладкість від VelvetSkin.',
+  ru: 'Восковая депиляция в Запорожье. Премиальный уход и идеальная гладкость от VelvetSkin.',
+  en: 'Professional waxing in Zaporizhzhia. Premium care and flawless skin by VelvetSkin.',
 };
 
 export async function generateMetadata({
@@ -60,9 +60,22 @@ export async function generateMetadata({
       description: descriptions[locale] || descriptions.uk,
       url: canonicalUrl || baseUrl,
       siteName: 'VelvetSkin',
-      images: [{ url: '/og-preview.png', width: 1200, height: 630 }],
+      images: [
+        {
+          url: '/img/hero-poster.webp',
+          width: 1200,
+          height: 630,
+          alt: 'VelvetSkin — воскова депіляція Запоріжжя',
+        },
+      ],
       locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uk_UA',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titles[locale] || titles.uk,
+      description: descriptions[locale] || descriptions.uk,
+      images: ['/img/hero-poster.webp'],
     },
   };
 }

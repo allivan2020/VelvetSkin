@@ -1,17 +1,21 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTranslations } from 'next-intl';
-import { X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { X, AlertCircle, Loader2 } from 'lucide-react';
+import { clsx } from 'clsx';
 
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAACppbzwvZa1GFBX5';
 
+type PreferredTime = 'morning' | 'afternoon' | 'evening' | '';
+
 const BookingModal = () => {
   const t = useTranslations('BookingModal');
   const turnstileRef = useRef<TurnstileInstance>(null);
+  const reduceMotion = useReducedMotion();
 
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState<
@@ -22,22 +26,22 @@ const BookingModal = () => {
     phone: '+380',
     service: '',
   });
+  const [preferredTime, setPreferredTime] = useState<PreferredTime>('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Очистка и закрытие
   const closeModal = useCallback(() => {
     setIsOpen(false);
     setTimeout(() => {
       setStatus('idle');
       setCaptchaToken(null);
       setValidationError(null);
+      setPreferredTime('');
       setFormData({ name: '', phone: '+380', service: '' });
       turnstileRef.current?.reset();
-    }, 300); // Соответствует длительности exit анимации
+    }, 300);
   }, []);
 
-  // Перехват кликов по хешу #booking-modal
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement)?.closest('a');
@@ -50,7 +54,6 @@ const BookingModal = () => {
     return () => document.removeEventListener('click', handleGlobalClick);
   }, []);
 
-  // Блокировка прокрутки + Escape
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     if (!isOpen) return;
@@ -81,12 +84,19 @@ const BookingModal = () => {
       return;
     }
 
+    if (!preferredTime) {
+      setValidationError(t('errors.time'));
+      return;
+    }
+
     if (!captchaToken) {
       setValidationError(t('errors.captcha'));
       return;
     }
 
     setStatus('loading');
+
+    const timeLabel = t(`times.${preferredTime}`);
 
     try {
       const res = await fetch('/api/leads', {
@@ -95,7 +105,7 @@ const BookingModal = () => {
         body: JSON.stringify({
           name: formData.name,
           contact: formData.phone,
-          selections: [formData.service],
+          selections: [formData.service, `Час: ${timeLabel}`],
           type: 'Запис з кнопки',
           captcha: captchaToken,
         }),
@@ -107,15 +117,16 @@ const BookingModal = () => {
       }
 
       setStatus('success');
-      setTimeout(closeModal, 4000);
+      setTimeout(closeModal, 8000);
     } catch (error) {
       console.error('Submit error:', error);
       setStatus('error');
-      // Сбрасываем капчу при ошибке, чтобы можно было отправить повторно
       setCaptchaToken(null);
       turnstileRef.current?.reset();
     }
   };
+
+  const timeOptions: PreferredTime[] = ['morning', 'afternoon', 'evening'];
 
   return (
     <AnimatePresence>
@@ -126,164 +137,212 @@ const BookingModal = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            className="absolute inset-0 bg-black/55 backdrop-blur-sm cursor-pointer"
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={
+              reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.97, y: 12 }
+            }
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.3 }}
+            exit={
+              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 12 }
+            }
+            transition={{ duration: reduceMotion ? 0.15 : 0.3 }}
             role="dialog"
             aria-modal="true"
             aria-labelledby="booking-modal-title"
-            className="relative w-full max-w-md bg-white rounded-[32px] p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="relative w-full max-w-md glass rounded-[28px] p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <button
               type="button"
               onClick={closeModal}
-              className="absolute top-6 right-6 text-gray-400 hover:text-[#bd9b7d] transition-colors p-1"
+              className="absolute top-6 right-6 text-brand-soft hover:text-brand-bronze transition-colors p-1"
               aria-label="Close"
             >
-              <X size={24} />
+              <X size={22} />
             </button>
-
-            <h3
-              id="booking-modal-title"
-              className="font-vibes text-4xl text-[#535353] text-center mb-2"
-            >
-              {t('title')}
-            </h3>
-            <p className="text-center text-sm text-gray-500 mb-8 font-medium">
-              {t('description')}
-            </p>
 
             {status === 'success' ? (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center py-8"
+                className="text-center py-6"
               >
-                <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="text-2xl font-bold text-gray-800 mb-3">
+                <p className="font-poppins text-[10px] uppercase tracking-[0.3em] text-brand-bronze mb-4">
+                  VelvetSkin
+                </p>
+                <h3 className="font-cormorant text-[2.25rem] text-brand-ink font-light mb-3">
                   {t('success.title')}
-                </h4>
-                <p className="text-gray-600 leading-relaxed">
+                </h3>
+                <p className="text-brand-muted leading-relaxed font-light text-[15px] mb-8 max-w-[320px] mx-auto">
                   {t('success.text')}
                 </p>
+                <div className="flex flex-col gap-3">
+                  <a
+                    href="https://t.me/velvetskinzp/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary w-full"
+                  >
+                    {t('buttons.telegram')}
+                  </a>
+                  <a href="tel:+380971950698" className="btn-ghost w-full">
+                    {t('buttons.call')}
+                  </a>
+                </div>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="booking-name" className="sr-only">
-                      {t('placeholders.name')}
-                    </label>
-                    <input
-                      id="booking-name"
-                      type="text"
-                      required
-                      disabled={status === 'loading'}
-                      placeholder={t('placeholders.name')}
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, name: e.target.value }))
-                      }
-                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="booking-phone" className="sr-only">
-                      Phone
-                    </label>
-                    <input
-                      id="booking-phone"
-                      type="tel"
-                      required
-                      disabled={status === 'loading'}
-                      placeholder="+380 (__) ___ __ __"
-                      value={formData.phone}
-                      onChange={handlePhoneChange}
-                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none transition-all disabled:opacity-50"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="booking-service" className="sr-only">
-                      {t('placeholders.service')}
-                    </label>
-                    <select
-                      id="booking-service"
-                      required
-                      disabled={status === 'loading'}
-                      value={formData.service}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, service: e.target.value }))
-                      }
-                      className="w-full px-5 py-4 rounded-2xl bg-[#f6f4f0] border-2 border-transparent focus:border-[#f3d9a2] focus:bg-white outline-none cursor-pointer transition-all disabled:opacity-50 appearance-none"
-                    >
-                      <option value="" disabled>
-                        {t('placeholders.service')}
-                      </option>
-                      <option value="Women's Waxing">
-                        {t('services.female')}
-                      </option>
-                      <option value="Men's Waxing">{t('services.male')}</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex justify-center my-4 min-h-[65px]">
-                  <Turnstile
-                    ref={turnstileRef}
-                    siteKey={TURNSTILE_SITE_KEY}
-                    onSuccess={(token) => {
-                      setCaptchaToken(token);
-                      setValidationError(null);
-                      if (status === 'error') setStatus('idle');
-                    }}
-                    onError={() => {
-                      setCaptchaToken(null);
-                      setValidationError(t('errors.captcha'));
-                    }}
-                    onExpire={() => setCaptchaToken(null)}
-                    options={{
-                      theme: 'light',
-                      retry: 'auto',
-                      refreshExpired: 'auto',
-                    }}
-                  />
-                </div>
-
-                {(status === 'error' || validationError) && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-center gap-2 text-red-500 text-sm font-semibold bg-red-50 p-3 rounded-xl"
-                  >
-                    <AlertCircle size={16} />
-                    <span>{validationError || t('errors.server')}</span>
-                  </motion.div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={status === 'loading' || !captchaToken}
-                  className="w-full py-4 mt-2 rounded-full text-white font-bold uppercase tracking-[0.1em] text-[12px] bg-[linear-gradient(160deg,#f3d9a2_0%,#c49f2d_45%,#c49f2d_55%,#a68525_100%)] shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              <>
+                <h3
+                  id="booking-modal-title"
+                  className="font-cormorant text-[2.25rem] text-brand-ink text-center mb-2 font-light"
                 >
-                  {status === 'loading' ? (
-                    <>
-                      <Loader2 className="animate-spin w-4 h-4" />
-                      {t('buttons.sending')}
-                    </>
-                  ) : (
-                    t('buttons.send')
+                  {t('title')}
+                </h3>
+                <p className="text-center text-sm text-brand-muted mb-8 font-light">
+                  {t('description')}
+                </p>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="booking-name" className="sr-only">
+                        {t('placeholders.name')}
+                      </label>
+                      <input
+                        id="booking-name"
+                        type="text"
+                        required
+                        disabled={status === 'loading'}
+                        placeholder={t('placeholders.name')}
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData((p) => ({ ...p, name: e.target.value }))
+                        }
+                        className="w-full px-5 py-4 rounded-2xl bg-white/70 border border-brand-line focus:border-brand-bronze outline-none transition-all disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="booking-phone" className="sr-only">
+                        Phone
+                      </label>
+                      <input
+                        id="booking-phone"
+                        type="tel"
+                        required
+                        disabled={status === 'loading'}
+                        placeholder="+380 (__) ___ __ __"
+                        value={formData.phone}
+                        onChange={handlePhoneChange}
+                        className="w-full px-5 py-4 rounded-2xl bg-white/70 border border-brand-line focus:border-brand-bronze outline-none transition-all disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="booking-service" className="sr-only">
+                        {t('placeholders.service')}
+                      </label>
+                      <select
+                        id="booking-service"
+                        required
+                        disabled={status === 'loading'}
+                        value={formData.service}
+                        onChange={(e) =>
+                          setFormData((p) => ({
+                            ...p,
+                            service: e.target.value,
+                          }))
+                        }
+                        className="w-full px-5 py-4 rounded-2xl bg-white/70 border border-brand-line focus:border-brand-bronze outline-none cursor-pointer transition-all disabled:opacity-50 appearance-none"
+                      >
+                        <option value="" disabled>
+                          {t('placeholders.service')}
+                        </option>
+                        <option value="Women's Waxing">
+                          {t('services.female')}
+                        </option>
+                        <option value="Men's Waxing">
+                          {t('services.male')}
+                        </option>
+                      </select>
+                    </div>
+
+                    <fieldset disabled={status === 'loading'}>
+                      <legend className="sr-only">{t('placeholders.time')}</legend>
+                      <div className="grid grid-cols-3 gap-2">
+                        {timeOptions.map((key) => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => {
+                              setPreferredTime(key);
+                              setValidationError(null);
+                            }}
+                            className={clsx(
+                              'py-3 rounded-2xl font-poppins text-[11px] uppercase tracking-[0.12em] transition-all border',
+                              preferredTime === key
+                                ? 'bg-brand-ink text-brand-cream border-brand-ink'
+                                : 'bg-white/60 text-brand-muted border-brand-line hover:border-brand-bronze',
+                            )}
+                          >
+                            {t(`times.${key}`)}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </div>
+
+                  <div className="flex justify-center my-4 min-h-[65px]">
+                    <Turnstile
+                      ref={turnstileRef}
+                      siteKey={TURNSTILE_SITE_KEY}
+                      onSuccess={(token) => {
+                        setCaptchaToken(token);
+                        setValidationError(null);
+                        if (status === 'error') setStatus('idle');
+                      }}
+                      onError={() => {
+                        setCaptchaToken(null);
+                        setValidationError(t('errors.captcha'));
+                      }}
+                      onExpire={() => setCaptchaToken(null)}
+                      options={{
+                        theme: 'light',
+                        retry: 'auto',
+                        refreshExpired: 'auto',
+                      }}
+                    />
+                  </div>
+
+                  {(status === 'error' || validationError) && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-center gap-2 text-red-500 text-sm font-medium bg-red-50/80 p-3 rounded-xl"
+                    >
+                      <AlertCircle size={16} />
+                      <span>{validationError || t('errors.server')}</span>
+                    </motion.div>
                   )}
-                </button>
-              </form>
+
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !captchaToken}
+                    className="btn-primary w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 className="animate-spin w-4 h-4" />
+                        {t('buttons.sending')}
+                      </>
+                    ) : (
+                      t('buttons.send')
+                    )}
+                  </button>
+                </form>
+              </>
             )}
           </motion.div>
         </div>
@@ -293,4 +352,3 @@ const BookingModal = () => {
 };
 
 export default BookingModal;
-

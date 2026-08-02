@@ -137,15 +137,15 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-[#231d19]/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-brand-hero/75 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-labelledby="quiz-modal-title"
     >
-      <div className="relative w-full max-w-md bg-[#fcfaf8] rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-        <div className="w-full h-1 bg-[#4a3f39]/10">
+      <div className="relative w-full max-w-md glass rounded-[28px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="w-full h-px bg-brand-line">
           <div
-            className="h-full bg-[#bd9b7d] transition-all duration-500 ease-out"
+            className="h-0.5 bg-brand-bronze transition-all duration-500 ease-out"
             style={{ width: `${(step / 3) * 100}%` }}
           />
         </div>
@@ -154,7 +154,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
           type="button"
           aria-label="Close modal"
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 text-[#4a3f39]/50 hover:text-[#4a3f39] z-10"
+          className="absolute top-4 right-4 p-2 text-brand-soft hover:text-brand-ink z-10"
         >
           <svg
             className="w-6 h-6"
@@ -176,7 +176,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
             <div className="flex flex-col gap-6">
               <h3
                 id="quiz-modal-title"
-                className="font-cormorant text-3xl text-[#4a3f39] text-center mb-2"
+                className="font-cormorant text-3xl text-brand-ink text-center mb-2 font-light"
               >
                 {t('steps.step1.title')}
               </h3>
@@ -184,14 +184,14 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                 <button
                   type="button"
                   onClick={() => handleExperienceSelect('new')}
-                  className="w-full py-4 px-6 text-left border border-[#bd9b7d]/30 rounded-xl font-poppins text-[14px] text-[#4a3f39] hover:bg-[#bd9b7d]/10 transition-colors"
+                  className="w-full py-4 px-6 text-left border border-brand-line rounded-2xl font-poppins text-[14px] text-brand-ink hover:border-brand-bronze hover:bg-brand-bronze/5 transition-colors"
                 >
                   {t('steps.step1.options.new')}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleExperienceSelect('regular')}
-                  className="w-full py-4 px-6 text-left border border-[#bd9b7d]/30 rounded-xl font-poppins text-[14px] text-[#4a3f39] hover:bg-[#bd9b7d]/10 transition-colors"
+                  className="w-full py-4 px-6 text-left border border-brand-line rounded-2xl font-poppins text-[14px] text-brand-ink hover:border-brand-bronze hover:bg-brand-bronze/5 transition-colors"
                 >
                   {t('steps.step1.options.regular')}
                 </button>
@@ -202,12 +202,12 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
           {step === 2 && (
             <div className="flex flex-col gap-6">
               <div className="text-center mb-2">
-                <h3 className="font-cormorant text-3xl text-[#4a3f39] mb-1">
+                <h3 className="font-cormorant text-3xl text-brand-ink mb-1 font-light">
                   {experienceKey === 'new'
                     ? t('steps.step2.titleNew')
                     : t('steps.step2.titleRegular')}
                 </h3>
-                <p className="font-poppins text-[11px] text-[#4a3f39]/60 uppercase tracking-[1px]">
+                <p className="font-poppins text-[11px] text-brand-soft uppercase tracking-[0.15em]">
                   {t('steps.step2.hint')}
                 </p>
               </div>
@@ -221,10 +221,10 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                       key={option}
                       onClick={() => toggleSelection(option)}
                       className={clsx(
-                        'w-full py-3 px-6 text-left border rounded-xl font-poppins text-[14px] transition-all flex items-center justify-between',
+                        'w-full py-3 px-6 text-left border rounded-2xl font-poppins text-[14px] transition-all flex items-center justify-between',
                         isSelected
-                          ? 'border-[#bd9b7d] bg-[#bd9b7d]/10 font-medium'
-                          : 'border-[#bd9b7d]/30 hover:bg-[#bd9b7d]/5',
+                          ? 'border-brand-bronze bg-brand-bronze/8 font-medium'
+                          : 'border-brand-line hover:bg-brand-bronze/5',
                       )}
                     >
                       {option}
@@ -232,8 +232,8 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                         className={clsx(
                           'w-5 h-5 rounded flex items-center justify-center border',
                           isSelected
-                            ? 'bg-[#bd9b7d] border-[#bd9b7d]'
-                            : 'border-[#bd9b7d]/50',
+                            ? 'bg-brand-bronze border-brand-bronze'
+                            : 'border-brand-line',
                         )}
                       >
                         {isSelected && (
@@ -258,14 +258,14 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                   type="button"
                   onClick={() => setStep(3)}
                   disabled={formData.selections.length === 0}
-                  className="w-full py-3.5 bg-[#4a3f39] disabled:opacity-30 text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px]"
+                  className="btn-primary w-full disabled:opacity-30"
                 >
                   {t('buttons.next')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="text-[12px] font-poppins text-[#bd9b7d] underline mt-2"
+                  className="text-[12px] font-poppins text-brand-bronze mt-2"
                 >
                   {t('buttons.back')}
                 </button>
@@ -275,14 +275,14 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
 
           {step === 3 && (
             <div className="flex flex-col gap-4">
-              <h3 className="font-cormorant text-3xl text-[#4a3f39] text-center mb-1">
+              <h3 className="font-cormorant text-3xl text-brand-ink text-center mb-1 font-light">
                 {t('steps.step3.title')}
               </h3>
-              <div className="bg-[#bd9b7d]/10 p-4 rounded-xl text-center mb-2">
-                <p className="font-poppins text-[13px] text-[#4a3f39]">
+              <div className="bg-brand-bronze/8 p-4 rounded-2xl text-center mb-2 border border-brand-line">
+                <p className="font-poppins text-[13px] text-brand-muted">
                   {t.rich('steps.step3.description', {
                     span: (chunks) => (
-                      <span className="font-semibold text-[#a6856a]">
+                      <span className="font-medium text-brand-bronze">
                         {chunks}
                       </span>
                     ),
@@ -306,10 +306,10 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className={clsx(
-                      'w-full py-3 px-5 border rounded-xl outline-none',
+                      'w-full py-3 px-5 border rounded-2xl outline-none bg-white/70',
                       errors.name
                         ? 'border-red-400'
-                        : 'border-[#4a3f39]/20 focus:border-[#bd9b7d]',
+                        : 'border-brand-line focus:border-brand-bronze',
                     )}
                   />
                   {errors.name && (
@@ -334,10 +334,10 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                       setFormData({ ...formData, contact: e.target.value })
                     }
                     className={clsx(
-                      'w-full py-3 px-5 border rounded-xl outline-none',
+                      'w-full py-3 px-5 border rounded-2xl outline-none bg-white/70',
                       errors.contact
                         ? 'border-red-400'
-                        : 'border-[#4a3f39]/20 focus:border-[#bd9b7d]',
+                        : 'border-brand-line focus:border-brand-bronze',
                     )}
                   />
                   {errors.contact && (
@@ -379,7 +379,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
                 <button
                   type="submit"
                   disabled={!captchaToken}
-                  className="w-full mt-2 py-3.5 bg-[#bd9b7d] hover:bg-[#a6856a] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-poppins text-[13px] uppercase tracking-[1px] font-medium shadow-lg active:scale-95 transition-all"
+                  className="btn-primary w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {t('buttons.submit')}
                 </button>
@@ -388,7 +388,7 @@ const QuizModal = ({ isOpen, onClose, onSubmit }: QuizModalProps) => {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-[12px] font-poppins text-[#bd9b7d] underline mt-2 text-center"
+                className="text-[12px] font-poppins text-brand-bronze mt-2 text-center"
               >
                 {t('buttons.back')}
               </button>

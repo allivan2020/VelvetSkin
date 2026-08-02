@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import toast from 'react-hot-toast'; // 👈 Додали імпорт
+import toast from 'react-hot-toast';
 import QuizModal from '@/components/ui/QuizModal';
 
 interface QuizData {
@@ -50,12 +50,11 @@ const About = () => {
   return (
     <section
       id="about"
-      className="relative py-32 md:py-48 bg-[#fdfbf7] overflow-hidden"
+      className="relative py-24 md:py-32 bg-brand-paper overflow-hidden"
     >
       <div className="container mx-auto max-w-[1200px] flex flex-col lg:flex-row items-center justify-center gap-16 md:gap-24 px-[5%]">
-        {/* БЛОК С ИЗОБРАЖЕНИЯМИ */}
         <figure className="relative flex-1 max-w-[460px] w-full lg:w-auto mb-10 lg:mb-0">
-          <div className="w-full aspect-[4/5] relative overflow-hidden rounded-t-[150px] md:rounded-t-[200px] rounded-b-md">
+          <div className="w-full aspect-[4/5] relative overflow-hidden rounded-t-[140px] md:rounded-t-[180px] rounded-b-sm">
             <Image
               src="/img/aftor.jpg"
               alt={t('images.mainAlt')}
@@ -66,7 +65,7 @@ const About = () => {
             />
           </div>
 
-          <div className="absolute -bottom-15 left-6 md:-bottom-12 md:-left-4 w-[40%] md:w-[38%] aspect-[3/4] z-[2] -rotate-90 origin-center p-2 md:p-3 bg-[#fdfbf7] shadow-[0_20px_40px_rgba(74,63,57,0.15)]">
+          <div className="absolute -bottom-12 left-6 md:-bottom-10 md:-left-4 w-[40%] md:w-[38%] aspect-[3/4] z-[2] -rotate-90 origin-center p-2 md:p-3 bg-brand-paper shadow-[0_24px_48px_rgba(26,22,20,0.12)]">
             <div className="relative w-full h-full overflow-hidden">
               <Image
                 src="/img/sert.webp"
@@ -80,30 +79,27 @@ const About = () => {
           </div>
         </figure>
 
-        {/* БЛОК С ТЕКСТОМ */}
         <article className="flex-[1.2] text-center lg:text-left">
           <header>
-            <p className="font-poppins text-[10px] md:text-[11px] uppercase tracking-[6px] text-[#917152] mb-6 font-bold">
-              {t('subtitle')}
-            </p>
-            <h2 className="font-vibes text-[clamp(54px,7vw,82px)] text-[#1a1614] leading-[0.9] mb-10">
+            <p className="section-eyebrow">{t('subtitle')}</p>
+            <h2 className="section-title mb-10">
               {t.rich('title', {
                 br: () => <br />,
                 span: (chunks) => (
-                  <span className="text-[#917152]">{chunks}</span>
+                  <span className="section-title-accent">{chunks}</span>
                 ),
               })}
             </h2>
           </header>
 
-          <div className="border-l-2 border-[#917152]/30 pl-6 md:pl-10 mb-12">
-            <p className="text-[16px] md:text-[18px] leading-[1.8] text-[#1a1614] font-light mb-6 max-w-[480px] lg:mx-0 mx-auto">
+          <div className="border-l border-brand-bronze/35 pl-6 md:pl-10 mb-12">
+            <p className="text-[16px] md:text-[17px] leading-[1.85] text-brand-ink/85 font-light mb-6 max-w-[480px] lg:mx-0 mx-auto">
               {t('description1')}
             </p>
-            <p className="text-[16px] md:text-[18px] leading-[1.8] text-[#1a1614] font-light max-w-[480px] lg:mx-0 mx-auto">
+            <p className="text-[16px] md:text-[17px] leading-[1.85] text-brand-ink/85 font-light max-w-[480px] lg:mx-0 mx-auto">
               {t.rich('description2', {
                 brand: (chunks) => (
-                  <span className="font-vibes text-[#917152] text-[28px]">
+                  <span className="font-vibes text-brand-bronze text-[26px] md:text-[28px]">
                     {chunks}
                   </span>
                 ),
@@ -114,10 +110,10 @@ const About = () => {
           <ul className="flex gap-12 p-0 mb-14 lg:justify-start justify-center">
             {[1, 2].map((num) => (
               <li key={num} className="flex flex-col gap-2">
-                <span className="font-vibes text-[42px] text-[#917152] leading-none">
+                <span className="font-cormorant text-[40px] text-brand-bronze leading-none font-light">
                   0{num}
                 </span>
-                <span className="text-[10px] uppercase tracking-[2px] text-[#1a1614] font-bold">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-brand-muted font-medium">
                   {t(`features.item${num}`)}
                 </span>
               </li>
@@ -126,8 +122,9 @@ const About = () => {
 
           <div className="flex justify-center lg:justify-start">
             <button
+              type="button"
               onClick={() => setIsQuizOpen(true)}
-              className="px-8 py-4 bg-[#bd9b7d] text-white rounded-full font-poppins text-[12px] md:text-[13px] uppercase tracking-[2px] transition-all hover:bg-[#a6856a] shadow-lg active:scale-95"
+              className="btn-primary"
             >
               {t('ctaButton')}
             </button>

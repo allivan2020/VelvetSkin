@@ -114,38 +114,33 @@ const Reviews = ({
   return (
     <section
       id="reviews"
-      className="relative py-24 md:py-32 overflow-hidden bg-[#fdfbf7]"
+      className="relative py-28 md:py-36 overflow-hidden bg-brand-paper"
     >
-      <div className="absolute top-10 left-[-10%] w-[500px] h-[500px] bg-[#bd9b7d]/20 blur-[100px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 right-[-10%] w-[600px] h-[600px] bg-[#e3d5c8]/40 blur-[120px] rounded-full pointer-events-none" />
-
       <div className="relative z-10 container mx-auto px-4 md:px-[5%]">
-        <header className="text-center mb-16">
-          <p className="font-poppins text-[10px] md:text-[12px] uppercase tracking-[6px] text-[#917152] mb-4 font-black">
-            {t('subtitle')}
-          </p>
-          <h2 className="font-vibes text-[clamp(48px,6vw,72px)] text-[#1a1614] leading-[1.1]">
+        <header className="text-center mb-16 md:mb-20">
+          <p className="section-eyebrow">{t('subtitle')}</p>
+          <h2 className="section-title">
             {t.rich('title', {
               span: (chunks) => (
-                <span className="text-[#917152]">{chunks}</span>
+                <span className="section-title-accent">{chunks}</span>
               ),
             })}
           </h2>
         </header>
 
-        <div className="relative h-[420px] w-full max-w-5xl mx-auto flex justify-center items-center touch-pan-y mb-10">
+        <div className="relative h-[400px] w-full max-w-5xl mx-auto flex justify-center items-center touch-pan-y mb-10">
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="font-poppins text-[#917152] animate-pulse uppercase tracking-[3px] text-xs font-bold">
+              <p className="font-poppins text-brand-bronze animate-pulse uppercase tracking-[0.25em] text-[10px] font-medium">
                 {t('loading')}
               </p>
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center">
-              <p className="font-cormorant text-2xl text-[#4a3f39] italic mb-4">
+              <p className="font-cormorant text-2xl text-brand-muted italic mb-4">
                 {t('emptyTitle')}
               </p>
-              <p className="font-poppins text-[#70573f] text-xs uppercase tracking-[2px] font-bold">
+              <p className="font-poppins text-brand-soft text-[10px] uppercase tracking-[0.2em] font-medium">
                 {t('emptySubtitle')}
               </p>
             </div>
@@ -168,19 +163,18 @@ const Reviews = ({
                     initial={false}
                     animate={{
                       x: offset === 0 ? '0%' : offset > 0 ? '105%' : '-105%',
-                      scale: isActive ? 1 : 0.85,
-                      filter: isActive ? 'blur(0px)' : 'blur(5px)',
-                      opacity: isActive ? 1 : 0.5,
+                      scale: isActive ? 1 : 0.92,
+                      opacity: isActive ? 1 : 0.35,
                       zIndex: isActive ? 10 : 5,
                     }}
-                    transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+                    transition={{ duration: 0.55, ease: [0.32, 0.72, 0, 1] }}
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     onDragEnd={(_, { offset: dragOffset }) => {
                       if (dragOffset.x < -50) nextReview();
                       else if (dragOffset.x > 50) prevReview();
                     }}
-                    className={`absolute w-full max-w-[340px] md:max-w-[420px] p-8 rounded-3xl bg-white/50 backdrop-blur-xl border border-white/60 shadow-sm ${
+                    className={`absolute w-full max-w-[340px] md:max-w-[400px] p-8 md:p-10 rounded-[28px] glass ${
                       isActive
                         ? 'cursor-grab active:cursor-grabbing'
                         : 'cursor-pointer'
@@ -190,33 +184,30 @@ const Reviews = ({
                       if (offset === -1) prevReview();
                     }}
                   >
-                    <span className="font-vibes text-[60px] text-[#bd9b7d]/40 leading-none absolute top-4 left-6">
-                      &ldquo;
-                    </span>
-                    <p className="font-cormorant italic text-[18px] md:text-[20px] leading-[1.6] text-[#4a3f39] mt-6 mb-6 relative z-10 line-clamp-6">
-                      {review.text}
+                    <p className="font-cormorant italic text-[19px] md:text-[21px] leading-[1.55] text-brand-ink/80 mb-8 relative z-10 line-clamp-6">
+                      “{review.text}”
                     </p>
 
-                    <div className="flex items-end justify-between border-t border-[#bd9b7d]/10 pt-4">
+                    <div className="flex items-end justify-between border-t border-brand-line pt-5">
                       <div>
-                        <h3 className="font-poppins text-[13px] uppercase tracking-[2px] text-[#1a1614] font-bold">
+                        <h3 className="font-poppins text-[11px] uppercase tracking-[0.18em] text-brand-ink font-medium">
                           {review.name}
                         </h3>
-                        <span className="text-[#917152] text-[10px] font-medium block mt-1">
+                        <span className="text-brand-bronze text-[10px] font-medium block mt-1.5">
                           {formattedDate}
                         </span>
                       </div>
-                      <div className="text-[9px] uppercase tracking-[1px] font-bold text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] font-medium text-right">
                         {review.link && review.link !== '#' ? (
                           <Link
                             href={review.link}
                             target="_blank"
-                            className="text-[#bd9b7d] hover:text-[#1a1614] transition-colors"
+                            className="text-brand-bronze hover:text-brand-ink transition-colors"
                           >
                             {review.source || t('sourceDefault')} ↗
                           </Link>
                         ) : (
-                          <span className="text-[#917152]/70">
+                          <span className="text-brand-soft">
                             {review.source || t('sourceDefault')}
                           </span>
                         )}
@@ -230,42 +221,45 @@ const Reviews = ({
         </div>
 
         {reviews.length > 1 && (
-          <div className="flex justify-center items-center gap-12 md:gap-16 mb-16 relative z-20">
+          <div className="flex justify-center items-center gap-10 md:gap-14 mb-14 relative z-20">
             <button
+              type="button"
               onClick={prevReview}
               aria-label={t('prevAria')}
-              className="group flex items-center gap-4 text-[#bd9b7d]"
+              className="group flex items-center gap-4 text-brand-bronze"
             >
-              <div className="w-12 h-[1px] bg-[#bd9b7d]/30 group-hover:w-16 group-hover:bg-[#bd9b7d] transition-all" />
-              <span className="text-[10px] uppercase tracking-[3px] font-bold hidden md:block">
+              <div className="w-10 h-px bg-brand-bronze/30 group-hover:w-14 group-hover:bg-brand-bronze transition-all" />
+              <span className="text-[10px] uppercase tracking-[0.25em] font-medium hidden md:block">
                 {t('prev')}
               </span>
             </button>
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               {reviews.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeIndex ? 'bg-[#bd9b7d] scale-125' : 'bg-[#bd9b7d]/30'}`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeIndex ? 'bg-brand-bronze scale-125' : 'bg-brand-bronze/25'}`}
                 />
               ))}
             </div>
             <button
+              type="button"
               onClick={nextReview}
               aria-label={t('nextAria')}
-              className="group flex items-center gap-4 text-[#bd9b7d]"
+              className="group flex items-center gap-4 text-brand-bronze"
             >
-              <span className="text-[10px] uppercase tracking-[3px] font-bold hidden md:block">
+              <span className="text-[10px] uppercase tracking-[0.25em] font-medium hidden md:block">
                 {t('next')}
               </span>
-              <div className="w-12 h-[1px] bg-[#bd9b7d]/30 group-hover:w-16 group-hover:bg-[#bd9b7d] transition-all" />
+              <div className="w-10 h-px bg-brand-bronze/30 group-hover:w-14 group-hover:bg-brand-bronze transition-all" />
             </button>
           </div>
         )}
 
-        <div className="text-center mt-10">
+        <div className="text-center mt-6">
           <button
+            type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-10 py-4 font-poppins text-[11px] uppercase tracking-[3px] text-[#1a1614] font-bold rounded-full bg-white/50 backdrop-blur-md border border-white/80 shadow-sm hover:bg-white/80 transition-all"
+            className="glass px-9 py-3.5 font-poppins text-[11px] uppercase tracking-[0.22em] text-brand-ink font-medium rounded-full hover:bg-white/80 transition-all"
           >
             {t('ctaButton')}
           </button>
@@ -285,29 +279,29 @@ const Reviews = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-[#1a1614]/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-brand-ink/50 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-lg p-8 md:p-10 rounded-[2rem] bg-white/90 backdrop-blur-2xl shadow-2xl"
+              exit={{ opacity: 0, scale: 0.97 }}
+              className="relative w-full max-w-lg p-8 md:p-10 rounded-[28px] glass shadow-2xl"
             >
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
                 aria-label={t('closeAria')}
-                className="absolute top-6 right-6 text-[#1a1614]/50 hover:text-[#1a1614] p-2"
+                className="absolute top-6 right-6 text-brand-ink/40 hover:text-brand-ink p-2"
               >
                 ✕
               </button>
 
               {isSubmitted ? (
                 <div className="text-center py-10">
-                  <h3 className="font-vibes text-[40px] text-[#917152] mb-2">
+                  <h3 className="font-cormorant text-[36px] text-brand-bronze mb-2 font-light">
                     {t('modal.successTitle')}
                   </h3>
-                  <p className="font-poppins text-[12px] text-[#4a3f39]">
+                  <p className="font-poppins text-[12px] text-brand-muted">
                     {t('modal.successText')}
                   </p>
                 </div>
@@ -315,7 +309,7 @@ const Reviews = ({
                 <>
                   <h3
                     id="review-modal-title"
-                    className="font-vibes text-[42px] text-[#1a1614] mb-6 text-center"
+                    className="font-cormorant text-[36px] text-brand-ink mb-6 text-center font-light"
                   >
                     {t('modal.title')}
                   </h3>
@@ -333,7 +327,7 @@ const Reviews = ({
                         onChange={(e) =>
                           setFormData({ ...formData, name: e.target.value })
                         }
-                        className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px]"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/70 border border-brand-line focus:border-brand-bronze outline-none text-[13px]"
                       />
                     </div>
                     <div>
@@ -349,13 +343,13 @@ const Reviews = ({
                         onChange={(e) =>
                           setFormData({ ...formData, text: e.target.value })
                         }
-                        className="w-full px-5 py-4 rounded-2xl bg-white/60 border border-[#bd9b7d]/20 focus:border-[#bd9b7d] outline-none text-[13px] resize-none"
+                        className="w-full px-5 py-4 rounded-2xl bg-white/70 border border-brand-line focus:border-brand-bronze outline-none text-[13px] resize-none"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={isSending}
-                      className="mt-2 w-full py-4 rounded-2xl bg-[#917152] text-white font-poppins text-[11px] uppercase tracking-[3px] font-bold disabled:opacity-50"
+                      className="btn-primary mt-2 w-full disabled:opacity-50"
                     >
                       {isSending ? t('modal.sending') : t('modal.send')}
                     </button>

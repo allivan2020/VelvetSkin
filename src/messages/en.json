@@ -19,14 +19,14 @@
     "subtitle": "Professional Waxing Studio",
     "title": "Waxing",
     "titleAccent": "pure art",
-    "description": "Experience flawless smoothness and premium skincare in the heart of the city.",
+    "description": "Flawless smoothness. Premium care.",
     "scroll": "Scroll"
   },
   "About": {
     "subtitle": "Aesthetic Skincare",
     "title": "Professional care for <span>your</span> skin",
-    "description1": "We believe beauty is more than just an appearance—it's about an inner sense of confidence and harmony.",
-    "description2": "Velvet <brand>Skin</brand> — where self-care becomes an art form.",
+    "description1": "Beauty is a feeling of confidence — not just appearance.",
+    "description2": "Velvet <brand>Skin</brand> — care that becomes an art form.",
     "features": {
       "item1": "Certified Professionals",
       "item2": "Premium Products"
@@ -38,7 +38,7 @@
     },
     "messages": {
       "loading": "Sending your request...",
-      "success": "Thank you! We will contact you shortly to confirm your bonus.",
+      "success": "Thank you! We’ll call within 15 minutes during business hours.",
       "error": "Oops, something went wrong. Please try again."
     }
   },
@@ -47,6 +47,7 @@
     "title": "An investment in <span>beauty</span>",
     "maleTitle": "Men's Waxing",
     "femaleTitle": "Women's Waxing",
+    "durationHint": "Sessions 20–90 min depending on the area",
     "currency": "UAH",
     "meta": {
       "serviceType": "Professional waxing and sugaring in Zaporizhzhia",
@@ -173,28 +174,42 @@
   },
   "BookingModal": {
     "title": "Book an Appointment",
-    "description": "Leave your details, and we will find the perfect time for your visit",
+    "description": "Choose a service and preferred time — we’ll confirm your visit.",
     "placeholders": {
       "name": "Your name",
-      "service": "Select service"
+      "service": "Select service",
+      "time": "Preferred time"
     },
     "services": {
       "female": "Women's Waxing",
       "male": "Men's Waxing"
     },
+    "times": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
     "buttons": {
       "send": "Book Now",
-      "sending": "Processing..."
+      "sending": "Processing...",
+      "telegram": "Message on Telegram",
+      "call": "Call us"
     },
     "success": {
-      "title": "Thank You!",
-      "text": "Your request has been received. We will contact you shortly."
+      "title": "Request received",
+      "text": "We’ll call within 15 minutes during business hours. Or reach us now:"
     },
     "errors": {
       "phone": "Please enter a valid phone number.",
       "captcha": "Please verify that you are not a robot.",
+      "time": "Please choose a preferred time.",
       "server": "Submission error. Please try again later."
     }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "text": "The link may be outdated or the page has moved.",
+    "cta": "Back home"
   },
   "FloatingButton": {
     "text": "Book now"

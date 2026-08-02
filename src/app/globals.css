@@ -1,21 +1,33 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Усиливаем насыщенность и глубину */
-  --color-brand-bg: hsl(30 40% 98%);         /* Фон оставляем нежным */
-  --color-brand-fg: #1a1614;        /* Текст: почти черный кофе (был 15%) */
-  --color-brand-primary: #856142;   /* Акценты: глубокая бронза (была 45%) */
-  --color-brand-secondary: hsl(35 30% 88%);  /* Темнее для теней */
-  --color-brand-accent: #c49f2d;     /* Яркая бронза для рукописного шрифта */
+  /* Quiet luxury — tight token set */
+  --color-brand-paper: #faf7f2;
+  --color-brand-cream: #fdfbf7;
+  --color-brand-ink: #1a1614;
+  --color-brand-muted: #5c524a;
+  --color-brand-soft: #8a8278;
+  --color-brand-bronze: #8a6b4a;
+  --color-brand-bronze-hover: #73583c;
+  --color-brand-champagne: #c4a882;
+  --color-brand-line: #e8dfd4;
+  --color-brand-hero: #231d19;
+  --color-brand-hero-fg: #fdfbf7;
 
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui;
-  --font-serif: var(--font-cormorant), ui-serif, Georgia;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-handwritten: var(--font-vibes), cursive;
 
   --keyframes-fade-in-up: {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  };
   --animation-fade-in-up: fade-in-up 1s ease-out forwards;
 }
 
@@ -25,30 +37,118 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--color-brand-accent) 28%, white);
-    color: var(--color-brand-fg);
+    background-color: color-mix(in srgb, var(--color-brand-bronze) 22%, white);
+    color: var(--color-brand-ink);
   }
 
   body {
-    background-color: var(--color-brand-bg);
-    color: var(--color-brand-fg);
-    @apply antialiased;
+    background-color: var(--color-brand-paper);
+    color: var(--color-brand-ink);
+    @apply antialiased font-sans;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-serif);
-    color: var(--color-brand-fg);
+    color: var(--color-brand-ink);
     @apply font-medium tracking-tight;
+    text-rendering: optimizeLegibility;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
   .font-vibes {
     font-family: var(--font-handwritten);
-    @apply font-normal;
+    font-weight: 400;
   }
 
-  h1, h2 {
-    @apply antialiased font-medium;
-    color: var(--color-brand-fg);
-    text-rendering: optimizeLegibility;
+  .font-cormorant {
+    font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  }
+
+  .font-poppins {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    @apply text-[10px] md:text-[11px] uppercase tracking-[0.35em] text-brand-bronze mb-6 font-medium;
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    @apply text-[clamp(2.75rem,6vw,4.5rem)] text-brand-ink leading-[1.05] font-light;
+  }
+
+  .section-title-accent {
+    @apply text-brand-bronze italic font-normal;
+  }
+
+  /* Apple-style frosted glass */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 12px 40px rgba(26, 22, 20, 0.08);
+  }
+
+  .glass-dark {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: saturate(160%) blur(28px);
+    -webkit-backdrop-filter: saturate(160%) blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  }
+
+  .glass-nav {
+    background: rgba(252, 250, 248, 0.72);
+    backdrop-filter: saturate(180%) blur(28px);
+    -webkit-backdrop-filter: saturate(180%) blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 8px 32px rgba(26, 22, 20, 0.1);
+  }
+
+  .btn-primary {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    @apply inline-flex items-center justify-center px-8 py-3.5 rounded-full text-[11px] uppercase tracking-[0.2em] font-medium text-white bg-brand-bronze transition-all duration-500 hover:bg-brand-bronze-hover active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    @apply inline-flex items-center justify-center px-8 py-3.5 rounded-full text-[11px] uppercase tracking-[0.2em] font-medium text-brand-ink border border-brand-ink/15 transition-all duration-500 hover:bg-brand-ink hover:text-brand-cream active:scale-[0.98];
+  }
+
+  .btn-glass {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-full text-[11px] uppercase tracking-[0.18em] font-medium text-brand-hero-fg border border-white/25 transition-all duration-500;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .btn-glass:hover {
+    @apply bg-brand-hero-fg text-brand-hero border-transparent;
   }
 }
