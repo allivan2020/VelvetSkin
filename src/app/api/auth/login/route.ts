@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       return errorResponse('Невірні дані', 400);
     }
 
-    if (parsed.data.password !== expected) {
+    if (parsed.data.password.trim() !== expected) {
       return errorResponse('Невірний пароль', 401);
     }
 
