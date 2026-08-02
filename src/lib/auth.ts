@@ -1,8 +1,26 @@
 export const ADMIN_COOKIE = 'vs_admin_session';
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
+/** Trim and strip wrapping quotes from env values (common Vercel/.env mistake). */
+export function normalizeSecret(
+  value: string | undefined | null,
+): string | null {
+  if (value == null) return null;
+  let v = value.trim();
+  if (
+    (v.startsWith('"') && v.endsWith('"')) ||
+    (v.startsWith("'") && v.endsWith("'"))
+  ) {
+    v = v.slice(1, -1).trim();
+  }
+  return v || null;
+}
+
 function getSecret(): string | null {
-  return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || null;
+  return (
+    normalizeSecret(process.env.ADMIN_SESSION_SECRET) ||
+    normalizeSecret(process.env.ADMIN_PASSWORD)
+  );
 }
 
 function toBase64Url(bytes: ArrayBuffer): string {
@@ -62,7 +80,7 @@ export async function verifyAdminSessionToken(
 }
 
 export function getAdminPassword(): string | null {
-  return process.env.ADMIN_PASSWORD || null;
+  return normalizeSecret(process.env.ADMIN_PASSWORD);
 }
 
 export function adminCookieOptions(maxAge = SESSION_TTL_SECONDS) {
