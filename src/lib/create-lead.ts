@@ -12,6 +12,41 @@ import {
 import { createLeadSchema } from '@/lib/validation';
 import { NextResponse } from 'next/server';
 
+const AI_SUMMARY_TIMEOUT_MS = 3_000;
+
+function buildFallbackSummary(
+  experience: string | undefined,
+  selections: string[],
+): string {
+  const exp = experience || 'не вказано';
+  const options = selections.length ? selections.join(', ') : 'не вказані';
+  return `Увага майстру: клієнт - досвід: "${exp}". Побажання: ${options}.`;
+}
+
+async function generateLeadSummaryWithTimeout(
+  experience: string | undefined,
+  selections: string[],
+): Promise<string> {
+  const fallback = buildFallbackSummary(experience, selections);
+
+  if (!experience && selections.length === 0) {
+    return fallback;
+  }
+
+  try {
+    const summary = await Promise.race([
+      generateLeadSummary({ experience, selections }),
+      new Promise<string>((resolve) =>
+        setTimeout(() => resolve(fallback), AI_SUMMARY_TIMEOUT_MS),
+      ),
+    ]);
+    return summary?.trim() || fallback;
+  } catch (e) {
+    console.error('AI Summary generation failed:', e);
+    return fallback;
+  }
+}
+
 /** Shared public lead creation — used by /api/leads and legacy /api/admin/leads POST. */
 export async function createPublicLead(req: Request) {
   const ip = getClientIp(req);
@@ -37,19 +72,10 @@ export async function createPublicLead(req: Request) {
   await connectToDatabase();
 
   const safeSelections = selections ?? [];
-
-  let aiSummary = 'AI аналіз недоступний';
-  try {
-    if (experience || safeSelections.length > 0) {
-      aiSummary =
-        (await generateLeadSummary({
-          experience,
-          selections: safeSelections,
-        })) || aiSummary;
-    }
-  } catch (e) {
-    console.error('AI Summary generation failed:', e);
-  }
+  const aiSummary = await generateLeadSummaryWithTimeout(
+    experience,
+    safeSelections,
+  );
 
   const newLead = new Lead({
     name,
@@ -64,8 +90,28 @@ export async function createPublicLead(req: Request) {
 
   const savedLead = await newLead.save();
 
-  const message = `🔥 <b>НОВА ЗАЯВКА!</b>\n👤 <b>Ім'я:</b> ${escapeHtml(name)}\n📞 <b>Контакт:</b> ${escapeHtml(contact)}\n🏷 <b>Тип:</b> ${escapeHtml(leadType)}\n📊 <b>AI:</b> ${escapeHtml(aiSummary)}`;
-  void notifyTelegram(message);
+  const selectionsText = safeSelections.length
+    ? escapeHtml(safeSelections.join(', '))
+    : '—';
+
+  const message = [
+    `🔥 <b>НОВА ЗАЯВКА!</b>`,
+    `👤 <b>Ім'я:</b> ${escapeHtml(name)}`,
+    `📞 <b>Контакт:</b> ${escapeHtml(contact)}`,
+    `🏷 <b>Тип:</b> ${escapeHtml(leadType)}`,
+    `✨ <b>Досвід:</b> ${escapeHtml(experience || 'Не вказано')}`,
+    `📝 <b>Побажання:</b> ${selectionsText}`,
+    `📊 <b>AI:</b> ${escapeHtml(aiSummary)}`,
+  ].join('\n');
+
+  // Must await on Vercel — void fire-and-forget is dropped when the isolate freezes.
+  const tg = await notifyTelegram(message);
+  if (!tg.ok) {
+    console.error(
+      `[Telegram] Lead ${String(savedLead._id)} saved but notify failed:`,
+      tg.reason,
+    );
+  }
 
   return NextResponse.json({ success: true, id: savedLead._id });
 }

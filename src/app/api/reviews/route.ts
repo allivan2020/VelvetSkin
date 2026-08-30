@@ -44,8 +44,24 @@ export async function POST(req: Request) {
       isApproved: false,
     });
 
-    const message = `<b>💬 Новий відгук!</b>\n\n<b>👤 Від:</b> ${escapeHtml(newReview.name)}\n<b>📱 Джерело:</b> ${escapeHtml(newReview.source)}\n<b>📝 Текст:</b> ${escapeHtml(newReview.text)}\n\n<i>⏳ Відгук очікує на модерацію.</i>`;
-    void notifyTelegram(message);
+    const message = [
+      `<b>💬 Новий відгук!</b>`,
+      ``,
+      `<b>👤 Від:</b> ${escapeHtml(newReview.name)}`,
+      `<b>📱 Джерело:</b> ${escapeHtml(newReview.source)}`,
+      `<b>📝 Текст:</b> ${escapeHtml(newReview.text)}`,
+      ``,
+      `<i>⏳ Відгук очікує на модерацію.</i>`,
+    ].join('\n');
+
+    // Must await on Vercel — void fire-and-forget is dropped when the isolate freezes.
+    const tg = await notifyTelegram(message);
+    if (!tg.ok) {
+      console.error(
+        `[Telegram] Review ${String(newReview._id)} saved but notify failed:`,
+        tg.reason,
+      );
+    }
 
     return NextResponse.json(newReview, { status: 201 });
   } catch (e) {

@@ -104,18 +104,115 @@ export async function requireAdmin(req: Request) {
   return null;
 }
 
-export async function notifyTelegram(text: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
+export type NotifyTelegramResult =
+  | { ok: true }
+  | { ok: false; reason: string };
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-    }),
-  }).catch((err) => console.error('Telegram Notify Error:', err));
+const TELEGRAM_TIMEOUT_MS = 8_000;
+const TELEGRAM_MAX_ATTEMPTS = 3;
+/** Telegram Bot API hard limit for sendMessage text. */
+const TELEGRAM_MAX_TEXT = 4096;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Reliable Telegram notify for serverless:
+ * timeout, retries, response validation. Always await before returning
+ * from a route — fire-and-forget is dropped when the isolate freezes.
+ */
+export async function notifyTelegram(
+  text: string,
+): Promise<NotifyTelegramResult> {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
+
+  if (!token || !chatId) {
+    console.error(
+      '[Telegram] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not configured',
+    );
+    return { ok: false, reason: 'not_configured' };
+  }
+
+  const safeText = String(text ?? '').slice(0, TELEGRAM_MAX_TEXT).trim();
+  if (!safeText) {
+    return { ok: false, reason: 'empty_message' };
+  }
+
+  let lastReason = 'unknown';
+
+  for (let attempt = 1; attempt <= TELEGRAM_MAX_ATTEMPTS; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TELEGRAM_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${token}/sendMessage`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: safeText,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+          }),
+          signal: controller.signal,
+        },
+      );
+
+      const data = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        description?: string;
+        error_code?: number;
+      } | null;
+
+      if (response.ok && data?.ok === true) {
+        return { ok: true };
+      }
+
+      const description =
+        data?.description || `HTTP ${response.status}`;
+      lastReason = description;
+
+      const retryable =
+        response.status === 429 ||
+        response.status >= 500 ||
+        data?.error_code === 429;
+
+      console.error(
+        `[Telegram] send failed attempt ${attempt}/${TELEGRAM_MAX_ATTEMPTS}:`,
+        description,
+      );
+
+      if (!retryable || attempt === TELEGRAM_MAX_ATTEMPTS) {
+        return { ok: false, reason: description };
+      }
+
+      await sleep(attempt * 500);
+    } catch (err) {
+      lastReason =
+        err instanceof Error
+          ? err.name === 'AbortError'
+            ? 'timeout'
+            : err.message
+          : String(err);
+
+      console.error(
+        `[Telegram] network error attempt ${attempt}/${TELEGRAM_MAX_ATTEMPTS}:`,
+        lastReason,
+      );
+
+      if (attempt === TELEGRAM_MAX_ATTEMPTS) {
+        return { ok: false, reason: lastReason };
+      }
+
+      await sleep(attempt * 500);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return { ok: false, reason: lastReason };
 }
