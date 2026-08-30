@@ -27,7 +27,17 @@ export async function POST(req: Request) {
       return errorResponse('Невірні дані клієнта', 400);
     }
 
-    const { name, phone, source, date, service, notes } = parsed.data;
+    const {
+      name,
+      phone,
+      source,
+      date,
+      service,
+      notes,
+      nextAppointment,
+      nextAppointmentTime,
+      nextAppointmentService,
+    } = parsed.data;
 
     const newVisit = {
       date: date || new Date().toLocaleDateString('uk-UA'),
@@ -36,10 +46,33 @@ export async function POST(req: Request) {
       price: 0,
     };
 
+    const appointmentFields = {
+      ...(nextAppointment !== undefined && {
+        nextAppointment: nextAppointment || '',
+      }),
+      ...(nextAppointmentTime !== undefined && {
+        nextAppointmentTime: nextAppointmentTime || '',
+      }),
+      ...(nextAppointmentService !== undefined && {
+        nextAppointmentService: nextAppointmentService || service || '',
+      }),
+    };
+
     const existingClient = await Client.findOne({ phone });
 
     if (existingClient) {
       existingClient.visits.push(newVisit);
+      if (appointmentFields.nextAppointment !== undefined) {
+        existingClient.nextAppointment = appointmentFields.nextAppointment;
+      }
+      if (appointmentFields.nextAppointmentTime !== undefined) {
+        existingClient.nextAppointmentTime =
+          appointmentFields.nextAppointmentTime;
+      }
+      if (appointmentFields.nextAppointmentService !== undefined) {
+        existingClient.nextAppointmentService =
+          appointmentFields.nextAppointmentService;
+      }
       existingClient.updatedAt = new Date();
       await existingClient.save();
 
@@ -57,6 +90,7 @@ export async function POST(req: Request) {
       phone,
       source: source || 'Сайт',
       visits: [newVisit],
+      ...appointmentFields,
     });
 
     return NextResponse.json(newClient, { status: 201 });
@@ -74,13 +108,24 @@ export async function PATCH(req: Request) {
       return errorResponse('Невірні дані оновлення', 400);
     }
 
-    const { id, visits, nextAppointment, generalNotes } = parsed.data;
+    const {
+      id,
+      visits,
+      nextAppointment,
+      nextAppointmentTime,
+      nextAppointmentService,
+      generalNotes,
+    } = parsed.data;
 
     const updatedClient = await Client.findByIdAndUpdate(
       id,
       {
         ...(visits && { visits }),
         ...(nextAppointment !== undefined && { nextAppointment }),
+        ...(nextAppointmentTime !== undefined && { nextAppointmentTime }),
+        ...(nextAppointmentService !== undefined && {
+          nextAppointmentService,
+        }),
         ...(generalNotes !== undefined && { generalNotes }),
       },
       { new: true },

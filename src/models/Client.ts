@@ -17,7 +17,12 @@ const ClientSchema = new mongoose.Schema(
     source: { type: String, default: '' }, // Откуда пришел (Квиз, Инстаграм, Сайт)
     visits: [VisitSchema], // История всех визитов
     generalNotes: { type: String, default: '' }, // Общие заметки о клиенте (характер, особенности)
-    nextAppointment: { type: String, default: '' }, // Дата следующего сеанса / когда напомнить
+    /** Next visit date yyyy-MM-dd */
+    nextAppointment: { type: String, default: '' },
+    /** Next visit time HH:mm (local Europe/Kyiv) */
+    nextAppointmentTime: { type: String, default: '' },
+    /** Short label for calendar (service / zones) */
+    nextAppointmentService: { type: String, default: '' },
   },
   { timestamps: true }, // Автоматически добавит createdAt и updatedAt
 );

@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import ConfirmModal from './ConfirmModal';
 import AddVisitModal from './AddVisitModal';
-import NextAppointmentModal from './NextAppointmentModal'; // 👈 Додали імпорт
+import NextAppointmentModal from './NextAppointmentModal';
+import { formatSlotUk, slotKey } from '@/lib/appointments';
 
 interface Visit {
   date: string;
@@ -22,6 +23,8 @@ interface Client {
   visits: Visit[];
   generalNotes: string;
   nextAppointment: string;
+  nextAppointmentTime?: string;
+  nextAppointmentService?: string;
   updatedAt: string;
 }
 
@@ -134,34 +137,28 @@ export default function ClientsTab() {
     });
   };
 
-  // 👈 Нова функція для збереження дати з модалки (з Optimistic UI)
-  const handleSaveAppointment = (date: string) => {
+  const handleSaveAppointment = (date: string, time: string) => {
     if (!appointmentModal.client) return;
     const clientId = appointmentModal.client._id;
 
-    // Миттєво оновлюємо інтерфейс
     setClients((prev) =>
       prev.map((c) =>
-        c._id === clientId ? { ...c, nextAppointment: date } : c,
+        c._id === clientId
+          ? {
+              ...c,
+              nextAppointment: date,
+              nextAppointmentTime: time,
+            }
+          : c,
       ),
     );
 
-    // Відправляємо на сервер
-    updateClient(clientId, { nextAppointment: date });
-
-    // Закриваємо модалку
-    setAppointmentModal({ isOpen: false, client: null });
-  };
-
-  // Функція для гарного форматування дати
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('uk-UA', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
+    updateClient(clientId, {
+      nextAppointment: date,
+      nextAppointmentTime: time,
     });
+
+    setAppointmentModal({ isOpen: false, client: null });
   };
 
   const displayedClients = [...clients]
@@ -179,14 +176,23 @@ export default function ClientsTab() {
       if (sortBy === 'upcoming') {
         if (!a.nextAppointment) return 1;
         if (!b.nextAppointment) return -1;
-        return a.nextAppointment.localeCompare(b.nextAppointment);
+        return slotKey(
+          a.nextAppointment,
+          a.nextAppointmentTime || '10:00',
+        ).localeCompare(
+          slotKey(b.nextAppointment, b.nextAppointmentTime || '10:00'),
+        );
       }
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
 
   const upcomingSoon = clients
     .filter((c) => c.nextAppointment)
-    .sort((a, b) => a.nextAppointment.localeCompare(b.nextAppointment))
+    .sort((a, b) =>
+      slotKey(a.nextAppointment, a.nextAppointmentTime || '10:00').localeCompare(
+        slotKey(b.nextAppointment, b.nextAppointmentTime || '10:00'),
+      ),
+    )
     .slice(0, 5);
 
   if (loading)
@@ -272,7 +278,7 @@ export default function ClientsTab() {
                 >
                   <span className="font-semibold text-gray-900">{c.name}</span>
                   <span className="text-[#856142] font-medium">
-                    {formatDate(c.nextAppointment)}
+                    {formatSlotUk(c.nextAppointment, c.nextAppointmentTime)}
                   </span>
                 </li>
               ))}
@@ -345,7 +351,7 @@ export default function ClientsTab() {
                     }`}
                   >
                     {client.nextAppointment
-                      ? `🗓 Заплановано: ${formatDate(client.nextAppointment)}` // 👈 Форматуємо для красивого виводу
+                      ? `🗓 ${formatSlotUk(client.nextAppointment, client.nextAppointmentTime)}`
                       : '🗓 Запланувати візит'}
                   </button>
                 </div>

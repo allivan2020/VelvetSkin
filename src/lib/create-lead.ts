@@ -1,6 +1,15 @@
 import connectToDatabase from '@/lib/mongodb';
 import Lead from '@/models/Lead';
+import Client from '@/models/Client';
 import { generateLeadSummary } from '@/lib/groq';
+import {
+  draftClientReplyUk,
+  suggestFreeWindows,
+} from '@/lib/appointments';
+import {
+  busyBlocksToOccupied,
+  listUpcomingBusyBlocks,
+} from '@/lib/busy-calendar';
 import {
   errorResponse,
   escapeHtml,
@@ -45,6 +54,31 @@ async function generateLeadSummaryWithTimeout(
     console.error('AI Summary generation failed:', e);
     return fallback;
   }
+}
+
+async function loadFreeWindows() {
+  const booked = await Client.find({
+    nextAppointment: { $exists: true, $nin: [null, ''] },
+  })
+    .select('nextAppointment nextAppointmentTime')
+    .lean();
+
+  let phoneOccupied: ReturnType<typeof busyBlocksToOccupied> = [];
+  try {
+    const notes = await listUpcomingBusyBlocks(80);
+    phoneOccupied = busyBlocksToOccupied(notes);
+  } catch (e) {
+    console.error('Busy blocks for free windows failed:', e);
+  }
+
+  return suggestFreeWindows([
+    ...booked.map((c) => ({
+      clientId: String(c._id),
+      date: String(c.nextAppointment),
+      time: (c.nextAppointmentTime as string) || '10:00',
+    })),
+    ...phoneOccupied,
+  ]);
 }
 
 /** Shared public lead creation — used by /api/leads and legacy /api/admin/leads POST. */
@@ -94,22 +128,53 @@ export async function createPublicLead(req: Request) {
     ? escapeHtml(safeSelections.join(', '))
     : '—';
 
-  const message = [
+  let freeWindows: { date: string; time: string }[] = [];
+  try {
+    freeWindows = await loadFreeWindows();
+  } catch (e) {
+    console.error('Free windows lookup failed:', e);
+  }
+
+  const freeText = freeWindows.length
+    ? freeWindows.map((w) => `${w.date} ${w.time}`).join(', ')
+    : 'немає вільних орієнтирів на найближчі дні';
+
+  const draft = draftClientReplyUk({ name, freeWindows });
+
+  const leadNotice = [
     `🔥 <b>НОВА ЗАЯВКА!</b>`,
     `👤 <b>Ім'я:</b> ${escapeHtml(name)}`,
     `📞 <b>Контакт:</b> ${escapeHtml(contact)}`,
     `🏷 <b>Тип:</b> ${escapeHtml(leadType)}`,
     `✨ <b>Досвід:</b> ${escapeHtml(experience || 'Не вказано')}`,
     `📝 <b>Побажання:</b> ${selectionsText}`,
-    `📊 <b>AI:</b> ${escapeHtml(aiSummary)}`,
+  ].join('\n');
+
+  const agentFollowUp = [
+    `🤖 <b>Асистент CRM</b>`,
+    `📊 <b>Порада:</b> ${escapeHtml(aiSummary)}`,
+    ``,
+    `🗓 <b>Вільні орієнтири:</b> ${escapeHtml(freeText)}`,
+    `👉 <b>Наступна дія:</b> /admin → Заявки → Прийняти (обрати дату/час)`,
+    ``,
+    `📋 <b>Чернетка клієнту</b> (скопіюй сам, бот не надсилає):`,
+    escapeHtml(draft),
   ].join('\n');
 
   // Must await on Vercel — void fire-and-forget is dropped when the isolate freezes.
-  const tg = await notifyTelegram(message);
-  if (!tg.ok) {
+  const tgLead = await notifyTelegram(leadNotice);
+  if (!tgLead.ok) {
     console.error(
-      `[Telegram] Lead ${String(savedLead._id)} saved but notify failed:`,
-      tg.reason,
+      `[Telegram] Lead ${String(savedLead._id)} saved but lead notify failed:`,
+      tgLead.reason,
+    );
+  }
+
+  const tgAgent = await notifyTelegram(agentFollowUp);
+  if (!tgAgent.ok) {
+    console.error(
+      `[Telegram] Lead ${String(savedLead._id)} agent follow-up failed:`,
+      tgAgent.reason,
     );
   }
 

@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk';
+import { getGroqModel } from '@/lib/groq-model';
 
 export interface QuizData {
   experience?: string;
@@ -38,8 +39,7 @@ export async function generateLeadSummary(data: QuizData): Promise<string> {
           content: `Досвід клієнта: ${exp}. Побажання клієнта: ${options}.`,
         },
       ],
-      // Актуальна та найпотужніша безкоштовна модель
-      model: 'llama-3.3-70b-versatile',
+      model: getGroqModel(),
       temperature: 0.4,
       max_tokens: 150,
     });

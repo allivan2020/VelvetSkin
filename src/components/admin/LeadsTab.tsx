@@ -85,16 +85,24 @@ export default function LeadsTab() {
           phone: phoneStr,
           source: lead.type || 'Сайт',
           service: serviceStr,
+          nextAppointment: date,
+          nextAppointmentTime: time,
+          nextAppointmentService: serviceStr,
         }),
       });
 
       if (!res.ok) throw new Error('Помилка сервера');
 
-      await fetch(`/api/admin/leads?id=${lead._id}`, { method: 'DELETE' });
+      const convertRes = await fetch('/api/admin/leads', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: lead._id, status: 'Конвертовано' }),
+      });
+      if (!convertRes.ok) throw new Error('Помилка статусу ліда');
 
       generateAndDownloadICS(lead.name, phoneStr, serviceStr, date, time);
 
-      toast.success('Заявку прийнято, календар завантажено!');
+      toast.success('Запис збережено в CRM і календар завантажено');
     } catch {
       toast.error('Сталася помилка');
       fetchLeads();

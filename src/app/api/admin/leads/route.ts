@@ -8,7 +8,15 @@ import { createPublicLead } from '@/lib/create-lead';
 export async function GET() {
   try {
     await connectToDatabase();
-    const leads = await Lead.find({}).sort({ createdAt: -1 }).lean();
+    const leads = await Lead.find({
+      $or: [
+        { status: { $in: ['Новий', 'В роботі'] } },
+        { status: { $exists: false } },
+        { status: null },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
     return NextResponse.json(leads);
   } catch (e) {
     return errorResponse('Помилка завантаження', 500, e);
