@@ -14,7 +14,7 @@ const Hero = () => {
       <div className="absolute inset-0 bg-black/25">
         <Image
           src="/img/hero-poster.webp"
-          alt="VelvetSkin Smooth Skin Background"
+          alt={t('imageAlt')}
           fill
           className="object-cover opacity-90"
           priority

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { BUSINESS } from '@/lib/business';
 
 const Footer = () => {
   const t = useTranslations('Footer');
@@ -31,6 +32,31 @@ const Footer = () => {
             <p className="text-[9px] text-brand-bronze/60 tracking-[0.18em] uppercase font-light">
               {t('tagline')}
             </p>
+            <address className="not-italic mt-4 space-y-1 text-[11px] text-brand-muted font-light leading-relaxed">
+              <a
+                href={BUSINESS.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block hover:text-brand-bronze transition-colors"
+              >
+                {t('address')}
+              </a>
+              <a
+                href={`tel:${BUSINESS.phoneE164}`}
+                className="block hover:text-brand-bronze transition-colors"
+              >
+                {BUSINESS.phoneDisplay}
+              </a>
+              <p>{t('hours')}</p>
+              <a
+                href={BUSINESS.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block pt-1 text-brand-bronze hover:text-brand-ink transition-colors"
+              >
+                {t('mapsLink')}
+              </a>
+            </address>
           </div>
         </div>
 

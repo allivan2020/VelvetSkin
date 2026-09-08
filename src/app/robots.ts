@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { BUSINESS } from '@/lib/business';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin', '/admin/', '/ru/admin', '/en/admin'],
     },
-    sitemap: 'https://www.velvetskinzp.com/sitemap.xml',
+    sitemap: `${BUSINESS.baseUrl}/sitemap.xml`,
+    host: BUSINESS.baseUrl,
   };
 }

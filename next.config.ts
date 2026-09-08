@@ -37,6 +37,16 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'velvetskinzp.com' }],
+        destination: 'https://www.velvetskinzp.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

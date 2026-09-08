@@ -13,8 +13,9 @@ import ClientProviders from '@/components/layout/ClientProviders';
 import { poppins, cormorant, vibes } from '../fonts';
 import '../globals.css';
 import { localePath } from '@/lib/locales';
+import { BUSINESS, beautySalonJsonLd } from '@/lib/business';
 
-const baseUrl = 'https://www.velvetskinzp.com';
+const baseUrl = BUSINESS.baseUrl;
 
 const titles: Record<string, string> = {
   uk: 'VelvetSkin — Воскова депіляція Запоріжжя | Записатись онлайн',
@@ -23,9 +24,9 @@ const titles: Record<string, string> = {
 };
 
 const descriptions: Record<string, string> = {
-  uk: 'Воскова депіляція у Запоріжжі. Преміальний догляд і ідеальна гладкість від VelvetSkin.',
-  ru: 'Восковая депиляция в Запорожье. Премиальный уход и идеальная гладкость от VelvetSkin.',
-  en: 'Professional waxing in Zaporizhzhia. Premium care and flawless skin by VelvetSkin.',
+  uk: 'VelvetSkin — воскова депіляція в Запоріжжі (вул. Українська, 43). Щодня 08:00–19:00. Запис: +38 (097) 195 06 98.',
+  ru: 'VelvetSkin — восковая депиляция в Запорожье (ул. Украинская, 43). Ежедневно 08:00–19:00. Запись: +38 (097) 195 06 98.',
+  en: 'VelvetSkin — waxing in Zaporizhzhia (Ukrainska St, 43). Open daily 08:00–19:00. Book: +38 (097) 195 06 98.',
 };
 
 export async function generateMetadata({
@@ -37,13 +38,17 @@ export async function generateMetadata({
   const canonicalPath = localePath(locale);
   const canonicalUrl = `${baseUrl}${canonicalPath === '/' ? '' : canonicalPath}`;
 
+  const title = titles[locale] || titles.uk;
+  const description = descriptions[locale] || descriptions.uk;
+
   return {
     metadataBase: new URL(baseUrl),
     verification: {
       google: 'WyolVzA8-vajcjKkRJInYbqeR6v1tKLTp0bHdcqJnl8',
     },
-    title: titles[locale] || titles.uk,
-    description: descriptions[locale] || descriptions.uk,
+    title,
+    description,
+    robots: { index: true, follow: true },
 
     alternates: {
       canonical: canonicalUrl || baseUrl,
@@ -56,16 +61,16 @@ export async function generateMetadata({
     },
 
     openGraph: {
-      title: titles[locale] || titles.uk,
-      description: descriptions[locale] || descriptions.uk,
+      title,
+      description,
       url: canonicalUrl || baseUrl,
-      siteName: 'VelvetSkin',
+      siteName: BUSINESS.name,
       images: [
         {
-          url: '/img/hero-poster.webp',
+          url: BUSINESS.ogImage,
           width: 1200,
           height: 630,
-          alt: 'VelvetSkin — воскова депіляція Запоріжжя',
+          alt: title,
         },
       ],
       locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uk_UA',
@@ -73,9 +78,9 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.uk,
-      description: descriptions[locale] || descriptions.uk,
-      images: ['/img/hero-poster.webp'],
+      title,
+      description,
+      images: [BUSINESS.ogImage],
     },
   };
 }
@@ -90,42 +95,7 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
-  // Stable NAP for Google Maps / Business Profile (same on every locale).
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BeautySalon',
-    '@id': `${baseUrl}/#business`,
-    name: 'VelvetSkin',
-    alternateName: 'Velvet Skin',
-    description: descriptions[locale] || descriptions.uk,
-    url: baseUrl,
-    telephone: '+380971950698',
-    image: [`${baseUrl}/img/hero-poster.webp`, `${baseUrl}/img/og-preview.jpg`],
-    logo: `${baseUrl}/img/icon-512x512.png`,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'вул. Українська, 43',
-      addressLocality: 'Запоріжжя',
-      addressRegion: 'Запорізька область',
-      postalCode: '69000',
-      addressCountry: 'UA',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 47.83155,
-      longitude: 35.15546,
-    },
-    hasMap: 'https://www.google.com/maps?q=47.83155,35.15546',
-    sameAs: [
-      'https://www.instagram.com/velvetskin.zp/',
-      'https://t.me/velvetskinzp/',
-    ],
-    priceRange: '₴₴',
-    areaServed: {
-      '@type': 'City',
-      name: 'Запоріжжя',
-    },
-  };
+  const jsonLd = beautySalonJsonLd(descriptions[locale] || descriptions.uk);
 
   return (
     <html

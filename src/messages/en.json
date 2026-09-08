@@ -16,10 +16,11 @@
     }
   },
   "Hero": {
-    "subtitle": "Professional Waxing Studio",
-    "title": "Waxing",
+    "subtitle": "Waxing studio · Zaporizhzhia",
+    "title": "VelvetSkin",
     "titleAccent": "pure art",
-    "description": "Flawless smoothness. Premium care.",
+    "description": "Premium care and flawless smoothness in central Zaporizhzhia.",
+    "imageAlt": "VelvetSkin — professional waxing in Zaporizhzhia",
     "scroll": "Scroll"
   },
   "About": {
@@ -148,17 +149,18 @@
   "Contacts": {
     "subtitle": "Contact Us",
     "title": "Your <span>beauty</span> begins here",
-    "address": "43 Ukrainska St, Zaporizhzhia",
-    "hours": "Open 7 days a week",
+    "address": "Запоріжжя, вул. Українська, 43",
+    "hours": "Daily 08:00–19:00",
     "labels": {
       "location": "Location",
       "phone": "Phone",
       "hours": "Hours"
     },
     "map": {
-      "alt": "VelvetSkin studio on Zaporizhzhia map",
+      "alt": "VelvetSkin on Google Maps — vul. Ukrainska 43, Zaporizhzhia",
       "button": "View on map",
-      "title": "Directions to VelvetSkin studio"
+      "title": "Directions to VelvetSkin studio",
+      "openInGoogle": "Open in Google Maps"
     }
   },
   "Footer": {
@@ -166,6 +168,9 @@
     "rights": "All rights reserved. Zaporizhzhia",
     "tagline": "Studio of aesthetics and comfort",
     "catchphrase": "Made with love <span>for your skin</span>",
+    "address": "Запоріжжя, вул. Українська, 43",
+    "hours": "Daily 08:00–19:00",
+    "mapsLink": "Google Maps",
     "nav": {
       "about": "About",
       "story": "Services",
