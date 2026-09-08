@@ -140,7 +140,7 @@ const Reviews = ({
               <p className="font-cormorant text-2xl text-brand-muted italic mb-4">
                 {t('emptyTitle')}
               </p>
-              <p className="font-poppins text-brand-soft text-[10px] uppercase tracking-[0.2em] font-medium">
+              <p className="font-poppins text-brand-muted text-[10px] uppercase tracking-[0.2em] font-medium">
                 {t('emptySubtitle')}
               </p>
             </div>
@@ -197,17 +197,17 @@ const Reviews = ({
                           {formattedDate}
                         </span>
                       </div>
-                      <div className="text-[9px] uppercase tracking-[0.12em] font-medium text-right">
+                      <div className="text-[10px] uppercase tracking-[0.12em] font-medium text-right">
                         {review.link && review.link !== '#' ? (
                           <Link
                             href={review.link}
                             target="_blank"
-                            className="text-brand-bronze hover:text-brand-ink transition-colors"
+                            className="inline-flex items-center min-h-11 text-brand-bronze hover:text-brand-ink transition-colors"
                           >
                             {review.source || t('sourceDefault')} ↗
                           </Link>
                         ) : (
-                          <span className="text-brand-soft">
+                          <span className="inline-flex items-center min-h-11 text-brand-muted">
                             {review.source || t('sourceDefault')}
                           </span>
                         )}

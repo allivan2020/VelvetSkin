@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 /vite-project
+/lighthouse-reports
 
 # debug
 npm-debug.log*
