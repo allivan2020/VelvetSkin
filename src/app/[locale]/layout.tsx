@@ -3,7 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { Toaster } from 'react-hot-toast';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from '@next/third-parties/google';
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -104,7 +104,17 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${poppins.className} relative`}>
+        {/* GA4 is configured inside this GTM container — do not also mount GoogleAnalytics. */}
         <GoogleTagManager gtmId="GTM-MKRCDF8N" />
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-MKRCDF8N"
+            height={0}
+            width={0}
+            style={{ display: 'none', visibility: 'hidden' }}
+            title="Google Tag Manager"
+          />
+        </noscript>
         <Toaster
           position="top-center"
           toastOptions={{
@@ -140,7 +150,6 @@ export default async function RootLayout({
 
         <SpeedInsights />
         <Analytics />
-        <GoogleAnalytics gaId="G-XJCXNT6D8B" />
       </body>
     </html>
   );
