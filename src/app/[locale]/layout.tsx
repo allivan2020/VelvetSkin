@@ -90,18 +90,41 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
+  // Stable NAP for Google Maps / Business Profile (same on every locale).
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BeautySalon',
+    '@id': `${baseUrl}/#business`,
     name: 'VelvetSkin',
+    alternateName: 'Velvet Skin',
+    description: descriptions[locale] || descriptions.uk,
+    url: baseUrl,
+    telephone: '+380971950698',
+    image: [`${baseUrl}/img/hero-poster.webp`, `${baseUrl}/img/og-preview.jpg`],
+    logo: `${baseUrl}/img/icon-512x512.png`,
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'вул. Українська, 43',
       addressLocality: 'Запоріжжя',
+      addressRegion: 'Запорізька область',
+      postalCode: '69000',
       addressCountry: 'UA',
     },
-    telephone: '+380971950698',
-    url: `${baseUrl}${localePath(locale) === '/' ? '' : localePath(locale)}`,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 47.83155,
+      longitude: 35.15546,
+    },
+    hasMap: 'https://www.google.com/maps?q=47.83155,35.15546',
+    sameAs: [
+      'https://www.instagram.com/velvetskin.zp/',
+      'https://t.me/velvetskinzp/',
+    ],
+    priceRange: '₴₴',
+    areaServed: {
+      '@type': 'City',
+      name: 'Запоріжжя',
+    },
   };
 
   return (

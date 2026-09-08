@@ -7,6 +7,8 @@ const intlMiddleware = createMiddleware({
   locales: [...locales],
   defaultLocale,
   localePrefix: 'as-needed',
+  // Keep `/` on default locale so Google Maps/GBP crawlers get 200, not 307→/en.
+  localeDetection: false,
 });
 
 function isAdminLoginPath(pathname: string): boolean {
